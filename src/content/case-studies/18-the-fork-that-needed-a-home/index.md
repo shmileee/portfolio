@@ -12,7 +12,7 @@ spotlight: false
 
 ## THE SITUATION
 
-Our incident-management provider's Terraform plugin broke at our scale. With ~30 team stacks planning against one account, the upstream provider — which had removed its request throttling — died with rate-limit errors on parallel runs; two resources re-planned phantom changes on every single run; a data source hard-crashed on duplicate records. Team automation ([case study 6](/#study-6)) depended on all of it.
+Our incident-management provider's Terraform plugin broke at our scale. With ~30 team stacks planning against one account, the upstream provider — which had removed its request throttling — died with rate-limit errors on parallel runs; two resources re-planned phantom changes on every single run; a data source hard-crashed on duplicate records. Team automation ([case study 6](/case-studies/06-teams-that-create-themselves/)) depended on all of it.
 
 ## WHAT I DID
 
@@ -27,7 +27,7 @@ firehydrant = {
 }
 ```
 
-The registry immediately outgrew its first tenant: it now hosts our own environment-lifecycle provider ([case study 14](/#study-14)) and mirrors the public registry for every provider we use — one governed, cached distribution point for all of Terraform.
+The registry immediately outgrew its first tenant: it now hosts our own environment-lifecycle provider ([case study 14](/case-studies/14-environments-you-can-create-and-destroy-with-one-command/)) and mirrors the public registry for every provider we use — one governed, cached distribution point for all of Terraform.
 
 ## THE INTERESTING PART
 

@@ -16,7 +16,7 @@ One of AWS's quietest taxes: the managed NAT Gateway charges not just per hour b
 ## What I did
 I adopted AlterNAT — an open-source project that replaces managed NAT gateways with auto-scaled EC2 NAT instances, while keeping a standby managed gateway as a safety net: a small function checks connectivity every minute and flips the route tables to the managed gateway if an instance ever fails, then back when it recovers. Cheap path by default, expensive path as insurance.
 
-I ran it first in our main VPCs, then designed it into the cell architecture ([case study 14](/#study-14)) as a per-environment toggle — on ARM instances, naturally ([case study 19](/#study-19) made that free). A later overhaul pre-allocates all the public IPs with the VPC — the NAT instances' and the standby gateways' — so flipping the toggle never changes the addresses the outside world has allowlisted.
+I ran it first in our main VPCs, then designed it into the cell architecture ([case study 14](/case-studies/14-environments-you-can-create-and-destroy-with-one-command/)) as a per-environment toggle — on ARM instances, naturally ([case study 19](/case-studies/19-turning-container-images-from-a-liability-into-a-supply-chain/) made that free). A later overhaul pre-allocates all the public IPs with the VPC — the NAT instances' and the standby gateways' — so flipping the toggle never changes the addresses the outside world has allowlisted.
 
 ## The interesting part
 I didn't just consume the project — I contributed the deployment model we needed upstream. Early AlterNAT required building and hosting a container image for its failover function; in shared automation (CI, pull-request-driven Terraform) that's a build dependency nobody wants.
