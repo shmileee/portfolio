@@ -172,7 +172,6 @@ export default function (eleventyConfig) {
   eleventyConfig.addFilter("pad2", (value) => String(value).padStart(2, "0"));
   eleventyConfig.addFilter("sortByNumber", (items) => [...items].sort(byNumber));
   eleventyConfig.addFilter("findByKey", (items, key) => items.find((item) => item.data.key === key));
-  eleventyConfig.addFilter("findByNumber", (items, number) => items.find((item) => item.data.number === number));
   eleventyConfig.addFilter("findSpotlight", (items) => items.find((item) => item.data.spotlight));
   eleventyConfig.addFilter("resolveStudyAssets", (html, studyUrl) =>
     html.replaceAll('src="./', `src="${studyUrl}`),
