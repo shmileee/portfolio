@@ -1,0 +1,106 @@
+---
+layout: layouts/base.njk
+permalink: index.html
+canonical: https://portfolio.oponomarov.com/
+---
+{% from "partials/case-card.njk" import caseCard %}
+{% set hero = collections.homeSections | findByKey("hero") %}
+{% set arc = collections.homeSections | findByKey("arc") %}
+{% set spotlight = collections.caseStudies | findByNumber(14) %}
+{% set orderedStudies = collections.caseStudies | indexOrder %}
+
+<main id="main-content">
+  <section class="hero section-shell" id="top">
+    <p class="section-eyebrow">{{ hero.data.eyebrow }}</p>
+    <h1>{{ hero.data.title }}<span class="hero-cursor" aria-hidden="true"></span></h1>
+    <div class="hero-copy">{{ hero.templateContent | safe }}</div>
+    <div class="hero-actions">
+      <a class="primary-link" href="{{ hero.data.primaryHref }}">{{ hero.data.primaryCta }}</a>
+      <a class="secondary-link" href="{{ hero.data.secondaryHref }}">{{ hero.data.secondaryCta }}</a>
+    </div>
+  </section>
+
+  <section class="section-block" id="arc">
+    <div class="section-shell">
+      <p class="section-eyebrow">{{ arc.data.eyebrow }}</p>
+      <h2>{{ arc.data.title }}</h2>
+      <div class="section-intro">{{ arc.templateContent | safe }}</div>
+      <div class="arc-list">
+        {% for beat in collections.arcBeats %}
+          <article class="arc-step">
+            <span class="arc-number">{{ beat.data.number | pad2 }}</span>
+            <div class="arc-content">
+              <div class="arc-copy">{{ beat.templateContent | safe }}</div>
+              <div class="arc-links">
+                {% for link in beat.data.links %}
+                  <a href="{% if link.number == 14 %}#cs-14{% else %}#study-{{ link.number }}{% endif %}">{{ link.number }} · {{ link.label }}</a>
+                {% endfor %}
+              </div>
+            </div>
+            {% if not loop.last %}<span class="arc-arrow" aria-hidden="true">↓</span>{% endif %}
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="section-block" id="featured">
+    <div class="section-shell">
+      <p class="section-eyebrow">02</p>
+      <h2>The biggest win</h2>
+      <article class="spotlight" id="cs-14">
+        <header class="spotlight-header">
+          <p class="reader-meta">Case study {{ spotlight.data.number | pad2 }} · featured</p>
+          <h3>Environments you can create <em>and destroy</em> with one command</h3>
+          <div class="topic-list" aria-label="Topics">
+            {% for topic in spotlight.data.topics %}<span>{{ topic }}</span>{% endfor %}
+            <span class="topic-featured">biggest win</span>
+          </div>
+        </header>
+        <div class="prose spotlight-prose">{{ spotlight.templateContent | resolveStudyAssets(spotlight.url) | safe }}</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section-block" id="index">
+    <div class="section-shell">
+      <p class="section-eyebrow">03</p>
+      <h2>All case studies</h2>
+      <div class="topic-filters" role="group" aria-label="Filter case studies">
+        <button type="button" data-topic-filter="all" aria-pressed="true">all</button>
+        {% for topic in site.topicOrder %}
+          <button type="button" data-topic-filter="{{ topic }}" aria-pressed="false">{{ topic }}</button>
+        {% endfor %}
+      </div>
+      <p class="sr-only" aria-live="polite" data-filter-status></p>
+      <div class="case-grid" data-case-grid>
+        {% for study in orderedStudies %}
+          {{ caseCard(study, loop.index0, site.initialCardCount) }}
+        {% endfor %}
+      </div>
+      <div class="grid-toggle-row">
+        <button class="grid-toggle" type="button" data-grid-toggle>see more →</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-block" id="how-i-work">
+    <div class="section-shell">
+      <p class="section-eyebrow">04</p>
+      <h2>How I work</h2>
+      <div class="principle-list">
+        {% for principle in collections.principles %}
+          <article class="principle">
+            <span>{{ principle.data.number | pad2 }}</span>
+            <div>
+              <h3>{{ principle.data.title }}</h3>
+              {{ principle.templateContent | safe }}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+</main>
+
+{% include "partials/reader.njk" %}

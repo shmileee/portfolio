@@ -1,0 +1,30 @@
+{% macro caseCard(study, index, initialCount) %}
+  {% set classes = "case-card" %}
+  {% if study.data.featured %}{% set classes = classes + " case-card-featured" %}{% endif %}
+  {% if study.data.spotlight %}
+    <a
+      class="{{ classes }}"
+      href="#cs-14"
+      data-case-card
+      data-topics="{{ study.data.topics | join('|') }}"
+      data-initially-hidden="{{ index >= initialCount }}"
+    >
+  {% else %}
+    <button
+      class="{{ classes }}"
+      type="button"
+      data-case-card
+      data-open-study="{{ study.data.number }}"
+      data-topics="{{ study.data.topics | join('|') }}"
+      data-initially-hidden="{{ index >= initialCount }}"
+    >
+  {% endif %}
+      <span class="case-card-number">
+        {{ study.data.number | pad2 }}{% if study.data.featured %} · featured{% elif study.data.number == 5 %} · sequel{% endif %}
+      </span>
+      <span class="case-card-title">{{ study.data.title }}</span>
+      <span class="case-card-summary">{{ study.data.summary }}</span>
+      <span class="case-card-topics">{{ study.data.topics | join(' · ') }}</span>
+      <span class="case-card-action">{% if study.data.spotlight %}full story ↑{% else %}read →{% endif %}</span>
+  {% if study.data.spotlight %}</a>{% else %}</button>{% endif %}
+{% endmacro %}
