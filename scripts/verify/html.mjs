@@ -35,7 +35,7 @@ function decodeNumericEntity(match, body, file) {
   return String.fromCodePoint(codePoint);
 }
 
-export function decodeEntities(text, file = "markup") {
+export function decodeEntities(text, file) {
   return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, body) => {
     const named = NAMED_ENTITIES.get(body.toLowerCase());
     if (named !== undefined) {
@@ -51,9 +51,9 @@ export function decodeEntities(text, file = "markup") {
   });
 }
 
-export function normalizeText(fragment) {
+export function normalizeText(fragment, file) {
   const withoutTags = fragment.replace(/<[^>]*>/g, " ");
-  return decodeEntities(withoutTags).replace(/\s+/g, " ").trim();
+  return decodeEntities(withoutTags, file).replace(/\s+/g, " ").trim();
 }
 
 function parseAttributes(html, from, file) {

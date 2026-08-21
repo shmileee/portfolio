@@ -25,7 +25,7 @@ function soleElementText(site, file, tagName) {
   if (close === -1) {
     throw new MalformedMarkupError(file, `<${tagName}> never closed`);
   }
-  return normalizeText(html.slice(matches[0].contentStart, close));
+  return normalizeText(html.slice(matches[0].contentStart, close), file);
 }
 
 function checkStudyPages(site) {
