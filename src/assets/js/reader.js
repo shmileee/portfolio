@@ -108,11 +108,15 @@ export function setupReader() {
   };
 
   const hideReader = () => {
+    const focusTarget = returnFocus;
+    const wasOpen = dialog.open;
+    returnFocus = null;
     intentGeneration += 1;
     study.removeAttribute("aria-busy");
-    if (dialog.open) dialog.close();
+    if (wasOpen) dialog.close();
     document.body.classList.remove("reader-open");
-    if (returnFocus?.isConnected) returnFocus.focus();
+    if (focusTarget?.isConnected) focusTarget.focus();
+    else if (wasOpen) document.querySelector("#main-content")?.focus();
   };
 
   const closeReader = () => {
@@ -194,11 +198,18 @@ export function setupReader() {
     const anchor = event.target.closest("a");
     if (!anchor || !isPrimarySameTab(event, anchor)) return;
 
+    const url = new URL(anchor.href);
+    const hashMatch = url.hash.match(STUDY_HASH);
+    const sameDocument = url.origin === window.location.origin && url.pathname === window.location.pathname && url.search === window.location.search;
+    if (!dialog.open && sameDocument && hashMatch && manifest.byNumber.has(Number(hashMatch[1]))) {
+      returnFocus = anchor;
+      return;
+    }
+
     let entry;
     if (anchor.matches("[data-open-study]")) {
       entry = manifest.byNumber.get(Number(anchor.dataset.openStudy));
     } else if (dialog.open && prose.contains(anchor)) {
-      const url = new URL(anchor.href);
       if (url.origin === window.location.origin) entry = manifest.byPath.get(url.pathname);
     }
     if (!entry) return;
