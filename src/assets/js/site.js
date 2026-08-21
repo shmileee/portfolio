@@ -1,3 +1,5 @@
+import { setupReader } from "./reader.js";
+
 const root = document.documentElement;
 
 function setupTheme() {
@@ -86,86 +88,6 @@ function setupStudyIndex() {
     if (!expanded) document.querySelector("#index")?.scrollIntoView({ block: "start" });
   });
   render();
-}
-
-function setupReader() {
-  const dialog = document.querySelector("[data-reader]");
-  if (!(dialog instanceof HTMLDialogElement)) return;
-
-  const panels = [...dialog.querySelectorAll("[data-reader-study]")];
-  const numbers = panels.map((panel) => Number(panel.dataset.readerStudy));
-  const closeButton = dialog.querySelector("[data-reader-close]");
-  let activeNumber = 0;
-  let returnFocus = null;
-
-  const showStudy = (number, updateHash = true) => {
-    const panel = panels.find((candidate) => Number(candidate.dataset.readerStudy) === number);
-    if (!panel) return;
-    activeNumber = number;
-    for (const candidate of panels) candidate.hidden = candidate !== panel;
-    dialog.setAttribute("aria-labelledby", `reader-title-${number}`);
-    if (!dialog.open) dialog.showModal();
-    document.body.classList.add("reader-open");
-    dialog.scrollTop = 0;
-    closeButton?.focus();
-    if (updateHash && window.location.hash !== `#study-${number}`) {
-      history.pushState(null, "", `#study-${number}`);
-    }
-  };
-
-  const close = (updateHash = true) => {
-    if (dialog.open) dialog.close();
-    document.body.classList.remove("reader-open");
-    if (updateHash && /^#study-\d+$/.test(window.location.hash)) {
-      history.pushState(null, "", `${window.location.pathname}${window.location.search}`);
-    }
-    if (returnFocus instanceof HTMLElement) returnFocus.focus();
-  };
-
-  const navigate = (direction) => {
-    const current = numbers.indexOf(activeNumber);
-    const offset = direction === "next" ? 1 : -1;
-    const next = (current + offset + numbers.length) % numbers.length;
-    showStudy(numbers[next]);
-  };
-
-  document.addEventListener("click", (event) => {
-    const opener = event.target.closest("[data-open-study]");
-    if (opener) {
-      returnFocus = opener;
-      showStudy(Number(opener.dataset.openStudy));
-      return;
-    }
-    const studyLink = event.target.closest('a[href^="/#study-"]');
-    if (studyLink && window.location.pathname === "/") {
-      event.preventDefault();
-      showStudy(Number(studyLink.hash.replace("#study-", "")));
-    }
-  });
-  closeButton?.addEventListener("click", () => close());
-  dialog.addEventListener("cancel", (event) => {
-    event.preventDefault();
-    close();
-  });
-  dialog.addEventListener("click", (event) => {
-    if (event.target === dialog) close();
-  });
-  dialog.addEventListener("click", (event) => {
-    const direction = event.target.closest("[data-reader-direction]")?.dataset.readerDirection;
-    if (direction) navigate(direction);
-  });
-  dialog.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowLeft") navigate("previous");
-    if (event.key === "ArrowRight") navigate("next");
-  });
-  window.addEventListener("hashchange", () => {
-    const match = window.location.hash.match(/^#study-(\d+)$/);
-    if (match) showStudy(Number(match[1]), false);
-    else if (dialog.open) close(false);
-  });
-
-  const initial = window.location.hash.match(/^#study-(\d+)$/);
-  if (initial) showStudy(Number(initial[1]), false);
 }
 
 setupTheme();
