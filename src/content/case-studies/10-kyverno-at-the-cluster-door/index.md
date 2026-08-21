@@ -16,9 +16,9 @@ Some rules can't live in code review alone. "Please never change this setting", 
 ## What I did
 I introduced Kyverno, the policy engine that enforces rules at that door — with the rules themselves versioned in git like everything else. Then I kept finding jobs for it:
 
-- Protecting data infrastructure. After I codified all our Kafka topics as git-managed resources ([case study 11](/#study-11)), policies made destructive edits impossible: replica settings are rejected outright, partition counts may only ever increase (Kafka can't shrink them safely), and nobody — however senior — can shell into a broker pod. The review comment "are you sure?" became a hard "no" from the cluster itself.
+- Protecting data infrastructure. After I codified all our Kafka topics as git-managed resources ([case study 11](/case-studies/11-kafka-topics-as-code/)), policies made destructive edits impossible: replica settings are rejected outright, partition counts may only ever increase (Kafka can't shrink them safely), and nobody — however senior — can shell into a broker pod. The review comment "are you sure?" became a hard "no" from the cluster itself.
 
-- The invisible registry switch. During our Docker Hub exit ([case study 17](/#study-17)), mutation policies rewrote every image reference on the fly to our own mirror — the mechanism that let the whole organization move registries without coordinating a single team.
+- The invisible registry switch. During our Docker Hub exit ([case study 17](/case-studies/17-leaving-docker-hub-without-anyone-noticing/)), mutation policies rewrote every image reference on the fly to our own mirror — the mechanism that let the whole organization move registries without coordinating a single team.
 
 - Deployment safety. A policy preserves cloud resources when a GitOps application is deleted — so removing an app definition can't cascade into deleting what it managed.
 
