@@ -1,20 +1,31 @@
-<dialog class="reader" id="case-study-reader" aria-label="Case study reader" data-reader>
+<dialog class="reader" id="case-study-reader" aria-labelledby="reader-title" data-reader>
   <div class="reader-shell">
     <div class="reader-toolbar">
       <button class="reader-close" type="button" data-reader-close>close <span aria-hidden="true">✕</span></button>
     </div>
-    {% for study in collections.caseStudies %}
-      <article class="reader-study" data-reader-study="{{ study.data.number }}" hidden>
-        <p class="reader-meta">
-          <span class="reader-meta-number">Case study {{ study.data.number | pad2 }}</span><span class="reader-meta-topics">{% for topic in study.data.topics %} · {{ topic }}{% endfor %}</span>
-        </p>
-        <h2 class="reader-title" id="reader-title-{{ study.data.number }}">{{ study.data.title }}</h2>
-        <div class="prose reader-prose">{{ study.templateContent | resolveStudyAssets(study.url) | safe }}</div>
-        <nav class="reader-navigation" aria-label="Case study navigation">
-          <button type="button" data-reader-direction="previous">← case study {% if loop.first %}{{ collections.caseStudies[collections.caseStudies.length - 1].data.number }}{% else %}{{ collections.caseStudies[loop.index0 - 1].data.number }}{% endif %}</button>
-          <button type="button" data-reader-direction="next">case study {% if loop.last %}{{ collections.caseStudies[0].data.number }}{% else %}{{ collections.caseStudies[loop.index0 + 1].data.number }}{% endif %} →</button>
-        </nav>
-      </article>
-    {% endfor %}
+    <article class="reader-study" data-reader-study>
+      <p class="reader-meta">
+        <span class="reader-meta-number" data-reader-meta-number></span><span class="reader-meta-topics" data-reader-meta-topics></span>
+      </p>
+      <h2 class="reader-title" id="reader-title" tabindex="-1" data-reader-title>Case study reader</h2>
+      <p class="sr-only" role="status" aria-live="polite" data-reader-status>Choose a case study to read.</p>
+      <div class="prose reader-prose" data-reader-prose></div>
+      <nav class="reader-navigation" aria-label="Case study navigation">
+        <button type="button" data-reader-direction="previous">← previous case study</button>
+        <button type="button" data-reader-direction="next">next case study →</button>
+      </nav>
+    </article>
   </div>
+  <script type="application/json" data-reader-manifest>
+    [
+      {% for study in collections.caseStudies %}
+        {
+          "number": {{ study.data.number }},
+          "url": {{ study.url | dump | safe }},
+          "title": {{ study.data.title | dump | safe }},
+          "topics": {{ study.data.topics | dump | safe }}
+        }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+  </script>
 </dialog>
