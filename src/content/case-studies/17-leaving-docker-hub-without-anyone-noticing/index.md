@@ -21,7 +21,7 @@ I proposed the move, wrote the plan — a project timeline whose final line was 
 
 First the infrastructure: mirror repositories in our own AWS registry that transparently cache Docker Hub and, soon after, several other public registries — credentials handled centrally, cleanup rules so caches don't grow forever, read access granted organization-wide.
 
-Then the bridge that made coordination unnecessary: the Kyverno mutation policies from [case study 10](/#study-10), rewriting image references on the fly so a workload asking for a Docker Hub image transparently receives the mirrored copy. The organization's image pulls moved to our own registry without waiting for a single manifest to change — within weeks the mirror was serving hundreds of images.
+Then the bridge that made coordination unnecessary: the Kyverno mutation policies from [case study 10](/case-studies/10-kyverno-at-the-cluster-door/), rewriting image references on the fly so a workload asking for a Docker Hub image transparently receives the mirrored copy. The organization's image pulls moved to our own registry without waiting for a single manifest to change — within weeks the mirror was serving hundreds of images.
 
 Then I migrated the manifests themselves in a focused sweep, and left the rewrite policy running as a safety net for stragglers. A year and a half later I deleted the migration rationale from the policy document — the project's quiet way of saying "done".
 
