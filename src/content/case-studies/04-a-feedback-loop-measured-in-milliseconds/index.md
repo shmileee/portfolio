@@ -28,4 +28,4 @@ I benchmarked instead of guessing. The old formatting hook took about seven seco
 
 Mistakes get fixed before they're even committed, review comments moved from formatting to substance, and the checks are self-contained enough that they spread to every repository without an installation guide.
 
-SEQUEL → [case study 5 — one tool version, everywhere](/#study-5)
+SEQUEL → [case study 5 — one tool version, everywhere](/case-studies/05-one-tool-version-everywhere/)
