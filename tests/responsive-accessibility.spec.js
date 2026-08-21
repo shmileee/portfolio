@@ -115,22 +115,44 @@ for (const viewport of VIEWPORTS) {
     });
     expect(overlap).toBe(0);
 
-    await page.locator("[data-reader]").evaluate((dialog) => dialog.showModal());
+    await page.locator('[data-open-study="14"]:visible').first().click();
+    await expect(page.locator("[data-reader]")).toBeVisible();
     await expectNoOverflow(page);
     const reader = await page.locator(".reader-shell").boundingBox();
     expect(reader).not.toBeNull();
     expect(reader.x).toBeGreaterThanOrEqual(0);
     expect(reader.x + reader.width).toBeLessThanOrEqual(viewport.width);
     await expectNamedTargets(page);
+    const readerProse = page.locator("[data-reader-prose]");
+    await expect(readerProse.locator(":scope > h2")).toHaveCount(0);
+    const readerSections = readerProse.locator(":scope > h3");
+    expect(await readerSections.count()).toBeGreaterThan(0);
+    const readerSectionStyle = await readerSections.first().evaluate((section) => {
+      const style = getComputedStyle(section);
+      return {
+        afterHeight: getComputedStyle(section, "::after").height,
+        display: style.display,
+        fontFamily: style.fontFamily,
+        textTransform: style.textTransform,
+      };
+    });
+    expect(readerSectionStyle.display).toBe("flex");
+    expect(readerSectionStyle.fontFamily).toContain("IBM Plex Mono");
+    expect(readerSectionStyle.textTransform).toBe("uppercase");
+    expect(readerSectionStyle.afterHeight).toBe("1px");
+    const readerAlignment = await readerProse.locator(":scope > p").first().evaluate(
+      (paragraph) => getComputedStyle(paragraph).textAlign,
+    );
+    expect(["left", "start"]).toContain(readerAlignment);
     await page.locator("[data-reader]").evaluate((dialog) => dialog.close());
 
     await page.goto(STUDY_PATH);
     await expectNoOverflow(page);
     await expectNamedTargets(page);
-    const proseAlignment = await page.locator(".case-detail-prose > p").first().evaluate(
+    const standaloneAlignment = await page.locator(".case-detail-prose > p").first().evaluate(
       (paragraph) => getComputedStyle(paragraph).textAlign,
     );
-    expect(["left", "start"]).toContain(proseAlignment);
+    expect(["left", "start"]).toContain(standaloneAlignment);
   });
 }
 
