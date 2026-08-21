@@ -18,10 +18,10 @@ The central Terraform repository was where all cloud infrastructure lived — an
 
 I treated the repository as a product with users. I moved the state out of git and into S3 backends — every stack, in one focused campaign.
 I replaced hand-made tags with a real release pipeline: structured commit messages produce versioned, changelogged module releases automatically. I standardized the code itself — formatters and linters enforced automatically, guidelines and best practices written down, documentation curated and rewritten (including recorded terminal walkthroughs, so people could watch the workflow, not just read about it).
-I introduced Terramate to manage the growing estate of stacks, designed the repository layout and the reusable imports, then migrated every legacy stack onto it. I stood up an internal Terraform registry to host our own providers ([case study 18](/#study-18)).
+I introduced Terramate to manage the growing estate of stacks, designed the repository layout and the reusable imports, then migrated every legacy stack onto it. I stood up an internal Terraform registry to host our own providers ([case study 18](/case-studies/18-the-fork-that-needed-a-home/)).
 And when navigation itself became the problem — hundreds of stacks across many accounts and regions — I built a terminal tool that answers "where is X deployed, and in which account?" in seconds:
 
-{% mediaExhibit { source: "./terramate-stacks-explorer.gif", alt: "Terminal recording: the terramate stacks explorer browsing stacks, with filters for group, environment and region", width: 1440, height: 820, filename: "terramate-stacks-explorer", badge: "TERMINAL · REC", maxWidth: 840, captionLabel: "EXHIBIT 02", caption: "Where is X deployed, and in which account? Answered in seconds · case study 13" } %}
+{% mediaExhibit { source: "./terramate-stacks-explorer.gif", alt: "Terminal recording: the terramate stacks explorer browsing stacks, with filters for group, environment and region", width: 1440, height: 820, filename: "terramate-stacks-explorer", badge: "TERMINAL · REC", maxWidth: 840, captionLabel: "EXHIBIT 01", caption: "Where is X deployed, and in which account? Answered in seconds" } %}
 
 Alongside the tooling I started the company's Terraform community channel, answered beginner questions, and taught people their first steps.
 
