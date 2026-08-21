@@ -56,7 +56,7 @@
   --text-primary: #ffffff;
   --text-body: rgba(255, 255, 255, 0.78);
   --text-secondary: rgba(255, 255, 255, 0.6);
-  --text-tertiary: rgba(255, 255, 255, 0.4);
+  --text-tertiary: #aab4c3;
   --border-default: rgba(255, 255, 255, 0.16);
   --border-subtle: rgba(255, 255, 255, 0.08);
   --accent-primary: #60a5fa;
@@ -65,7 +65,7 @@
   --selection-surface: rgba(96, 165, 250, 0.12);
   --accent-border: rgba(96, 165, 250, 0.35);
   --progress: #f9423a;
-  --focus-ring: rgba(147, 197, 253, 0.5);
+  --focus-ring: #93c5fd;
   --reader-shadow: 0 10px 20px -6px rgba(0, 0, 0, 0.5), 0 4px 8px -4px rgba(0, 0, 0, 0.4);
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -93,7 +93,7 @@
   --text-primary: #111827;
   --text-body: rgba(17, 24, 39, 0.84);
   --text-secondary: rgba(17, 24, 39, 0.66);
-  --text-tertiary: rgba(17, 24, 39, 0.48);
+  --text-tertiary: #4b5563;
   --border-default: rgba(17, 24, 39, 0.16);
   --border-subtle: rgba(17, 24, 39, 0.09);
   --accent-primary: #1d4ed8;
@@ -101,7 +101,7 @@
   --accent-surface: rgba(37, 99, 235, 0.14);
   --selection-surface: rgba(37, 99, 235, 0.1);
   --accent-border: rgba(37, 99, 235, 0.4);
-  --focus-ring: rgba(29, 78, 216, 0.45);
+  --focus-ring: #1d4ed8;
   --reader-shadow: 0 10px 20px -6px rgba(0, 0, 0, 0.5), 0 4px 8px -4px rgba(0, 0, 0, 0.4);
 }
 
@@ -158,8 +158,9 @@ button {
 }
 
 :focus-visible {
-  outline: 0;
-  box-shadow: 0 0 0 3px var(--focus-ring);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+  box-shadow: none;
 }
 
 [hidden] {
@@ -763,7 +764,8 @@ h3 {
   line-height: 1.75;
 }
 
-.prose > h2 {
+.prose > h2,
+.reader-prose > h3 {
   counter-increment: prose-section;
   display: flex;
   align-items: center;
@@ -779,7 +781,7 @@ h3 {
 }
 
 .spotlight-prose > h2:first-child,
-.reader-prose > h2:first-child {
+.reader-prose > h3:first-child {
   margin-top: 3.5rem;
 }
 
@@ -787,13 +789,15 @@ h3 {
   margin-bottom: 0;
 }
 
-.prose > h2::before {
+.prose > h2::before,
+.reader-prose > h3::before {
   content: counter(prose-section, decimal-leading-zero);
   color: var(--accent-soft);
   font-weight: 600;
 }
 
-.prose > h2::after {
+.prose > h2::after,
+.reader-prose > h3::after {
   content: "";
   flex: 1;
   height: 1px;
@@ -802,7 +806,7 @@ h3 {
 
 .prose p {
   margin: 0 0 var(--space-5);
-  max-width: 70ch;
+  max-width: min(65ch, var(--reading-width));
 }
 
 .prose strong {
@@ -949,7 +953,7 @@ h3 {
   min-width: 0;
   margin-left: var(--space-2);
   overflow: hidden;
-  color: rgba(255, 255, 255, 0.55);
+  color: #9ca3af;
   font: 0.75rem/normal "IBM Plex Mono", ui-monospace, monospace;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -961,7 +965,7 @@ h3 {
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 0.25rem;
   padding: 0.125rem var(--space-2);
-  color: rgba(255, 255, 255, 0.5);
+  color: #9ca3af;
   font: 0.625rem/normal "IBM Plex Mono", ui-monospace, monospace;
   letter-spacing: 0.12em;
 }
@@ -983,7 +987,7 @@ h3 {
 .code-exhibit .token.prolog,
 .code-exhibit .token.doctype,
 .code-exhibit .token.cdata {
-  color: rgba(255, 255, 255, 0.32);
+  color: #9ca3af;
   font-style: italic;
 }
 
@@ -1032,7 +1036,11 @@ h3 {
   background: var(--surface-secondary);
 }
 
-.prose .media-exhibit img {
+.prose .media-exhibit img,
+.prose .media-exhibit video {
+  display: block;
+  width: 100%;
+  height: auto;
   max-width: 100%;
   margin: 0;
   border: 0;
@@ -1066,7 +1074,7 @@ h3 {
   width: 100%;
   max-width: none;
   margin-bottom: 0.875rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: #9ca3af;
   font: 0.65625rem/normal "IBM Plex Mono", ui-monospace, monospace;
   letter-spacing: 0.16em;
   text-align: center;
@@ -1098,7 +1106,7 @@ h3 {
   width: 100%;
   max-width: none;
   margin: 0 0 0.875rem;
-  color: rgba(255, 255, 255, 0.45);
+  color: #9ca3af;
   font-size: 0.65625rem;
   letter-spacing: 0.16em;
   line-height: normal;
@@ -1150,7 +1158,9 @@ h3 {
 }
 
 .reader-shell {
+  box-sizing: border-box;
   width: min(100%, 52.5rem);
+  max-width: 100%;
   margin: 0 auto;
   border: 1px solid color-mix(in srgb, var(--text-primary) 14%, transparent);
   border-radius: 0.75rem;
@@ -1225,18 +1235,18 @@ h3 {
   line-height: 1.7;
 }
 
-.reader-prose > h2 {
+.reader-prose > h3 {
   margin-top: var(--space-10);
   margin-bottom: 1.125rem;
   color: color-mix(in srgb, var(--text-primary) 55%, transparent);
 }
 
-.reader-prose > h2:first-child {
+.reader-prose > h3:first-child {
   margin-top: 0;
 }
 
 .reader-prose p {
-  max-width: none;
+  max-width: min(65ch, 100%);
   text-wrap: wrap;
 }
 
@@ -1297,7 +1307,7 @@ h3 {
   margin-bottom: var(--space-10);
 }
 
-.reader-prose > h2:nth-of-type(3) + p {
+.reader-prose > h3:nth-of-type(3) + p {
   margin-bottom: var(--space-10);
   border-left: 2px solid var(--accent-border);
   padding-left: clamp(1rem, 3.5vw, 1.625rem);
@@ -1445,6 +1455,27 @@ h3 {
   color: var(--text-primary);
 }
 
+.brand-link,
+.site-nav a,
+.theme-toggle,
+.hero-actions > a,
+.arc-links a,
+.topic-filters button,
+.grid-toggle,
+.reader-close,
+.reader-navigation button,
+.back-link,
+.case-detail-footer a,
+.contact-links a,
+.back-to-top {
+  box-sizing: border-box;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1480,9 +1511,9 @@ h3 {
   }
 }
 
-@media (max-width: 740px) {
+@media (max-width: 900px) {
   html {
-    scroll-padding-top: 6.5rem;
+    scroll-padding-top: 7rem;
   }
 
   .header-inner {
@@ -1496,7 +1527,7 @@ h3 {
 
   .site-nav {
     justify-content: flex-start;
-    gap: var(--space-2) 0.875rem;
+    gap: var(--space-2);
   }
 
   .arc-step {
@@ -1511,19 +1542,24 @@ h3 {
   .reader-shell {
     padding: 1.75rem;
   }
-}
 
-@media (min-width: 741px) {
-  .spotlight-prose > p,
-  .reader-prose > p,
-  .case-detail-prose > p {
-    text-align: justify;
-    text-align-last: start;
-    text-justify: inter-word;
+  .back-to-top {
+    position: static;
+    display: none;
+    width: max-content;
+    margin: 0 var(--page-gutter) var(--space-8) auto;
+  }
+
+  .back-to-top[data-visible="true"] {
+    display: inline-flex;
   }
 }
 
 @media (max-width: 480px) {
+  html {
+    scroll-padding-top: 10rem;
+  }
+
   .hero-actions {
     align-items: flex-start;
     flex-direction: column;
@@ -1539,6 +1575,14 @@ h3 {
 
   .footer-inner {
     flex-direction: column;
+  }
+
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-color: Highlight;
+    box-shadow: none;
   }
 }
 
