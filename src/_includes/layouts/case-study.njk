@@ -1,0 +1,19 @@
+---
+layout: layouts/base.njk
+---
+<main class="case-detail" id="main-content">
+  <header class="case-detail-header">
+    <a class="back-link" href="/#index">← all case studies</a>
+    <p class="section-eyebrow">Case study {{ number | pad2 }}{% if featured %} · featured{% endif %}</p>
+    <h1>{{ title }}</h1>
+    <p class="case-detail-summary">{{ summary }}</p>
+    <div class="topic-list" aria-label="Topics">
+      {% for topic in topics %}<span>{{ topic }}</span>{% endfor %}
+    </div>
+  </header>
+  <article class="prose case-detail-prose">{{ content | safe }}</article>
+  <nav class="case-detail-footer" aria-label="Case study navigation">
+    <a href="/#study-{{ number }}">Open in the portfolio reader</a>
+    <a href="/#index">Browse all case studies →</a>
+  </nav>
+</main>

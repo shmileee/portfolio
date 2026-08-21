@@ -1,0 +1,20 @@
+<dialog class="reader" id="case-study-reader" aria-label="Case study reader" data-reader>
+  <div class="reader-shell">
+    <div class="reader-toolbar">
+      <button class="reader-close" type="button" data-reader-close>close <span aria-hidden="true">✕</span></button>
+    </div>
+    {% for study in collections.caseStudies %}
+      <article class="reader-study" data-reader-study="{{ study.data.number }}" hidden>
+        <p class="reader-meta">
+          <span class="reader-meta-number">Case study {{ study.data.number | pad2 }}</span><span class="reader-meta-topics">{% for topic in study.data.topics %} · {{ topic }}{% endfor %}</span>
+        </p>
+        <h2 class="reader-title" id="reader-title-{{ study.data.number }}">{{ study.data.title }}</h2>
+        <div class="prose reader-prose">{{ study.templateContent | resolveStudyAssets(study.url) | safe }}</div>
+        <nav class="reader-navigation" aria-label="Case study navigation">
+          <button type="button" data-reader-direction="previous">← case study {% if loop.first %}{{ collections.caseStudies[collections.caseStudies.length - 1].data.number }}{% else %}{{ collections.caseStudies[loop.index0 - 1].data.number }}{% endif %}</button>
+          <button type="button" data-reader-direction="next">case study {% if loop.last %}{{ collections.caseStudies[0].data.number }}{% else %}{{ collections.caseStudies[loop.index0 + 1].data.number }}{% endif %} →</button>
+        </nav>
+      </article>
+    {% endfor %}
+  </div>
+</dialog>
