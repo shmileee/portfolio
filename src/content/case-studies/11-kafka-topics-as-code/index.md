@@ -46,7 +46,7 @@ It also cleaned as it went — stripping settings that merely repeated broker de
 ## The interesting part
 Adopting ~550 live topics without touching production data. The generated definitions matched live state exactly, so the topic operator's first pass had nothing to change — adoption, not recreation.
 
-Auto-deployment was turned on in its most conservative form: apply changes, never delete anything. And the door I closed behind me: admission policies ([case study 10](/#study-10)) now reject replica changes outright, allow partition counts only to grow (Kafka cannot shrink them safely), and nobody can shell into a broker pod anymore — the manual workflow isn't just deprecated, it's impossible.
+Auto-deployment was turned on in its most conservative form: apply changes, never delete anything. And the door I closed behind me: admission policies ([case study 10](/case-studies/10-kyverno-at-the-cluster-door/)) now reject replica changes outright, allow partition counts only to grow (Kafka cannot shrink them safely), and nobody can shell into a broker pod anymore — the manual workflow isn't just deprecated, it's impossible.
 
 ## What it changed
 Topic changes became pull requests with named owners, review, and history. The runbook retired. And "what topics do we have?" went from an investigation to `ls`.
