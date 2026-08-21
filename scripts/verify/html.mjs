@@ -20,17 +20,32 @@ const NAMED_ENTITIES = new Map([
   ["apos", "'"],
 ]);
 
-export function decodeEntities(text) {
+function decodeNumericEntity(match, body, file) {
+  const radix = body.toLowerCase().startsWith("#x") ? 16 : 10;
+  const digits = body.slice(radix === 16 ? 2 : 1);
+  const codePoint = Number.parseInt(digits, radix);
+  const isUnicodeScalar =
+    Number.isSafeInteger(codePoint) &&
+    codePoint >= 0 &&
+    codePoint <= 0x10ffff &&
+    (codePoint < 0xd800 || codePoint > 0xdfff);
+  if (!isUnicodeScalar) {
+    throw new MalformedMarkupError(file, `invalid numeric entity ${match}`);
+  }
+  return String.fromCodePoint(codePoint);
+}
+
+export function decodeEntities(text, file = "markup") {
   return text.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, body) => {
     const named = NAMED_ENTITIES.get(body.toLowerCase());
     if (named !== undefined) {
       return named;
     }
     if (body.toLowerCase().startsWith("#x")) {
-      return String.fromCodePoint(Number.parseInt(body.slice(2), 16));
+      return decodeNumericEntity(match, body, file);
     }
     if (body.startsWith("#")) {
-      return String.fromCodePoint(Number.parseInt(body.slice(1), 10));
+      return decodeNumericEntity(match, body, file);
     }
     return match;
   });
@@ -90,7 +105,7 @@ function parseAttributes(html, from, file) {
         }
       }
     }
-    attrs.set(name.toLowerCase(), decodeEntities(value));
+    attrs.set(name.toLowerCase(), decodeEntities(value, file));
   }
   throw new MalformedMarkupError(file, `tag starting at offset ${from} never closed`);
 }
@@ -141,5 +156,3 @@ export function* scanTags(html, file) {
     yield tag;
   }
 }
-
-
