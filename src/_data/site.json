@@ -17,9 +17,8 @@
   ],
   "initialCardCount": 9,
   "navigation": [
+    { "label": "Work", "href": "/#index" },
     { "label": "The arc", "href": "/#arc" },
-    { "label": "Case studies", "href": "/#featured" },
-    { "label": "Index", "href": "/#index" },
     { "label": "How I work", "href": "/#how-i-work" },
     { "label": "Contact", "href": "/#contact" }
   ],

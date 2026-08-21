@@ -1,6 +1,6 @@
 ---
 key: arc
-eyebrow: 01 — An industrial IoT company
+eyebrow: 03 — An industrial IoT company
 title: Each layer made the next one possible
 ---
 
