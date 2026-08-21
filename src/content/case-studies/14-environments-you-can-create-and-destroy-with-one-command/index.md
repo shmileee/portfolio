@@ -9,6 +9,7 @@ topics:
   - delivery
 featured: true
 spotlight: true
+spotlightProof: Environments became genuinely independent — a problem in one cannot spread to the others — their costs actually end when they are deleted, and entering a new region became an infrastructure change, not an infrastructure project.
 ---
 
 ## The situation

@@ -96,7 +96,8 @@ function validateCaseStudies(studies) {
   const numbers = new Set();
 
   for (const study of studies) {
-    const { featured, number, slug, spotlight, summary, title, topics } = study.data;
+    const { cardLabel, featured, number, slug, spotlight, spotlightProof, summary, title, topics } =
+      study.data;
     const location = study.inputPath;
 
     if (!Number.isInteger(number) || number < 1) {
@@ -117,6 +118,14 @@ function validateCaseStudies(studies) {
     }
     if (typeof featured !== "boolean" || typeof spotlight !== "boolean") {
       throw new TypeError(`${location}: featured and spotlight must be booleans`);
+    }
+    if (cardLabel !== undefined && (typeof cardLabel !== "string" || cardLabel.trim() === "")) {
+      throw new TypeError(`${location}: cardLabel must be a non-empty string when defined`);
+    }
+    if (spotlight && (typeof spotlightProof !== "string" || spotlightProof.trim() === "")) {
+      throw new TypeError(
+        `${location}: the spotlight case study must define a non-empty spotlightProof`,
+      );
     }
   }
 
@@ -164,6 +173,7 @@ export default function (eleventyConfig) {
   eleventyConfig.addFilter("sortByNumber", (items) => [...items].sort(byNumber));
   eleventyConfig.addFilter("findByKey", (items, key) => items.find((item) => item.data.key === key));
   eleventyConfig.addFilter("findByNumber", (items, number) => items.find((item) => item.data.number === number));
+  eleventyConfig.addFilter("findSpotlight", (items) => items.find((item) => item.data.spotlight));
   eleventyConfig.addFilter("resolveStudyAssets", (html, studyUrl) =>
     html.replaceAll('src="./', `src="${studyUrl}`),
   );
