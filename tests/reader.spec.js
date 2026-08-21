@@ -288,7 +288,6 @@ test("real Study 03 media and reader controls complete the headed journey", asyn
   }
   await reader(page).locator("[data-reader-close]").click();
   await expect(opener).toBeFocused();
-  console.log("TASK14_HEADED_FACTS", JSON.stringify({ studyRequests, historyState: await page.evaluate(() => history.state), videoPaused: await video.evaluate((element) => element.paused) }));
 });
 
 for (const failure of ["abort", "500", "malformed"]) {
