@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      document.documentElement.dataset.theme = localStorage.getItem("om-theme") || "dark";
+    </script>
+    
+    
+    <title>Kafka topics as code: 550 topics, zero surprises — Oleksandr Ponomarov</title>
+    <meta name="description" content="Topic changes became pull requests with named owners, review, and history.">
+    <link rel="canonical" href="https://portfolio.oponomarov.com/case-studies/11-kafka-topics-as-code/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230B1220'/><text x='6' y='44' font-family='monospace' font-size='24' fill='%2393c5fd'>~/op</text></svg>">
+    <meta property="og:title" content="Kafka topics as code: 550 topics, zero surprises — Oleksandr Ponomarov">
+    <meta property="og:description" content="Topic changes became pull requests with named owners, review, and history.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/11-kafka-topics-as-code/">
+    <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/assets/css/site.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header" data-site-header="">
+  <div class="reading-progress" aria-hidden="true"><span data-reading-progress=""></span></div>
+  <div class="header-inner">
+    <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      
+        <a href="/#arc">The arc</a>
+      
+        <a href="/#featured">Case studies</a>
+      
+        <a href="/#index">Index</a>
+      
+        <a href="/#how-i-work">How I work</a>
+      
+        <a href="/#contact">Contact</a>
+      
+      <button class="theme-toggle" type="button" aria-label="Toggle color scheme" data-theme-toggle="">light</button>
+    </nav>
+  </div>
+</header>
+
+    <main class="case-detail" id="main-content">
+  <header class="case-detail-header">
+    <a class="back-link" href="/#index">← all case studies</a>
+    <p class="section-eyebrow">Case study 11</p>
+    <h1>Kafka topics as code: 550 topics, zero surprises</h1>
+    <p class="case-detail-summary">Topic changes became pull requests with named owners, review, and history.</p>
+    <div class="topic-list" aria-label="Topics">
+      <span>reliability</span><span>delivery</span>
+    </div>
+  </header>
+  <article class="prose case-detail-prose"><h2>The situation</h2>
+<p>Our Kafka topics — hundreds of them, across clusters and environments — were managed the way most companies manage them: someone shells into a broker pod and runs the topic tool by hand, and a markdown runbook full of copy-paste commands pretends to be the source of truth.</p>
+<p>Nobody could say with confidence what existed, who owned what, or whether the doc matched reality.</p>
+<h2>What I did</h2>
+<p>I moved every topic into git as a Kubernetes resource (Strimzi's KafkaTopic), managed by the same GitOps pipeline as everything else. Each topic is now one small reviewable file:</p>
+<div class="code-exhibit" data-exhibit="">
+  <div class="exhibit-toolbar">
+    <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="exhibit-filename">topics/orders-events.yaml</span>
+    <span class="exhibit-badge">YAML</span>
+  </div>
+  <pre class="language-yaml"><code class="language-yaml"><span class="token comment"># topics/orders-events.yaml</span>
+<span class="token key atrule">apiVersion</span><span class="token punctuation">:</span> kafka.strimzi.io/v1
+<span class="token key atrule">kind</span><span class="token punctuation">:</span> KafkaTopic
+<span class="token key atrule">metadata</span><span class="token punctuation">:</span>
+  <span class="token key atrule">name</span><span class="token punctuation">:</span> orders<span class="token punctuation">-</span>events
+  <span class="token key atrule">labels</span><span class="token punctuation">:</span>
+    <span class="token key atrule">owner</span><span class="token punctuation">:</span> team<span class="token punctuation">-</span>orders         <span class="token comment"># ownership resolved from our service catalog</span>
+<span class="token key atrule">spec</span><span class="token punctuation">:</span>
+  <span class="token key atrule">topicName</span><span class="token punctuation">:</span> orders.events
+  <span class="token key atrule">partitions</span><span class="token punctuation">:</span> <span class="token number">12</span>
+  <span class="token key atrule">replicas</span><span class="token punctuation">:</span> <span class="token number">3</span>
+  <span class="token key atrule">config</span><span class="token punctuation">:</span>
+    <span class="token key atrule">cleanup.policy</span><span class="token punctuation">:</span> compact
+    <span class="token key atrule">retention.ms</span><span class="token punctuation">:</span> <span class="token number">-1</span>
+    <span class="token key atrule">min.compaction.lag.ms</span><span class="token punctuation">:</span> <span class="token number">86400000</span>
+    <span class="token key atrule">segment.bytes</span><span class="token punctuation">:</span> <span class="token number">1000000000</span></code></pre>
+
+</div><p>The migration itself was a Python program I wrote (~900 lines), and its design is the story. It read two sources of truth and reconciled them: the legacy markdown runbook (parsing the actual <code>--create</code> commands out of the doc) and the live clusters (querying every broker for what really exists, in parallel).</p>
+<p>Production became the baseline: topics that exist everywhere became shared definitions; per-environment extras got their own folders; and where the same topic differed between environments, the generator emitted a minimal override patch containing only the differing fields.</p>
+<p>It also cleaned as it went — stripping settings that merely repeated broker defaults, resolving each topic's owning team from our service catalog — and, my favorite part, it wrote a discrepancy report: a folder of everything the documentation claimed that reality disagreed with, and vice versa. The audit of doc-vs-truth fell out of the migration for free.</p>
+<h2>The interesting part</h2>
+<p>Adopting ~550 live topics without touching production data. The generated definitions matched live state exactly, so the topic operator's first pass had nothing to change — adoption, not recreation.</p>
+<p>Auto-deployment was turned on in its most conservative form: apply changes, never delete anything. And the door I closed behind me: admission policies (<a href="/#study-10">case study 10</a>) now reject replica changes outright, allow partition counts only to grow (Kafka cannot shrink them safely), and nobody can shell into a broker pod anymore — the manual workflow isn't just deprecated, it's impossible.</p>
+<h2>What it changed</h2>
+<p>Topic changes became pull requests with named owners, review, and history. The runbook retired. And &quot;what topics do we have?&quot; went from an investigation to <code>ls</code>.</p>
+</article>
+  <nav class="case-detail-footer" aria-label="Case study navigation">
+    <a href="/#study-11">Open in the portfolio reader</a>
+    <a href="/#index">Browse all case studies →</a>
+  </nav>
+</main>
+
+    <button class="back-to-top" type="button" aria-label="Back to top" data-back-to-top="">↑ top</button>
+    <footer class="site-footer" id="contact">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">~/oleksandr-ponomarov</p>
+      <p class="footer-note">Case studies describe real production systems; details generalized.</p>
+    </div>
+    <div class="contact-links">
+      
+        <a href="https://github.com/shmileee" target="_blank" rel="noreferrer">
+          github.com/shmileee<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="https://www.linkedin.com/in/aleksandr-ponomarov" target="_blank" rel="noreferrer">
+          linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="mailto:ponomarov.aleksandr@gmail.com">
+          ponomarov.aleksandr@gmail.com
+        </a>
+      
+    </div>
+  </div>
+</footer>
+
+    <script type="module" src="/assets/js/site.js"></script>
+  </body>
+</html>

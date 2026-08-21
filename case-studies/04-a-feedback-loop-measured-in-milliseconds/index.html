@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      document.documentElement.dataset.theme = localStorage.getItem("om-theme") || "dark";
+    </script>
+    
+    
+    <title>A feedback loop measured in milliseconds — Oleksandr Ponomarov</title>
+    <meta name="description" content="The old formatting hook took about seven seconds; the rewritten one runs a fifty-file commit in 59 milliseconds.">
+    <link rel="canonical" href="https://portfolio.oponomarov.com/case-studies/04-a-feedback-loop-measured-in-milliseconds/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230B1220'/><text x='6' y='44' font-family='monospace' font-size='24' fill='%2393c5fd'>~/op</text></svg>">
+    <meta property="og:title" content="A feedback loop measured in milliseconds — Oleksandr Ponomarov">
+    <meta property="og:description" content="The old formatting hook took about seven seconds; the rewritten one runs a fifty-file commit in 59 milliseconds.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/04-a-feedback-loop-measured-in-milliseconds/">
+    <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/assets/css/site.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header" data-site-header="">
+  <div class="reading-progress" aria-hidden="true"><span data-reading-progress=""></span></div>
+  <div class="header-inner">
+    <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      
+        <a href="/#arc">The arc</a>
+      
+        <a href="/#featured">Case studies</a>
+      
+        <a href="/#index">Index</a>
+      
+        <a href="/#how-i-work">How I work</a>
+      
+        <a href="/#contact">Contact</a>
+      
+      <button class="theme-toggle" type="button" aria-label="Toggle color scheme" data-theme-toggle="">light</button>
+    </nav>
+  </div>
+</header>
+
+    <main class="case-detail" id="main-content">
+  <header class="case-detail-header">
+    <a class="back-link" href="/#index">← all case studies</a>
+    <p class="section-eyebrow">Case study 04</p>
+    <h1>A feedback loop measured in milliseconds</h1>
+    <p class="case-detail-summary">The old formatting hook took about seven seconds; the rewritten one runs a fifty-file commit in 59 milliseconds.</p>
+    <div class="topic-list" aria-label="Topics">
+      <span>developer experience</span><span>delivery</span>
+    </div>
+  </header>
+  <article class="prose case-detail-prose"><h2>THE SITUATION</h2>
+<p>Code review kept catching the same mechanical problems: formatting, stale documentation, missing ownership entries, malformed commit messages. Humans were doing robot work, and CI took minutes to tell you what a script could have told you before you even committed.</p>
+<h2>WHAT I DID</h2>
+<p>I introduced pre-commit checks to the company and built our own hook library. The philosophy: fix what's fixable, only complain about the rest. Formatting, documentation generation, navigation files — the hooks repair these automatically; in CI, a bot commits the fix to your pull request by itself.
+Over three years I kept tightening the loop: parallelized the slow hooks, added caching, migrated the whole company to <code>prek</code> (a faster Rust reimplementation of pre-commit), and rewrote the critical hooks in Go with a twist — the hook manager compiles them from source itself, so nobody ever installs anything. No brew, no npm, no &quot;works on my machine&quot;: a new laptop or a CI runner gets identical checks with zero setup.
+To make the loop fast in CI as well, I set up the company's internal GitHub Actions runners inside our own clusters — built to speed up exactly these checks and our container image builds — with node-local caching so a warm runner starts checking in seconds.</p>
+<h2>THE INTERESTING PART</h2>
+<p>I benchmarked instead of guessing. The old formatting hook took about seven seconds on our biggest repository; the rewritten one runs a fifty-file commit in 59 milliseconds.</p>
+<h2>WHAT IT CHANGED</h2>
+<p>Mistakes get fixed before they're even committed, review comments moved from formatting to substance, and the checks are self-contained enough that they spread to every repository without an installation guide.</p>
+<p>SEQUEL → <a href="/#study-5">case study 5 — one tool version, everywhere</a></p>
+</article>
+  <nav class="case-detail-footer" aria-label="Case study navigation">
+    <a href="/#study-4">Open in the portfolio reader</a>
+    <a href="/#index">Browse all case studies →</a>
+  </nav>
+</main>
+
+    <button class="back-to-top" type="button" aria-label="Back to top" data-back-to-top="">↑ top</button>
+    <footer class="site-footer" id="contact">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">~/oleksandr-ponomarov</p>
+      <p class="footer-note">Case studies describe real production systems; details generalized.</p>
+    </div>
+    <div class="contact-links">
+      
+        <a href="https://github.com/shmileee" target="_blank" rel="noreferrer">
+          github.com/shmileee<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="https://www.linkedin.com/in/aleksandr-ponomarov" target="_blank" rel="noreferrer">
+          linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="mailto:ponomarov.aleksandr@gmail.com">
+          ponomarov.aleksandr@gmail.com
+        </a>
+      
+    </div>
+  </div>
+</footer>
+
+    <script type="module" src="/assets/js/site.js"></script>
+  </body>
+</html>

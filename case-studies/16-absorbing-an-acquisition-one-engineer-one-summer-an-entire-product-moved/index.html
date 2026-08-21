@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      document.documentElement.dataset.theme = localStorage.getItem("om-theme") || "dark";
+    </script>
+    
+    
+    <title>Absorbing an acquisition — Oleksandr Ponomarov</title>
+    <meta name="description" content="One engineer, one summer, an entire product moved.">
+    <link rel="canonical" href="https://portfolio.oponomarov.com/case-studies/16-absorbing-an-acquisition-one-engineer-one-summer-an-entire-product-moved/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230B1220'/><text x='6' y='44' font-family='monospace' font-size='24' fill='%2393c5fd'>~/op</text></svg>">
+    <meta property="og:title" content="Absorbing an acquisition — Oleksandr Ponomarov">
+    <meta property="og:description" content="One engineer, one summer, an entire product moved.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/16-absorbing-an-acquisition-one-engineer-one-summer-an-entire-product-moved/">
+    <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/assets/css/site.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header" data-site-header="">
+  <div class="reading-progress" aria-hidden="true"><span data-reading-progress=""></span></div>
+  <div class="header-inner">
+    <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      
+        <a href="/#arc">The arc</a>
+      
+        <a href="/#featured">Case studies</a>
+      
+        <a href="/#index">Index</a>
+      
+        <a href="/#how-i-work">How I work</a>
+      
+        <a href="/#contact">Contact</a>
+      
+      <button class="theme-toggle" type="button" aria-label="Toggle color scheme" data-theme-toggle="">light</button>
+    </nav>
+  </div>
+</header>
+
+    <main class="case-detail" id="main-content">
+  <header class="case-detail-header">
+    <a class="back-link" href="/#index">← all case studies</a>
+    <p class="section-eyebrow">Case study 16</p>
+    <h1>Absorbing an acquisition</h1>
+    <p class="case-detail-summary">One engineer, one summer, an entire product moved.</p>
+    <div class="topic-list" aria-label="Topics">
+      <span>delivery</span><span>reliability</span><span>cost</span>
+    </div>
+  </header>
+  <article class="prose case-detail-prose"><h2>The situation</h2>
+<p>The company made an acquisition, and the acquired product ran on Heroku — a different cloud, a different deployment model, different everything. Running two parallel stacks means double the tooling, double the on-call knowledge, and an &quot;integration&quot; that exists on slides but not in production.</p>
+<h2>What I did</h2>
+<p>I migrated their entire product onto our platform, single-handedly, in about two months.</p>
+<p>I wrote the deployment charts for their services — the backend API, background workers, the web frontend, and a handful of supporting jobs — and wired them into our GitOps pipeline like any other internal app. I recreated everything their old hosting had quietly been providing: the databases with the extensions their code depended on, a cache, object storage, certificates for their public domain, secrets management.</p>
+<p>I replaced their deployment pipeline by putting CI runners inside our cluster, so their existing repositories could deploy the new way without disruption.</p>
+<p>We rehearsed the database export and import, deployed to staging, then production — and after a dry run, cut over DNS in a scheduled maintenance window. The switch itself was a one-line configuration change, built to be rolled back in seconds.</p>
+<h2>The interesting part</h2>
+<p>The hard part wasn't the cutover itself; it was making the move boring enough that the acquired team could keep shipping through the same pipeline, with the same dashboards and their own alert channel from day one.</p>
+<h2>What it changed</h2>
+<p>One less cloud, one less deployment model, one less set of tools to staff and secure. The acquired team shipped through the same pipeline as everyone else, with the same dashboards and their own alert channel from day one — and the old hosting account could be closed.</p>
+<p>Years later, when the product was eventually sunset, decommissioning it was ordinary infrastructure work instead of archaeology.</p>
+</article>
+  <nav class="case-detail-footer" aria-label="Case study navigation">
+    <a href="/#study-16">Open in the portfolio reader</a>
+    <a href="/#index">Browse all case studies →</a>
+  </nav>
+</main>
+
+    <button class="back-to-top" type="button" aria-label="Back to top" data-back-to-top="">↑ top</button>
+    <footer class="site-footer" id="contact">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">~/oleksandr-ponomarov</p>
+      <p class="footer-note">Case studies describe real production systems; details generalized.</p>
+    </div>
+    <div class="contact-links">
+      
+        <a href="https://github.com/shmileee" target="_blank" rel="noreferrer">
+          github.com/shmileee<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="https://www.linkedin.com/in/aleksandr-ponomarov" target="_blank" rel="noreferrer">
+          linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="mailto:ponomarov.aleksandr@gmail.com">
+          ponomarov.aleksandr@gmail.com
+        </a>
+      
+    </div>
+  </div>
+</footer>
+
+    <script type="module" src="/assets/js/site.js"></script>
+  </body>
+</html>

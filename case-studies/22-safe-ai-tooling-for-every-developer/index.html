@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      document.documentElement.dataset.theme = localStorage.getItem("om-theme") || "dark";
+    </script>
+    
+    
+    <title>Safe AI tooling for every developer — Oleksandr Ponomarov</title>
+    <meta name="description" content="Nothing new to leak, nothing to rotate, one governed door instead of a hundred hand-made ones.">
+    <link rel="canonical" href="https://portfolio.oponomarov.com/case-studies/22-safe-ai-tooling-for-every-developer/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230B1220'/><text x='6' y='44' font-family='monospace' font-size='24' fill='%2393c5fd'>~/op</text></svg>">
+    <meta property="og:title" content="Safe AI tooling for every developer — Oleksandr Ponomarov">
+    <meta property="og:description" content="Nothing new to leak, nothing to rotate, one governed door instead of a hundred hand-made ones.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/22-safe-ai-tooling-for-every-developer/">
+    <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/assets/css/site.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header" data-site-header="">
+  <div class="reading-progress" aria-hidden="true"><span data-reading-progress=""></span></div>
+  <div class="header-inner">
+    <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      
+        <a href="/#arc">The arc</a>
+      
+        <a href="/#featured">Case studies</a>
+      
+        <a href="/#index">Index</a>
+      
+        <a href="/#how-i-work">How I work</a>
+      
+        <a href="/#contact">Contact</a>
+      
+      <button class="theme-toggle" type="button" aria-label="Toggle color scheme" data-theme-toggle="">light</button>
+    </nav>
+  </div>
+</header>
+
+    <main class="case-detail" id="main-content">
+  <header class="case-detail-header">
+    <a class="back-link" href="/#index">← all case studies</a>
+    <p class="section-eyebrow">Case study 22 · featured</p>
+    <h1>Safe AI tooling for every developer</h1>
+    <p class="case-detail-summary">Nothing new to leak, nothing to rotate, one governed door instead of a hundred hand-made ones.</p>
+    <div class="topic-list" aria-label="Topics">
+      <span>ai</span><span>security</span><span>developer experience</span>
+    </div>
+  </header>
+  <article class="prose case-detail-prose"><h2>THE SITUATION</h2>
+<p>AI coding assistants became genuinely useful for operations work — if they could see our systems: deployments, dashboards, metrics. The naive path was every developer wiring assistants to internal tools with hand-made tokens: a security nightmare multiplying with every tool and every laptop.</p>
+<h2>WHAT I DID</h2>
+<p>I built the company's MCP gateway (MCP is the open protocol AI assistants use to call external tools): one stable, secure address per environment through which any assistant can reach our deployment system, dashboards, and metrics. Developers authenticate with the AWS identity they already have — no new tokens exist at all.</p>
+<p>Behind the gateway, every backend is deliberately blunted: the deployment tool is read-only in production, the dashboard tool has writing disabled and only a safe subset of its capabilities exposed. Access for every developer is granted through our normal identity platform, in code.</p>
+<div class="diagram-exhibit" data-exhibit="">
+  <div class="diagram-exhibit-label">EXHIBIT — MCP GATEWAY · REQUEST PATH</div>
+  <svg aria-label="MCP gateway flow from client to production tools" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 628" style="display:block; width:100%; height:auto; max-width:720px; margin:0 auto" role="img"><defs><marker id="arrGW" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--w5, rgba(255,255,255,0.5))"></path></marker></defs><rect x="140" y="10" width="320" height="58" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="300" y="33" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">OpenCode or Cursor</text><text x="300" y="51" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">MCP client</text><path d="M300,68 L300,92" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="94" width="320" height="40" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="300" y="119" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">local AWS signing bridge</text><path d="M300,134 L300,158" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="160" width="320" height="58" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="300" y="183" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">API Gateway</text><text x="300" y="201" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">IAM-authorized</text><path d="M300,218 L300,242" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="244" width="320" height="58" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="300" y="267" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">Frontdoor Lambda</text><text x="300" y="285" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">re-signs for the gateway service</text><path d="M300,302 L300,326" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="328" width="320" height="40" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="300" y="353" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">AgentCore gateway</text><path d="M300,368 L300,392" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="394" width="320" height="58" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="300" y="417" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">Per-target API</text><text x="300" y="435" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">JWT protected</text><path d="M300,452 L300,476" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="478" width="320" height="58" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="300" y="501" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">Proxy Lambda</text><text x="300" y="519" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">in VPC</text><path d="M300,536 L300,560" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="562" width="320" height="58" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="300" y="585" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">ArgoCD · Grafana · Prometheus</text><text x="300" y="603" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">MCP services</text><rect x="500" y="319" width="210" height="58" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1" stroke-dasharray="4 4"></rect><text x="605" y="342" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w7, rgba(255,255,255,0.7))">OAuth</text><text x="605" y="360" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">machine-to-machine</text><path d="M460,348 L498,348" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" stroke-dasharray="3 4" marker-end="url(#arrGW)"></path><text x="605" y="393" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="0.06em" fill="var(--w55, rgba(255,255,255,0.55))">per-target token</text></svg>
+</div>
+<p>Connecting a client is a few lines — the committed example our developers copy (here for OpenCode; Cursor uses the same command in its own config):</p>
+<div class="code-exhibit" data-exhibit="">
+  <div class="exhibit-toolbar">
+    <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="exhibit-filename">opencode.jsonc</span>
+    <span class="exhibit-badge">JSONC</span>
+  </div>
+  <pre class="language-jsonc"><code class="language-jsonc">{
+  "mcp": {
+    "sre-mcp-dev": {
+      "type": "local",
+      "command": [
+        "uvx", "mcp-proxy-for-aws",
+        "https://sre.mcp.dev.<internal-domain>/mcp",
+        "--service", "execute-api",
+        "--region", "eu-west-1",
+        "--profile", "dev"
+      ]
+    }
+  }
+}</internal-domain></code></pre>
+
+</div><p>Same pattern for staging, operations, and production — only the URL and profile change. Rolled out to all four environments; our repositories now instruct AI agents to prefer the gateway over raw command-line access.</p>
+<blockquote>
+<p>The gnarliest bug was cryptographic: requests are signed by the client for the public address, but the AWS service behind it requires a different signature — so the front door strips and re-signs every request in flight.</p>
+<p>And when an upstream tool suddenly rejected all proxied traffic (a new security feature couldn't know our gateway hostname was legitimate), the fix required understanding exactly which protection layer was redundant behind our signing — and disabling only that one.</p>
+</blockquote>
+<h2>THE INTERESTING PART</h2>
+<p>The whole design is one stable door, many safe backends. The hard part wasn't just making the proxy work; it was making the security model obvious enough that the repository itself can tell developers how to use it.</p>
+<h2>WHAT IT CHANGED</h2>
+<p>The company got AI-assistant access to production tooling that is safe by default: nothing new to leak, nothing to rotate, one governed door instead of a hundred hand-made ones. Every developer has it; the security team can sleep.</p>
+</article>
+  <nav class="case-detail-footer" aria-label="Case study navigation">
+    <a href="/#study-22">Open in the portfolio reader</a>
+    <a href="/#index">Browse all case studies →</a>
+  </nav>
+</main>
+
+    <button class="back-to-top" type="button" aria-label="Back to top" data-back-to-top="">↑ top</button>
+    <footer class="site-footer" id="contact">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">~/oleksandr-ponomarov</p>
+      <p class="footer-note">Case studies describe real production systems; details generalized.</p>
+    </div>
+    <div class="contact-links">
+      
+        <a href="https://github.com/shmileee" target="_blank" rel="noreferrer">
+          github.com/shmileee<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="https://www.linkedin.com/in/aleksandr-ponomarov" target="_blank" rel="noreferrer">
+          linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="mailto:ponomarov.aleksandr@gmail.com">
+          ponomarov.aleksandr@gmail.com
+        </a>
+      
+    </div>
+  </div>
+</footer>
+
+    <script type="module" src="/assets/js/site.js"></script>
+  </body>
+</html>

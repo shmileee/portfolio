@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      document.documentElement.dataset.theme = localStorage.getItem("om-theme") || "dark";
+    </script>
+    
+    
+    <title>Turning a Terraform repository into a product — Oleksandr Ponomarov</title>
+    <meta name="description" content="Terraform stopped being a specialist skill.">
+    <link rel="canonical" href="https://portfolio.oponomarov.com/case-studies/07-turning-a-terraform-repository-into-a-product/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230B1220'/><text x='6' y='44' font-family='monospace' font-size='24' fill='%2393c5fd'>~/op</text></svg>">
+    <meta property="og:title" content="Turning a Terraform repository into a product — Oleksandr Ponomarov">
+    <meta property="og:description" content="Terraform stopped being a specialist skill.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/07-turning-a-terraform-repository-into-a-product/">
+    <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/assets/css/site.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header" data-site-header="">
+  <div class="reading-progress" aria-hidden="true"><span data-reading-progress=""></span></div>
+  <div class="header-inner">
+    <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      
+        <a href="/#arc">The arc</a>
+      
+        <a href="/#featured">Case studies</a>
+      
+        <a href="/#index">Index</a>
+      
+        <a href="/#how-i-work">How I work</a>
+      
+        <a href="/#contact">Contact</a>
+      
+      <button class="theme-toggle" type="button" aria-label="Toggle color scheme" data-theme-toggle="">light</button>
+    </nav>
+  </div>
+</header>
+
+    <main class="case-detail" id="main-content">
+  <header class="case-detail-header">
+    <a class="back-link" href="/#index">← all case studies</a>
+    <p class="section-eyebrow">Case study 07</p>
+    <h1>Turning a Terraform repository into a product</h1>
+    <p class="case-detail-summary">Terraform stopped being a specialist skill.</p>
+    <div class="topic-list" aria-label="Topics">
+      <span>developer experience</span><span>delivery</span>
+    </div>
+  </header>
+  <article class="prose case-detail-prose"><h2>THE SITUATION</h2>
+<p>The central Terraform repository was where all cloud infrastructure lived — and it showed its age. Shared modules were &quot;versioned&quot; with hand-made git tags in no consistent format: random suffixes, a mix of underscores and hyphens, no changelogs. The Terraform state itself was committed into the git repository. There was no release process, no consistent style, and no place to learn how to do things right.</p>
+<h2>WHAT I DID</h2>
+<p>I treated the repository as a product with users. I moved the state out of git and into S3 backends — every stack, in one focused campaign.
+I replaced hand-made tags with a real release pipeline: structured commit messages produce versioned, changelogged module releases automatically. I standardized the code itself — formatters and linters enforced automatically, guidelines and best practices written down, documentation curated and rewritten (including recorded terminal walkthroughs, so people could watch the workflow, not just read about it).
+I introduced Terramate to manage the growing estate of stacks, designed the repository layout and the reusable imports, then migrated every legacy stack onto it. I stood up an internal Terraform registry to host our own providers (<a href="/#study-18">case study 18</a>).
+And when navigation itself became the problem — hundreds of stacks across many accounts and regions — I built a terminal tool that answers &quot;where is X deployed, and in which account?&quot; in seconds:</p>
+<figure class="media-exhibit" data-exhibit="" style="--media-exhibit-width: 840px">
+  <div class="media-exhibit-frame">
+    <div class="exhibit-toolbar">
+      <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="exhibit-filename">terramate-stacks-explorer</span>
+      <span class="exhibit-badge">TERMINAL · REC</span>
+    </div>
+    <div class="media-exhibit-stage">
+      <img src="./terramate-stacks-explorer.gif" alt="Terminal recording: the terramate stacks explorer browsing stacks, with filters for group, environment and region" width="1440" height="820" loading="lazy" decoding="async">
+    </div>
+  </div>
+  <figcaption class="exhibit-caption"><span>EXHIBIT 02</span> — Where is X deployed, and in which account? Answered in seconds · case study 13</figcaption>
+</figure>
+<p>Alongside the tooling I started the company's Terraform community channel, answered beginner questions, and taught people their first steps.</p>
+<h2>THE INTERESTING PART</h2>
+<p>The teaching mattered as much as the tooling. Standards that arrive as documentation get ignored; standards that arrive with a helpful human, worked examples, and automation that silently fixes your formatting get adopted.</p>
+<h2>WHAT IT CHANGED</h2>
+<p>Terraform stopped being a specialist skill. Engineers across teams now propose infrastructure changes routinely, modules are versioned and reusable, and the repository scaled from dozens of stacks to hundreds without becoming unmanageable.</p>
+</article>
+  <nav class="case-detail-footer" aria-label="Case study navigation">
+    <a href="/#study-7">Open in the portfolio reader</a>
+    <a href="/#index">Browse all case studies →</a>
+  </nav>
+</main>
+
+    <button class="back-to-top" type="button" aria-label="Back to top" data-back-to-top="">↑ top</button>
+    <footer class="site-footer" id="contact">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">~/oleksandr-ponomarov</p>
+      <p class="footer-note">Case studies describe real production systems; details generalized.</p>
+    </div>
+    <div class="contact-links">
+      
+        <a href="https://github.com/shmileee" target="_blank" rel="noreferrer">
+          github.com/shmileee<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="https://www.linkedin.com/in/aleksandr-ponomarov" target="_blank" rel="noreferrer">
+          linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="mailto:ponomarov.aleksandr@gmail.com">
+          ponomarov.aleksandr@gmail.com
+        </a>
+      
+    </div>
+  </div>
+</footer>
+
+    <script type="module" src="/assets/js/site.js"></script>
+  </body>
+</html>

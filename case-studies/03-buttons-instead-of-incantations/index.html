@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      document.documentElement.dataset.theme = localStorage.getItem("om-theme") || "dark";
+    </script>
+    
+    
+    <title>Buttons instead of incantations — Oleksandr Ponomarov</title>
+    <meta name="description" content="The kind of small tool that costs a week and pays for itself every single day.">
+    <link rel="canonical" href="https://portfolio.oponomarov.com/case-studies/03-buttons-instead-of-incantations/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230B1220'/><text x='6' y='44' font-family='monospace' font-size='24' fill='%2393c5fd'>~/op</text></svg>">
+    <meta property="og:title" content="Buttons instead of incantations — Oleksandr Ponomarov">
+    <meta property="og:description" content="The kind of small tool that costs a week and pays for itself every single day.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/03-buttons-instead-of-incantations/">
+    <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/assets/css/site.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header" data-site-header="">
+  <div class="reading-progress" aria-hidden="true"><span data-reading-progress=""></span></div>
+  <div class="header-inner">
+    <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      
+        <a href="/#arc">The arc</a>
+      
+        <a href="/#featured">Case studies</a>
+      
+        <a href="/#index">Index</a>
+      
+        <a href="/#how-i-work">How I work</a>
+      
+        <a href="/#contact">Contact</a>
+      
+      <button class="theme-toggle" type="button" aria-label="Toggle color scheme" data-theme-toggle="">light</button>
+    </nav>
+  </div>
+</header>
+
+    <main class="case-detail" id="main-content">
+  <header class="case-detail-header">
+    <a class="back-link" href="/#index">← all case studies</a>
+    <p class="section-eyebrow">Case study 03</p>
+    <h1>Buttons instead of incantations</h1>
+    <p class="case-detail-summary">The kind of small tool that costs a week and pays for itself every single day.</p>
+    <div class="topic-list" aria-label="Topics">
+      <span>developer experience</span>
+    </div>
+  </header>
+  <article class="prose case-detail-prose"><h2>THE SITUATION</h2>
+<p>Atlantis is driven by typed pull-request comments: <code>atlantis plan</code>, <code>atlantis apply</code>, with project flags that must be exactly right. Power users type them from muscle memory; everyone else copies them from somewhere, gets a flag wrong, and waits for the bot to complain. During large migrations — dozens of pull requests a day — the typing itself became measurable friction.
+The obvious fixes were all worse: a web service with GitHub tokens to manage, or yet another bot with write access.</p>
+<h2>WHAT I DID</h2>
+<p>I built a small browser extension that injects the commands as buttons directly into the GitHub pull-request page.</p>
+<figure class="media-exhibit" data-exhibit="" style="--media-exhibit-width: 840px">
+  <div class="media-exhibit-frame">
+    <div class="exhibit-toolbar">
+      <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="exhibit-filename">atlantis-pr-buttons.png</span>
+      <span class="exhibit-badge">PNG</span>
+    </div>
+    <div class="media-exhibit-stage">
+      <img src="./atlantis-pr-buttons.png" alt="Screenshot: Atlantis Plan, Approve and Apply buttons injected above the GitHub pull-request comment box" width="1654" height="676" loading="lazy" decoding="async">
+    </div>
+  </div>
+  <figcaption class="exhibit-caption"><span>EXHIBIT 01</span> — Atlantis controls inside the GitHub pull-request comment box</figcaption>
+</figure>
+<p>One click writes and submits the comment — <em>as the logged-in user</em>, through the same comment box they would have typed into. That one design decision is the whole security story: there are no tokens, no server, no new identity, and nothing new to secure — GitHub sees an ordinary comment from an ordinary user with their ordinary permissions.
+The extension only activates on the right repositories, checks team membership before showing itself, and the dangerous button is two-stage: <code>apply</code> must be armed before it fires, so nobody fat-fingers an apply while scrolling.</p>
+<h2>WHAT IT CHANGED</h2>
+<p>Infrastructure pull-request interactions became one-click, typo-free, and slightly delightful — the kind of small tool that costs a week and pays for itself every single day.</p>
+<p>Here it is in action:</p>
+<figure class="media-exhibit" data-exhibit="" style="--media-exhibit-width: 840px">
+  <div class="media-exhibit-frame">
+    <div class="exhibit-toolbar">
+      <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="exhibit-filename">atlantis-pr-buttons-demo.gif</span>
+      <span class="exhibit-badge">GIF · REC</span>
+    </div>
+    <div class="media-exhibit-stage">
+      <img src="./atlantis-pr-buttons-demo.gif" alt="Screen recording: Atlantis plan and apply buttons injected into a GitHub pull request" width="880" height="587" loading="lazy" decoding="async">
+    </div>
+  </div>
+  <figcaption class="exhibit-caption"><span>EXHIBIT 02</span> — The one-click plan and apply flow in action</figcaption>
+</figure>
+</article>
+  <nav class="case-detail-footer" aria-label="Case study navigation">
+    <a href="/#study-3">Open in the portfolio reader</a>
+    <a href="/#index">Browse all case studies →</a>
+  </nav>
+</main>
+
+    <button class="back-to-top" type="button" aria-label="Back to top" data-back-to-top="">↑ top</button>
+    <footer class="site-footer" id="contact">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">~/oleksandr-ponomarov</p>
+      <p class="footer-note">Case studies describe real production systems; details generalized.</p>
+    </div>
+    <div class="contact-links">
+      
+        <a href="https://github.com/shmileee" target="_blank" rel="noreferrer">
+          github.com/shmileee<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="https://www.linkedin.com/in/aleksandr-ponomarov" target="_blank" rel="noreferrer">
+          linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="mailto:ponomarov.aleksandr@gmail.com">
+          ponomarov.aleksandr@gmail.com
+        </a>
+      
+    </div>
+  </div>
+</footer>
+
+    <script type="module" src="/assets/js/site.js"></script>
+  </body>
+</html>

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      document.documentElement.dataset.theme = localStorage.getItem("om-theme") || "dark";
+    </script>
+    
+    
+    <title>Environments you can create and destroy with one command — Oleksandr Ponomarov</title>
+    <meta name="description" content="Entering a new region became an infrastructure change, not an infrastructure project.">
+    <link rel="canonical" href="https://portfolio.oponomarov.com/case-studies/14-environments-you-can-create-and-destroy-with-one-command/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230B1220'/><text x='6' y='44' font-family='monospace' font-size='24' fill='%2393c5fd'>~/op</text></svg>">
+    <meta property="og:title" content="Environments you can create and destroy with one command — Oleksandr Ponomarov">
+    <meta property="og:description" content="Entering a new region became an infrastructure change, not an infrastructure project.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/14-environments-you-can-create-and-destroy-with-one-command/">
+    <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/assets/css/site.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header" data-site-header="">
+  <div class="reading-progress" aria-hidden="true"><span data-reading-progress=""></span></div>
+  <div class="header-inner">
+    <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      
+        <a href="/#arc">The arc</a>
+      
+        <a href="/#featured">Case studies</a>
+      
+        <a href="/#index">Index</a>
+      
+        <a href="/#how-i-work">How I work</a>
+      
+        <a href="/#contact">Contact</a>
+      
+      <button class="theme-toggle" type="button" aria-label="Toggle color scheme" data-theme-toggle="">light</button>
+    </nav>
+  </div>
+</header>
+
+    <main class="case-detail" id="main-content">
+  <header class="case-detail-header">
+    <a class="back-link" href="/#index">← all case studies</a>
+    <p class="section-eyebrow">Case study 14 · featured</p>
+    <h1>Environments you can create and destroy with one command</h1>
+    <p class="case-detail-summary">Entering a new region became an infrastructure change, not an infrastructure project.</p>
+    <div class="topic-list" aria-label="Topics">
+      <span>reliability</span><span>cost</span><span>delivery</span>
+    </div>
+  </header>
+  <article class="prose case-detail-prose"><h2>The situation</h2>
+<p>Standing up a complete environment — network, Kubernetes cluster, autoscaling, secrets, DNS, deployment pipeline — was a bespoke, multi-week effort.</p>
+<p>Worse, tearing one down was genuinely dangerous: cloud environments are easy to create and surprisingly hard to delete completely, because components inside the cluster create cloud resources the infrastructure tooling doesn't know about. Half-deleted environments would linger, quietly billing money.</p>
+<h2>What I did</h2>
+<p>This is the work I consider my biggest win. I led the design and build of our take on cell-based architecture — an AWS-endorsed resilience pattern where, instead of one big shared environment, you run self-contained copies (&quot;cells&quot;) so that any failure is contained to one copy (<a href="https://docs.aws.amazon.com/wellarchitected/latest/reducing-scope-of-impact-with-cell-based-architecture/what-is-a-cell-based-architecture.html">AWS describes it in its Well-Architected guidance on reducing scope of impact ↗</a>).</p>
+<p>Our main driver was speed into new markets: the ability to stand up a complete environment in a new region, quickly. But the same primitive serves more: developers can spin up an ephemeral cell to test something and throw it away, and a cell can be dedicated to a single customer where data residency demands it.</p>
+<p>A cell is one Terraform stack that provisions everything — the VPC, the EKS cluster with its networking, IAM, DNS, and identity integration — and it joins the Cloud WAN network from <a href="/#study-13">case study 13</a> with one flag. Three design pieces I'm particularly proud of:</p>
+<ul>
+<li>
+<p><strong>The GitOps bridge.</strong> Terraform stops where it should. It builds the foundation, installs the Flux operator into the fresh cluster, declares the Flux runtime — and hands over: Flux finishes the bootstrap the GitOps way, pulling the remaining twenty-plus platform add-ons from the git repository. This solves the classic chicken-and-egg of cluster bootstrapping (you need a cluster to run the deployment system that deploys everything else), following the community &quot;GitOps Bridge&quot; pattern; cluster-specific values flow across the bridge through a metadata file Terraform writes and Flux substitutes.</p>
+</li>
+<li>
+<p><strong>A data-only brain.</strong> I wrote a companion module that creates no cloud resources at all: it validates every cell input at plan time (unsupported region? wrong size? rejected before anything runs), normalizes names, resolves network sizing from t-shirt sizes (small/medium/large map to precise subnet layouts), and auto-discovers which SSO roles should get cluster access. All the judgment in one testable place, all the resources elsewhere.</p>
+</li>
+<li>
+<p><strong>Togglable add-ons.</strong> Every piece of the platform a cell can carry — NAT optimization (<a href="/#study-15">case study 15</a>), the network attachment, each add-on — sits behind an explicit toggle, so a cell's consumer opts in or out per environment instead of inheriting one-size-fits-all.</p>
+</li>
+</ul>
+<p>Every cell also registers itself in a central cell registry (a DynamoDB table) — the shared source of truth for what cells exist and how they're attached, consumed today by the secrets and network reconcilers, and designed to later feed a cell router that steers tenants and traffic to the right cell.</p>
+<h2>The interesting part</h2>
+<p>The teardown problem had no off-the-shelf solution, so I wrote a custom Terraform provider to close the gap. It walks an environment down in ordered phases — freeze the deployment system, evacuate workloads, decommission autoscaled capacity, sweep, verify — and it never pretends: if anything survived, it stops, reports failure, and names exactly what is still alive rather than letting leftover resources hide. It can even rehearse a destroy during planning and tell you what would be left behind.</p>
+<div class="teardown-exhibit" role="img" aria-label="Teardown ordered phases: freeze, evacuate, decommission, sweep, verify">
+  <p>TEARDOWN — ORDERED PHASES</p>
+  <div>
+    <span>freeze</span><i aria-hidden="true">→</i>
+    <span>evacuate</span><i aria-hidden="true">→</i>
+    <span>decommission</span><i aria-hidden="true">→</i>
+    <span>sweep</span><i aria-hidden="true">→</i>
+    <span>verify</span>
+  </div>
+</div>
+<h2>What it changed</h2>
+<p>Environments became genuinely independent — a problem in one cannot spread to the others — their costs actually end when they are deleted, and entering a new region became an infrastructure change, not an infrastructure project.</p>
+</article>
+  <nav class="case-detail-footer" aria-label="Case study navigation">
+    <a href="/#study-14">Open in the portfolio reader</a>
+    <a href="/#index">Browse all case studies →</a>
+  </nav>
+</main>
+
+    <button class="back-to-top" type="button" aria-label="Back to top" data-back-to-top="">↑ top</button>
+    <footer class="site-footer" id="contact">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">~/oleksandr-ponomarov</p>
+      <p class="footer-note">Case studies describe real production systems; details generalized.</p>
+    </div>
+    <div class="contact-links">
+      
+        <a href="https://github.com/shmileee" target="_blank" rel="noreferrer">
+          github.com/shmileee<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="https://www.linkedin.com/in/aleksandr-ponomarov" target="_blank" rel="noreferrer">
+          linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="mailto:ponomarov.aleksandr@gmail.com">
+          ponomarov.aleksandr@gmail.com
+        </a>
+      
+    </div>
+  </div>
+</footer>
+
+    <script type="module" src="/assets/js/site.js"></script>
+  </body>
+</html>

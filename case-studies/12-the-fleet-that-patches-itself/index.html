@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      document.documentElement.dataset.theme = localStorage.getItem("om-theme") || "dark";
+    </script>
+    
+    
+    <title>The fleet that patches itself (while engineers are watching) — Oleksandr Ponomarov</title>
+    <meta name="description" content="A vendor announces a fix; the fleet is rotating onto it within hours.">
+    <link rel="canonical" href="https://portfolio.oponomarov.com/case-studies/12-the-fleet-that-patches-itself/">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230B1220'/><text x='6' y='44' font-family='monospace' font-size='24' fill='%2393c5fd'>~/op</text></svg>">
+    <meta property="og:title" content="The fleet that patches itself (while engineers are watching) — Oleksandr Ponomarov">
+    <meta property="og:description" content="A vendor announces a fix; the fleet is rotating onto it within hours.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/12-the-fleet-that-patches-itself/">
+    <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="/assets/css/site.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header" data-site-header="">
+  <div class="reading-progress" aria-hidden="true"><span data-reading-progress=""></span></div>
+  <div class="header-inner">
+    <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
+    <nav class="site-nav" aria-label="Primary navigation">
+      
+        <a href="/#arc">The arc</a>
+      
+        <a href="/#featured">Case studies</a>
+      
+        <a href="/#index">Index</a>
+      
+        <a href="/#how-i-work">How I work</a>
+      
+        <a href="/#contact">Contact</a>
+      
+      <button class="theme-toggle" type="button" aria-label="Toggle color scheme" data-theme-toggle="">light</button>
+    </nav>
+  </div>
+</header>
+
+    <main class="case-detail" id="main-content">
+  <header class="case-detail-header">
+    <a class="back-link" href="/#index">← all case studies</a>
+    <p class="section-eyebrow">Case study 12 · featured</p>
+    <h1>The fleet that patches itself (while engineers are watching)</h1>
+    <p class="case-detail-summary">A vendor announces a fix; the fleet is rotating onto it within hours.</p>
+    <div class="topic-list" aria-label="Topics">
+      <span>security</span><span>reliability</span>
+    </div>
+  </header>
+  <article class="prose case-detail-prose"><h2>The situation</h2>
+<p>We built security-patched machine images for our Kubernetes nodes — and then discovered they weren't reaching the nodes. Rotation was effectively off: replacement budgets set to zero, one production pool allowed a two-hour window per week (months to rotate the whole pool), and the monitoring nodes were configured to rotate during business hours — risking metric gaps in the middle of an incident.</p>
+<p>Patched images existed; nothing consumed them.</p>
+<h2>What I did</h2>
+<p>I wrote the design that connected the two ends — an event-driven image pipeline feeding a deliberately scheduled node-rotation policy — and drove it with seven colleagues as named reviewers; the build pipeline itself was co-built with two teammates.</p>
+<p>The build side is fully event-driven: when the OS vendor announces a security release (a public notification feed) or the upstream Kubernetes image changes (a poller watching the public parameter), the pipeline wakes up on its own, builds our patched image on top of the upstream one — applying <em>security updates only</em>, and never touching the container runtime, kubelet, or kernel, so we never diverge from what the cloud provider validated — and publishes the result per environment. Failed builds retry on the next cycle automatically.</p>
+<p>The consumption side uses Karpenter's drift mechanism: a node whose image no longer matches the declared spec is flagged and replaced. The design decides when:</p>
+<ul>
+<li>
+<p>Development and staging track new images instantly (name-pattern match — nodes start rotating minutes after a build).</p>
+</li>
+<li>
+<p>Production pins exact image IDs — and the dependency bot (<a href="/#study-8">case study 8</a>) proposes the bump as a pull request. The merge button <em>is</em> the deployment gate: human review, full audit trail, no custom tooling.</p>
+</li>
+<li>
+<p>Rotation happens when engineers are watching. The core principle from the design doc: <em>drift is a controlled, planned operation triggered by a known image change — it should happen during coverage hours.</em> Our two on-call regions cover 07:00–20:00 weekdays; rotation windows close at 18:00 — two hours before coverage ends, so a bad image is caught on-shift, never discovered by the night. Weekends are blocked (&quot;no one gets paged on weekends for node rotation&quot;)… with one deliberate inversion: the development Kafka brokers rotate <em>on</em> weekends, because a rebalance hurts developers more on a Tuesday than it hurts a Saturday.</p>
+</li>
+<li>
+<p>Budgets control parallelism; pod-disruption rules protect individual services. A percentage cap decides how many nodes churn at once; per-service rules serialize replicas of the same service while different services drain in parallel. Special pools get special treatment: the metrics store rotates one node at a time, databases stagger per availability zone in pre-dawn slots, and one streaming workload blocks drift entirely — its own operator migrates jobs on demand instead.</p>
+</li>
+<li>
+<p>A safety-net alert fires if any node's termination is stuck for over twelve hours, with a runbook for the usual suspects (blocking disruption rules, crash-looping pods, stuck volumes).</p>
+</li>
+</ul>
+<div class="diagram-exhibit" data-exhibit="">
+  <div class="diagram-exhibit-label">EXHIBIT — BUILD SIDE · EVENT-DRIVEN</div>
+  <svg aria-label="The self-patching fleet: EXHIBIT — BUILD SIDE · EVENT-DRIVEN" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 332" style="display:block; width:100%; height:auto; max-width:720px; margin:0 auto" role="img"><defs><marker id="arrFB" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--w5, rgba(255,255,255,0.5))"></path></marker></defs><rect x="20" y="10" width="320" height="58" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="180" y="33" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">OS security release</text><text x="180" y="51" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">public notification feed</text><rect x="380" y="10" width="320" height="58" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="540" y="33" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">Upstream EKS image change</text><text x="540" y="51" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">public parameter, polled</text><path d="M180,68 L180,92 L360,92" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none"></path><path d="M540,68 L540,92 L360,92" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none"></path><path d="M360,92 L360,116" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" marker-end="url(#arrFB)"></path><rect x="190" y="118" width="340" height="74" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="360" y="141" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">Image build</text><text x="360" y="159" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">security updates only</text><text x="360" y="177" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">runtime, kubelet, kernel untouched</text><path d="M360,192 L360,216" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" marker-end="url(#arrFB)"></path><rect x="190" y="218" width="340" height="40" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="360" y="243" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">Patched image, dated</text><path d="M360,258 L360,282" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" marker-end="url(#arrFB)"></path><rect x="190" y="284" width="340" height="40" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="360" y="309" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">Published per environment</text></svg>
+  <div class="diagram-exhibit-label diagram-exhibit-label-secondary">CONSUMPTION SIDE · SCHEDULED DRIFT</div>
+  <svg aria-label="The self-patching fleet: CONSUMPTION SIDE · SCHEDULED DRIFT" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 324" style="display:block; width:100%; height:auto; max-width:720px; margin:0 auto" role="img"><defs><marker id="arrFC" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--w5, rgba(255,255,255,0.5))"></path></marker></defs><rect x="20" y="10" width="320" height="58" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="180" y="33" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">dev / staging</text><text x="180" y="51" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">name-pattern match → instant drift</text><rect x="380" y="10" width="320" height="74" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="540" y="33" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">production</text><text x="540" y="51" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">pinned ID → bot opens pull request</text><text x="540" y="69" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">→ human merges</text><path d="M180,68 L180,100 L360,100" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none"></path><path d="M540,84 L540,100 L360,100" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none"></path><path d="M360,100 L360,124" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" marker-end="url(#arrFC)"></path><rect x="190" y="126" width="340" height="58" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="360" y="149" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">Budget-limited rotation</text><text x="360" y="167" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">coverage-hours schedule · per-pool exceptions</text><path d="M360,184 L360,208" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" marker-end="url(#arrFC)"></path><rect x="190" y="210" width="340" height="40" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="360" y="235" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">Disruption-rule-gated drain</text><path d="M360,250 L360,274" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" marker-end="url(#arrFC)"></path><rect x="190" y="276" width="340" height="40" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1"></rect><text x="360" y="301" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w88, rgba(255,255,255,0.88))">Patched fleet</text><rect x="550" y="201" width="168" height="58" rx="6" fill="var(--bg, #0B1220)" stroke="var(--ab4, rgba(96,165,250,0.4))" stroke-width="1" stroke-dasharray="4 4"></rect><text x="634" y="224" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--w7, rgba(255,255,255,0.7))">Stuck termination</text><text x="634" y="242" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--w45, rgba(255,255,255,0.45))">alert + runbook</text><path d="M530,230 L548,230" stroke="var(--w42, rgba(255,255,255,0.42))" stroke-width="1.2" fill="none" stroke-dasharray="3 4" marker-end="url(#arrFC)"></path><text x="634" y="276" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="0.06em" fill="var(--w55, rgba(255,255,255,0.55))">stuck over 12 h</text></svg>
+</div>
+<h2>The interesting part</h2>
+<p>The schedule math is where the craft hides. The scheduler reads times in UTC with no daylight-saving handling — so the windows are set to the intersection of summer and winter coverage, safe in both. And the whole policy is expressed as a handful of declarative budget blocks in the chart values, reviewed like any other code — the on-call calendar, encoded.</p>
+<h2>What it changed</h2>
+<p>Node patching went from &quot;images exist, nobody consumes them&quot; to a self-feeding loop: vendor announces a fix, the fleet is rotating onto it within hours in lower environments and one reviewed merge later in production — at a pace the on-call rota can actually absorb.</p>
+</article>
+  <nav class="case-detail-footer" aria-label="Case study navigation">
+    <a href="/#study-12">Open in the portfolio reader</a>
+    <a href="/#index">Browse all case studies →</a>
+  </nav>
+</main>
+
+    <button class="back-to-top" type="button" aria-label="Back to top" data-back-to-top="">↑ top</button>
+    <footer class="site-footer" id="contact">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand">~/oleksandr-ponomarov</p>
+      <p class="footer-note">Case studies describe real production systems; details generalized.</p>
+    </div>
+    <div class="contact-links">
+      
+        <a href="https://github.com/shmileee" target="_blank" rel="noreferrer">
+          github.com/shmileee<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="https://www.linkedin.com/in/aleksandr-ponomarov" target="_blank" rel="noreferrer">
+          linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
+        </a>
+      
+        <a href="mailto:ponomarov.aleksandr@gmail.com">
+          ponomarov.aleksandr@gmail.com
+        </a>
+      
+    </div>
+  </div>
+</footer>
+
+    <script type="module" src="/assets/js/site.js"></script>
+  </body>
+</html>
