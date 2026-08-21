@@ -29,4 +29,4 @@ Infrastructure pull-request interactions became one-click, typo-free, and slight
 
 Here it is in action:
 
-{% mediaExhibit { source: "./atlantis-pr-buttons-demo.gif", alt: "Screen recording: Atlantis plan and apply buttons injected into a GitHub pull request", width: 880, height: 587, badge: "GIF · REC", maxWidth: 840, captionLabel: "EXHIBIT 02", caption: "The one-click plan and apply flow in action" } %}
+{% mediaExhibit { source: "./atlantis-pr-buttons-demo.mp4", poster: "./atlantis-pr-buttons-demo-poster.png", alt: "Screen recording: Atlantis plan and apply buttons injected into a GitHub pull request", width: 880, height: 588, filename: "atlantis-pr-buttons-demo.mp4", badge: "MP4 · VIDEO", maxWidth: 840, captionLabel: "EXHIBIT 02", caption: "The one-click plan and apply flow in action" } %}
