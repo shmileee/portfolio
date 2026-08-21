@@ -50,6 +50,11 @@ function renderMediaExhibit(options) {
     throw new TypeError("mediaExhibit: width and height must be positive integers");
   }
 
+  const isVideo = extname(options.source).toLowerCase() === ".mp4";
+  if (isVideo && (typeof options.poster !== "string" || options.poster.trim() === "")) {
+    throw new TypeError("mediaExhibit: poster must be a non-empty string for MP4 sources");
+  }
+
   const maxWidth = options.maxWidth === undefined ? null : Number(options.maxWidth);
   if (maxWidth !== null && (!Number.isInteger(maxWidth) || maxWidth < 1)) {
     throw new TypeError("mediaExhibit: maxWidth must be a positive integer");
@@ -61,6 +66,9 @@ function renderMediaExhibit(options) {
   const caption = options.caption
     ? `<figcaption class="exhibit-caption">${options.captionLabel ? `<span>${escapeHtml(options.captionLabel)}</span> — ` : ""}${escapeHtml(options.caption)}</figcaption>`
     : "";
+  const media = isVideo
+    ? `<video src="${escapeHtml(options.source)}" poster="${escapeHtml(options.poster)}" width="${width}" height="${height}" controls playsinline preload="metadata" aria-label="${escapeHtml(options.alt)}"></video>`
+    : `<img src="${escapeHtml(options.source)}" alt="${escapeHtml(options.alt)}" width="${width}" height="${height}" loading="lazy" decoding="async">`;
 
   return `<figure class="media-exhibit" data-exhibit${style}>
   <div class="media-exhibit-frame">
@@ -70,7 +78,7 @@ function renderMediaExhibit(options) {
       <span class="exhibit-badge">${escapeHtml(badge)}</span>
     </div>
     <div class="media-exhibit-stage">
-      <img src="${escapeHtml(options.source)}" alt="${escapeHtml(options.alt)}" width="${width}" height="${height}" loading="lazy" decoding="async">
+      ${media}
     </div>
   </div>
   ${caption}
@@ -164,7 +172,7 @@ export default function (eleventyConfig) {
 
   eleventyConfig.addPassthroughCopy({ assets: "assets" });
   eleventyConfig.addPassthroughCopy({ "src/assets": "assets" });
-  eleventyConfig.addPassthroughCopy("src/content/case-studies/**/*.{gif,png,svg}", {
+  eleventyConfig.addPassthroughCopy("src/content/case-studies/**/*.{mp4,png,svg}", {
     mode: "html-relative",
     failOnError: true,
   });
@@ -173,9 +181,6 @@ export default function (eleventyConfig) {
   eleventyConfig.addFilter("sortByNumber", (items) => [...items].sort(byNumber));
   eleventyConfig.addFilter("findByKey", (items, key) => items.find((item) => item.data.key === key));
   eleventyConfig.addFilter("findSpotlight", (items) => items.find((item) => item.data.spotlight));
-  eleventyConfig.addFilter("resolveStudyAssets", (html, studyUrl) =>
-    html.replaceAll('src="./', `src="${studyUrl}`),
-  );
   eleventyConfig.addFilter("indexOrder", (items) => {
     const sorted = [...items].sort(byNumber);
     return [...sorted.filter((item) => item.data.featured), ...sorted.filter((item) => !item.data.featured)];
