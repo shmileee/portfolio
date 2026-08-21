@@ -23,7 +23,7 @@ function parseSitemapLocations(xml, file) {
   const locations = [];
   const urlEntry = /^<url>\s*<loc>([^<]+)<\/loc>\s*<\/url>\s*/;
   for (let match = urlEntry.exec(rest); match !== null; match = urlEntry.exec(rest)) {
-    locations.push(decodeEntities(match[1].trim()));
+    locations.push(decodeEntities(match[1].trim(), file));
     rest = rest.slice(match[0].length);
   }
   if (rest !== "</urlset>") {
