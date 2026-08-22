@@ -156,6 +156,30 @@ for (const viewport of VIEWPORTS) {
   });
 }
 
+test("320px layout fits beside a classic vertical scrollbar", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+
+  for (const path of ["/", STUDY_PATH]) {
+    await page.goto(path);
+    await page.addStyleTag({ content: "html { overflow-y: scroll; scrollbar-gutter: stable; }" });
+    const geometry = await page.evaluate(() => {
+      const probe = document.createElement("div");
+      probe.style.cssText = "position: fixed; inset: 0; pointer-events: none";
+      document.body.append(probe);
+      const viewportRight = probe.getBoundingClientRect().right;
+      const bodyRight = document.body.getBoundingClientRect().right;
+      probe.remove();
+      return { bodyRight, scrollWidth: document.documentElement.scrollWidth, viewportRight };
+    });
+    expect(geometry.bodyRight, `${path} body exceeds the scrollbar-adjusted viewport`).toBeLessThanOrEqual(
+      geometry.viewportRight,
+    );
+    expect(geometry.scrollWidth, `${path} scrolls horizontally beside a classic scrollbar`).toBeLessThanOrEqual(
+      geometry.viewportRight,
+    );
+  }
+});
+
 for (const theme of ["dark", "light"]) {
   test(`${theme} theme meets contrast and keyboard-focus thresholds`, async ({ page }) => {
     await page.addInitScript((selectedTheme) => localStorage.setItem("om-theme", selectedTheme), theme);
