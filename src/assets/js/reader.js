@@ -93,7 +93,8 @@ function isReaderState(state) {
 }
 
 function isGuardedArrowTarget(target) {
-  return target instanceof Element && Boolean(target.closest(ARROW_GUARD_SELECTOR));
+  const element = target instanceof Element ? target : target instanceof Node ? target.parentElement : null;
+  return Boolean(element?.closest(ARROW_GUARD_SELECTOR));
 }
 
 export function setupReader() {

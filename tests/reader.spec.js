@@ -268,6 +268,43 @@ test("unmodified arrows navigate with wrapping and replace reader history", asyn
   }
 });
 
+test("nested contenteditable Text node arrows remain native", async ({ page }) => {
+  // Given fetched prose whose editable content is a nested Text node
+  await page.goto("/");
+  await page.route("**/case-studies/**", (route) => route.fulfill({
+    contentType: "text/html",
+    body: fixture('<div data-text-arrow-guard contenteditable="true">abc</div>'),
+  }));
+
+  for (const key of ["ArrowLeft", "ArrowRight"]) {
+    await page.goto("/");
+    await openStudy(page, 6);
+    const before = await page.evaluate(() => ({
+      number: history.state.number,
+      hash: location.hash,
+      historyLength: history.length,
+    }));
+
+    // When the bubbling arrow event originates from the editable Text node
+    const defaultPrevented = await reader(page).locator("[data-text-arrow-guard]").evaluate((element, arrowKey) => {
+      const target = element.firstChild;
+      if (target?.nodeType !== Node.TEXT_NODE) throw new Error("Expected a nested Text node target");
+      const event = new KeyboardEvent("keydown", { key: arrowKey, bubbles: true, cancelable: true });
+      target.dispatchEvent(event);
+      return event.defaultPrevented;
+    }, key);
+    await expect.poll(() => reader(page).locator("[data-reader-study]").getAttribute("aria-busy")).toBe(null);
+
+    // Then native handling remains available without changing reader navigation state
+    expect(defaultPrevented).toBe(false);
+    expect(await page.evaluate(() => ({
+      number: history.state.number,
+      hash: location.hash,
+      historyLength: history.length,
+    }))).toEqual(before);
+  }
+});
+
 test("native link variants and every guarded arrow target pass through", async ({ page }) => {
   // Given same-tab card enhancement and fetched prose with every guarded target kind
   await page.goto("/");
