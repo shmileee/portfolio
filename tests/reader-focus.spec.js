@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 const reader = (page) => page.locator("dialog[data-reader]");
 const card = (page, number) => page.locator(`[data-open-study="${number}"]`).first();
-const arcLink = (page, number) => page.locator(`.arc-links a[href="#study-${number}"]`).first();
+const arcLink = (page, number) => page.locator(`#arc [data-arc-study="${number}"]`).first();
 
 async function openCard(page, number) {
   const opener = card(page, number);
@@ -11,7 +11,7 @@ async function openCard(page, number) {
   await expect(reader(page)).toBeVisible();
 }
 
-test("native arc activation replaces a stale card restoration target", async ({ page }) => {
+test("ordinary canonical arc activation replaces a stale card restoration target", async ({ page }) => {
   // Given a completed card-reader interaction followed by a focused arc link
   await page.goto("/");
   const staleCard = card(page, 3);
@@ -22,7 +22,7 @@ test("native arc activation replaces a stale card restoration target", async ({ 
   const invoker = arcLink(page, 3);
   await invoker.focus();
 
-  // When native hash navigation opens and then closes the reader
+  // When progressive enhancement opens and then closes the reader
   await invoker.click();
   await expect(reader(page)).toBeVisible();
   await page.keyboard.press("Escape");

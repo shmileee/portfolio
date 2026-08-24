@@ -19,33 +19,29 @@ canonical: https://portfolio.oponomarov.com/
       <a class="primary-link" href="{{ hero.data.primaryHref }}">{{ hero.data.primaryCta }}</a>
       <a class="secondary-link" href="{{ hero.data.secondaryHref }}">{{ hero.data.secondaryCta }}</a>
     </div>
-    <nav class="contact-links hero-actions" aria-label="Professional profiles and email">
-      {% for link in site.contactLinks %}
-        <a href="{{ link.href }}"{% if link.external %} target="_blank" rel="noreferrer"{% endif %}>
-          {{ link.label }}{% if link.external %}<span aria-hidden="true"> ↗</span>{% endif %}
-        </a>
-      {% endfor %}
-    </nav>
   </section>
 
-  <section class="section-block" id="index">
+  <section class="section-block" id="arc">
     <div class="section-shell">
-      <p class="section-eyebrow">01</p>
-      <h2>All case studies</h2>
-      <div class="topic-filters" role="group" aria-label="Filter case studies">
-        <button type="button" data-topic-filter="all" aria-pressed="true">all</button>
-        {% for topic in site.topicOrder %}
-          <button type="button" data-topic-filter="{{ topic }}" aria-pressed="false">{{ topic }}</button>
+      <p class="section-eyebrow">{{ arc.data.eyebrow }}</p>
+      <h2>{{ arc.data.title }}</h2>
+      <div class="section-intro">{{ arc.templateContent | safe }}</div>
+      <div class="arc-list">
+        {% for beat in collections.arcBeats %}
+          <article class="arc-step">
+            <span class="arc-number">{{ beat.data.number | pad2 }}</span>
+            <div class="arc-content">
+              <div class="arc-copy">{{ beat.templateContent | safe }}</div>
+              <div class="arc-links">
+                {% for link in beat.data.links %}
+                  {% set study = collections.caseStudies | findByNumber(link.number) %}
+                  <a href="{{ study.url }}" data-open-study="{{ study.data.number }}" data-arc-study="{{ study.data.number }}">{{ link.number }} · {{ link.label }}</a>
+                {% endfor %}
+              </div>
+            </div>
+            {% if not loop.last %}<span class="arc-arrow" aria-hidden="true">↓</span>{% endif %}
+          </article>
         {% endfor %}
-      </div>
-      <p class="sr-only" aria-live="polite" data-filter-status></p>
-      <div class="case-grid" data-case-grid>
-        {% for study in orderedStudies %}
-          {{ caseCard(study, loop.index0, site.initialCardCount) }}
-        {% endfor %}
-      </div>
-      <div class="grid-toggle-row">
-        <button class="grid-toggle" type="button" data-grid-toggle>see more →</button>
       </div>
     </div>
   </section>
@@ -73,26 +69,24 @@ canonical: https://portfolio.oponomarov.com/
     </div>
   </section>
 
-  <section class="section-block" id="arc">
+  <section class="section-block" id="index">
     <div class="section-shell">
-      <p class="section-eyebrow">{{ arc.data.eyebrow }}</p>
-      <h2>{{ arc.data.title }}</h2>
-      <div class="section-intro">{{ arc.templateContent | safe }}</div>
-      <div class="arc-list">
-        {% for beat in collections.arcBeats %}
-          <article class="arc-step">
-            <span class="arc-number">{{ beat.data.number | pad2 }}</span>
-            <div class="arc-content">
-              <div class="arc-copy">{{ beat.templateContent | safe }}</div>
-              <div class="arc-links">
-                {% for link in beat.data.links %}
-                  <a href="#study-{{ link.number }}">{{ link.number }} · {{ link.label }}</a>
-                {% endfor %}
-              </div>
-            </div>
-            {% if not loop.last %}<span class="arc-arrow" aria-hidden="true">↓</span>{% endif %}
-          </article>
+      <p class="section-eyebrow">03</p>
+      <h2>All case studies</h2>
+      <div class="topic-filters" role="group" aria-label="Filter case studies">
+        <button type="button" data-topic-filter="all" aria-pressed="true">all</button>
+        {% for topic in site.topicOrder %}
+          <button type="button" data-topic-filter="{{ topic }}" aria-pressed="false">{{ topic }}</button>
         {% endfor %}
+      </div>
+      <p class="sr-only" aria-live="polite" data-filter-status></p>
+      <div class="case-grid" data-case-grid>
+        {% for study in orderedStudies %}
+          {{ caseCard(study, loop.index0, site.initialCardCount) }}
+        {% endfor %}
+      </div>
+      <div class="grid-toggle-row">
+        <button class="grid-toggle" type="button" data-grid-toggle>see more →</button>
       </div>
     </div>
   </section>
