@@ -15,6 +15,7 @@ const ARROW_GUARD_SELECTOR = [
   "[contenteditable]",
   "audio",
   "video",
+  ".diagram-exhibit",
   '[role="textbox"]',
   '[role="searchbox"]',
   '[role="spinbutton"]',

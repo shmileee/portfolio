@@ -268,6 +268,92 @@ test("unmodified arrows navigate with wrapping and replace reader history", asyn
   }
 });
 
+test("focused diagrams retain native real-key arrows in standalone and reader", async ({ page }) => {
+  // Given the real Study 12 diagram at a mobile viewport
+  await page.setViewportSize({ width: 375, height: 900 });
+  await page.goto("/");
+  const path = await studyPath(page, 12);
+  await page.goto(path);
+  const standaloneDiagram = page.locator(".diagram-exhibit").first();
+  await standaloneDiagram.focus();
+  await page.evaluate(() => {
+    window.__diagramArrowEvents = [];
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        window.__diagramArrowEvents.push({ defaultPrevented: event.defaultPrevented, key: event.key });
+      }
+    });
+  });
+
+  // When native horizontal arrows operate the standalone scroll container
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => standaloneDiagram.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+  await page.keyboard.press("ArrowLeft");
+  await expect.poll(() => standaloneDiagram.evaluate((element) => element.scrollLeft)).toBe(0);
+
+  // Then the standalone events remain uncanceled and the canonical study stays put
+  expect(await page.evaluate(() => window.__diagramArrowEvents)).toEqual([
+    { defaultPrevented: false, key: "ArrowRight" },
+    { defaultPrevented: false, key: "ArrowLeft" },
+  ]);
+  expect(new URL(page.url()).pathname).toBe(path);
+
+  // Given the same real diagram loaded into a marked reader entry
+  await page.goto("/");
+  await openStudy(page, 12);
+  const readerDiagram = reader(page).locator(".diagram-exhibit").first();
+  await readerDiagram.focus();
+  await page.evaluate(() => {
+    window.__diagramArrowEvents = [];
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        window.__diagramArrowEvents.push({ defaultPrevented: event.defaultPrevented, key: event.key });
+      }
+    });
+  });
+  const readerState = await page.evaluate(() => ({
+    hash: location.hash,
+    historyLength: history.length,
+    historyState: history.state,
+  }));
+
+  // When the focused wrapper receives real ArrowRight and ArrowLeft keys
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => reader(page).locator("[data-reader-study]").getAttribute("aria-busy")).toBe(null);
+  expect(await page.evaluate(() => ({
+    hash: location.hash,
+    historyLength: history.length,
+    historyState: history.state,
+  }))).toEqual(readerState);
+  await expect.poll(
+    () => readerDiagram.evaluate((element) => element.scrollLeft),
+  ).toBeGreaterThan(0);
+  const rightScroll = await readerDiagram.evaluate((element) => element.scrollLeft);
+  await page.keyboard.press("ArrowLeft");
+  await expect.poll(() => readerDiagram.evaluate((element) => element.scrollLeft)).toBeLessThan(rightScroll);
+
+  // And a real key event originating from a focused SVG descendant uses the same native owner
+  await readerDiagram.evaluate((element) => { element.scrollLeft = 0; });
+  const descendant = readerDiagram.locator("svg").first();
+  await descendant.evaluate((element) => element.setAttribute("tabindex", "0"));
+  await descendant.focus();
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => readerDiagram.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+
+  // Then neither target is reader-canceled and study/hash/history stay fixed
+  expect(await page.evaluate(() => window.__diagramArrowEvents)).toEqual([
+    { defaultPrevented: false, key: "ArrowRight" },
+    { defaultPrevented: false, key: "ArrowLeft" },
+    { defaultPrevented: false, key: "ArrowRight" },
+  ]);
+  expect(await page.evaluate(() => ({
+    hash: location.hash,
+    historyLength: history.length,
+    historyState: history.state,
+  }))).toEqual(readerState);
+  await expect(reader(page).locator("[data-reader-meta-number]")).toHaveText("Case study 12");
+});
+
 test("nested contenteditable Text node arrows remain native", async ({ page }) => {
   // Given fetched prose whose editable content is a nested Text node
   await page.goto("/");
