@@ -60,6 +60,38 @@ async function expectNoOverflow(page) {
   return geometry;
 }
 
+async function adjacentControlFacts(control) {
+  return control.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const title = element.querySelector("[data-reader-case-title], .case-detail-adjacent-title");
+    const rect = element.getBoundingClientRect();
+    const dialog = element.closest("dialog");
+    return {
+      geometry: {
+        height: rect.height,
+        left: rect.left,
+        pageClientWidth: document.documentElement.clientWidth,
+        pageScrollWidth: document.documentElement.scrollWidth,
+        scrollHeight: dialog?.scrollHeight ?? document.documentElement.scrollHeight,
+        scrollWidth: dialog?.scrollWidth ?? document.documentElement.scrollWidth,
+        top: rect.top,
+        width: rect.width,
+      },
+      interaction: {
+        background: style.backgroundColor,
+        border: style.borderColor,
+        boxShadow: style.boxShadow,
+        outlineColor: style.outlineColor,
+        outlineStyle: style.outlineStyle,
+        outlineWidth: Number.parseFloat(style.outlineWidth),
+        text: getComputedStyle(title).color,
+        transform: style.transform,
+        transitionProperty: style.transitionProperty,
+      },
+    };
+  });
+}
+
 async function expectNamedTargets(page) {
   const undersized = await page.locator(CONTROL_SELECTOR).evaluateAll((elements) =>
     elements
@@ -613,6 +645,63 @@ for (const theme of ["dark", "light"]) {
     expect(focus.color).not.toBe("rgba(0, 0, 0, 0)");
   });
 }
+
+test("Task 6 adjacent cards expose perceptible hover without moving and keep stronger focus", async ({
+  browser,
+}) => {
+  test.setTimeout(120_000);
+
+  for (const theme of ["dark", "light"]) {
+    for (const surface of ["reader", "standalone"]) {
+      const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+      await context.addInitScript((selectedTheme) => localStorage.setItem("om-theme", selectedTheme), theme);
+      const page = await context.newPage();
+      await page.goto(
+        surface === "reader" ? "/#study-12" : "/case-studies/12-the-fleet-that-patches-itself/",
+        { waitUntil: "networkidle" },
+      );
+      await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+      if (surface === "reader") await expect(page.locator("[data-reader]")).toBeVisible();
+
+      const control = page.locator(
+        surface === "reader"
+          ? '[data-reader-direction="next"]'
+          : '.case-detail-adjacent [data-study-direction="next"]',
+      );
+      await control.scrollIntoViewIfNeeded();
+      await page.mouse.move(0, 0);
+      const resting = await adjacentControlFacts(control);
+
+      await control.hover();
+      expect(await control.evaluate((element) => element.matches(":hover"))).toBe(true);
+      await control.evaluate((element) => Promise.all(element.getAnimations().map((animation) => animation.finished)));
+      const hovered = await adjacentControlFacts(control);
+      const deltas = ["border", "background", "text", "boxShadow"].filter(
+        (property) => resting.interaction[property] !== hovered.interaction[property],
+      );
+      expect(
+        deltas.length,
+        `${surface} ${theme} hover must visibly change at least two painted properties: ` +
+          JSON.stringify({ resting: resting.interaction, hovered: hovered.interaction }),
+      ).toBeGreaterThanOrEqual(2);
+      expect(hovered.geometry).toEqual(resting.geometry);
+      expect(hovered.interaction.transform).toBe("none");
+      expect(hovered.interaction.transitionProperty).not.toContain("transform");
+
+      await page.mouse.move(0, 0);
+      await control.focus();
+      await expect(control).toBeFocused();
+      await control.evaluate((element) => Promise.all(element.getAnimations().map((animation) => animation.finished)));
+      const focused = await adjacentControlFacts(control);
+      expect(focused.geometry).toEqual(resting.geometry);
+      expect(focused.interaction.outlineStyle).toBe("solid");
+      expect(focused.interaction.outlineWidth).toBeGreaterThanOrEqual(3);
+      expect(focused.interaction.outlineColor).not.toBe(hovered.interaction.outlineColor);
+      expect(focused.interaction.transform).toBe("none");
+      await context.close();
+    }
+  }
+});
 
 test("code and inline diagrams adapt across standalone and reader themes", async ({ browser }) => {
   const facts = {};

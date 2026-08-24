@@ -1436,7 +1436,7 @@ h3 {
   color: var(--text-secondary);
   cursor: pointer;
   text-decoration: none;
-  transition: color 130ms ease, border-color 130ms ease;
+  transition: color 130ms ease, border-color 130ms ease, background-color 130ms ease;
 }
 
 .reader-navigation button,
@@ -1459,7 +1459,12 @@ h3 {
 }
 
 .reader-navigation button:hover,
-.case-detail-adjacent a:hover,
+.case-detail-adjacent a:hover {
+  border-color: var(--accent-primary);
+  background: var(--accent-surface);
+  color: var(--text-primary);
+}
+
 .case-detail-footer a:hover {
   border-color: color-mix(in srgb, var(--accent-primary) 60%, transparent);
   color: var(--text-primary);
