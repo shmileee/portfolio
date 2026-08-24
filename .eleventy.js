@@ -13,6 +13,19 @@ const TOPICS = new Set([
 ]);
 
 const byNumber = (left, right) => left.data.number - right.data.number;
+const sortCaseStudiesByNumber = (items) => [...items].sort(byNumber);
+
+function findCaseStudyByNumber(items, number) {
+  const requestedNumber = Number(number);
+  const sortedItems = sortCaseStudiesByNumber(items);
+  const index = sortedItems.findIndex((item) => item.data.number === requestedNumber);
+
+  if (index === -1) {
+    throw new RangeError(`Case study number ${String(number)} was not found`);
+  }
+
+  return { index, requestedNumber, sortedItems };
+}
 
 function parseCodeFenceInfo(info) {
   const language = info.trim().split(/\s+/, 1)[0] || "text";
@@ -179,10 +192,23 @@ export default function (eleventyConfig) {
 
   eleventyConfig.addFilter("pad2", (value) => String(value).padStart(2, "0"));
   eleventyConfig.addFilter("sortByNumber", (items) => [...items].sort(byNumber));
+  eleventyConfig.addFilter("findByNumber", (items, number) => {
+    const { index, sortedItems } = findCaseStudyByNumber(items, number);
+
+    return sortedItems[index];
+  });
+  eleventyConfig.addFilter("studyNeighbors", (items, number) => {
+    const { index, sortedItems } = findCaseStudyByNumber(items, number);
+
+    return {
+      previous: sortedItems[(index - 1 + sortedItems.length) % sortedItems.length],
+      next: sortedItems[(index + 1) % sortedItems.length],
+    };
+  });
   eleventyConfig.addFilter("findByKey", (items, key) => items.find((item) => item.data.key === key));
   eleventyConfig.addFilter("findSpotlight", (items) => items.find((item) => item.data.spotlight));
   eleventyConfig.addFilter("indexOrder", (items) => {
-    const sorted = [...items].sort(byNumber);
+    const sorted = sortCaseStudiesByNumber(items);
     return [...sorted.filter((item) => item.data.featured), ...sorted.filter((item) => !item.data.featured)];
   });
 
@@ -212,7 +238,7 @@ export default function (eleventyConfig) {
   );
 
   eleventyConfig.addCollection("caseStudies", (collectionApi) => {
-    const studies = collectionApi.getFilteredByTag("caseStudy").sort(byNumber);
+    const studies = sortCaseStudiesByNumber(collectionApi.getFilteredByTag("caseStudy"));
     validateCaseStudies(studies);
     return studies;
   });
