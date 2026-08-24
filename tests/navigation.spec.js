@@ -1,7 +1,10 @@
 import { expect, test } from "@playwright/test";
 
 const CARD_SELECTOR = 'a.case-card[href^="/case-studies/"]';
+const ARC_SELECTOR = "#arc a[data-arc-study]";
 const EXPECTED_STUDY_COUNT = 23;
+const EXPECTED_ARC_STUDY_COUNT = 18;
+const STUDY_03_URL = "/case-studies/03-buttons-instead-of-incantations/";
 const NEW_TAB_MODIFIER = process.platform === "darwin" ? "Meta" : "Control";
 
 test("homepage exposes canonical case cards and one lightweight reader contract", async ({ page }) => {
@@ -54,6 +57,34 @@ test("homepage exposes canonical case cards and one lightweight reader contract"
   await expect(reader.locator("section, .case-detail-prose")).toHaveCount(0);
   await expect(reader.locator("[data-reader-prose]")).toBeEmpty();
   await expect(page.locator('[data-open-study="5"] .case-card-number')).toContainText("05 · sequel");
+});
+
+test("homepage arc exposes 18 unique canonical anchors aligned with the reader manifest", async ({ page }) => {
+  // Given the built homepage and its reader manifest
+  await page.goto("/");
+  const manifest = await page.locator("[data-reader-manifest]").evaluate((element) =>
+    JSON.parse(element.textContent ?? "[]"),
+  );
+
+  // When every authored arc anchor is collected
+  const arcEntries = await page.locator(ARC_SELECTOR).evaluateAll((anchors) =>
+    anchors.map((anchor) => ({
+      arcStudy: Number(anchor.dataset.arcStudy),
+      href: anchor.getAttribute("href"),
+      openStudy: Number(anchor.dataset.openStudy),
+    })),
+  );
+
+  // Then each unique label uses the manifest's canonical route and enhancement number
+  expect(arcEntries).toHaveLength(EXPECTED_ARC_STUDY_COUNT);
+  expect(new Set(arcEntries.map(({ arcStudy }) => arcStudy)).size).toBe(EXPECTED_ARC_STUDY_COUNT);
+  expect(new Set(arcEntries.map(({ href }) => href)).size).toBe(EXPECTED_ARC_STUDY_COUNT);
+  for (const entry of arcEntries) {
+    expect(entry.openStudy).toBe(entry.arcStudy);
+    expect(entry.href).toBe(manifest.find(({ number }) => number === entry.arcStudy)?.url);
+    expect(entry.href).toMatch(/^\/case-studies\/.+\/$/);
+  }
+  await expect(page.locator('#arc a[href*="#study-"]')).toHaveCount(0);
 });
 
 for (const width of [375, 768, 1280]) {
@@ -208,6 +239,85 @@ test("JavaScript-disabled activation reaches the standalone case study", async (
 
   // Then the canonical standalone article renders without an enhanced reader
   expect(new URL(page.url()).pathname).toBe(href);
+  await expect(page.locator("main.case-detail h1")).toBeVisible();
+  await expect(page.locator("article.case-detail-prose")).toBeVisible();
+  await expect(page.locator("dialog[open]")).toHaveCount(0);
+  await context.close();
+});
+
+test("arc Study 03 href remains suitable for browser copy-link behavior", async ({ page }) => {
+  // Given the Study 03 label in the homepage arc
+  await page.goto("/");
+
+  // When its authored and browser-resolved link values are read
+  const link = await page.locator(`${ARC_SELECTOR}[data-arc-study="3"]`).evaluate((anchor) => ({
+    absoluteHref: anchor.href,
+    attributeHref: anchor.getAttribute("href"),
+    download: anchor.hasAttribute("download"),
+    target: anchor.getAttribute("target"),
+  }));
+
+  // Then Copy Link Address resolves to the canonical standalone route
+  expect(link.attributeHref).toBe(STUDY_03_URL);
+  expect(link.absoluteHref).toBe(new URL(STUDY_03_URL, page.url()).href);
+  expect(link.download).toBe(false);
+  expect(link.target).toBeNull();
+});
+
+test("modified arc activation opens canonical Study 03 without replacing the homepage", async ({ context, page }) => {
+  // Given the canonical Study 03 arc anchor
+  await page.goto("/");
+  const link = page.locator(`${ARC_SELECTOR}[data-arc-study="3"]`);
+
+  // When the visitor uses the platform new-tab modifier
+  const [openedPage] = await Promise.all([
+    context.waitForEvent("page"),
+    link.click({ modifiers: [NEW_TAB_MODIFIER] }),
+  ]);
+  await openedPage.waitForLoadState("domcontentloaded");
+
+  // Then the homepage stays and the new tab loads the canonical standalone route
+  expect(new URL(page.url()).pathname).toBe("/");
+  expect(new URL(openedPage.url()).pathname).toBe(STUDY_03_URL);
+  await openedPage.close();
+});
+
+test("middle arc activation opens canonical Study 03 without replacing the homepage", async ({ context, page }) => {
+  // Given the canonical Study 03 arc anchor
+  await page.goto("/");
+  const link = page.locator(`${ARC_SELECTOR}[data-arc-study="3"]`);
+
+  // When the visitor middle-clicks the label
+  const [openedPage] = await Promise.all([
+    context.waitForEvent("page"),
+    link.click({ button: "middle" }),
+  ]);
+  await openedPage.waitForLoadState("domcontentloaded");
+
+  // Then the homepage stays and the new tab loads the canonical standalone route
+  expect(new URL(page.url()).pathname).toBe("/");
+  expect(new URL(openedPage.url()).pathname).toBe(STUDY_03_URL);
+  await openedPage.close();
+});
+
+test("JavaScript-disabled arc activation reaches canonical Study 03", async ({ browser }) => {
+  // Given a browser context with JavaScript disabled
+  const context = await browser.newContext({
+    baseURL: "http://127.0.0.1:8080",
+    javaScriptEnabled: false,
+  });
+  const page = await context.newPage();
+  await page.goto("/");
+  const link = page.locator(`${ARC_SELECTOR}[data-arc-study="3"]`);
+
+  // When the visitor activates the Study 03 arc label
+  await Promise.all([
+    page.waitForURL((url) => url.pathname === STUDY_03_URL),
+    link.click(),
+  ]);
+
+  // Then the canonical standalone article renders without an enhanced reader
+  expect(new URL(page.url()).pathname).toBe(STUDY_03_URL);
   await expect(page.locator("main.case-detail h1")).toBeVisible();
   await expect(page.locator("article.case-detail-prose")).toBeVisible();
   await expect(page.locator("dialog[open]")).toHaveCount(0);

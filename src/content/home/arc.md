@@ -1,11 +1,11 @@
 ---
 key: arc
-eyebrow: 03 — An industrial IoT company
+eyebrow: 01 — Four years at an industrial IoT company
 title: Each layer made the next one possible
 ---
 
-So far, everything in this portfolio comes from one chapter: my years owning the platform foundation at an industrial IoT company. This section is the map of that work.
+For four years, I owned the platform foundation of an industrial IoT company. I joined when infrastructure changes were still applied by hand; by the end, a few hundred engineers were shipping through systems designed to make changes visible, reviewable, and reversible.
 
-When I joined, infrastructure changes were still applied by hand.
+The work did not arrive as isolated projects. Each layer unlocked the next: reviewable changes made faster feedback safe; automation turned maintenance into background work; rebuilt foundations made self-service possible; and those foundations supported the newest chapter in secure AI tooling and customer-facing platforms.
 
-None of the projects below stands alone. They compound, and the order matters. The chips under each step link to the case studies that tell it in detail:
+This is that four-year story in the order it happened. Each label opens the case study behind the step:
