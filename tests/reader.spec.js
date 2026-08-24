@@ -17,6 +17,10 @@ async function openStudy(page, number) {
   await expect(reader(page)).toBeVisible();
 }
 
+async function manifestEntries(page) {
+  return JSON.parse(await reader(page).locator("[data-reader-manifest]").textContent());
+}
+
 const fixture = (body) => `<!doctype html><article class="case-detail-prose">${body}</article>`;
 
 async function observeNativeClick(page, number, attributes, eventInit = {}) {
@@ -204,28 +208,147 @@ test("canonical prose navigation replaces history and previous-next controls wra
   expect(await page.evaluate(() => history.length)).toBe(markedLength);
 });
 
-test("native link variants and arrow-key input behavior pass through", async ({ page }) => {
-  // Given same-tab card enhancement and fetched prose with a native input
+test("close and adjacent controls expose structured descriptive semantics", async ({ page }) => {
+  // Given the study immediately before the longest manifest title
+  await page.goto("/");
+  const entries = await manifestEntries(page);
+  const longest = entries.reduce((candidate, entry) => entry.title.length > candidate.title.length ? entry : candidate);
+  const longestIndex = entries.findIndex(({ number }) => number === longest.number);
+  const current = entries[(longestIndex - 1 + entries.length) % entries.length];
+  const previous = entries[(longestIndex - 2 + entries.length) % entries.length];
+  await openStudy(page, current.number);
+
+  // Then Close is icon-only and each adjacent control exposes stable structured nodes
+  const close = reader(page).locator("[data-reader-close]");
+  await expect(close).toHaveText("×");
+  await expect(close).toHaveAccessibleName("Close case study");
+
+  for (const { direction, entry, kicker } of [
+    { direction: "previous", entry: previous, kicker: "Previous" },
+    { direction: "next", entry: longest, kicker: "Next" },
+  ]) {
+    const control = reader(page).locator(`[data-reader-direction="${direction}"]`);
+    await expect(control.locator("[data-reader-direction-kicker]")).toHaveText(kicker);
+    await expect(control.locator("[data-reader-case-number]")).toHaveText(`Case ${String(entry.number).padStart(2, "0")}`);
+    await expect(control.locator("[data-reader-case-title]")).toHaveText(entry.title);
+    await expect(control).toHaveAccessibleName(`${kicker} case study: Case ${String(entry.number).padStart(2, "0")} — ${entry.title}`);
+  }
+});
+
+test("unmodified arrows navigate with wrapping and replace reader history", async ({ page }) => {
+  // Given an open reader with one marked history entry
+  await page.goto("/");
+  await openStudy(page, 6);
+  const markedLength = await page.evaluate(() => history.length);
+
+  // When unmodified arrows move forward and backward
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(7);
+  expect(await page.evaluate(() => history.length)).toBe(markedLength);
+  await page.keyboard.press("ArrowLeft");
+  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(6);
+  expect(await page.evaluate(() => history.length)).toBe(markedLength);
+
+  // And the first and last entries wrap in both directions
+  await reader(page).locator("[data-reader-close]").click();
+  await expect(reader(page)).toBeHidden();
+  await openStudy(page, 1);
+  const wrappedLength = await page.evaluate(() => history.length);
+  await page.keyboard.press("ArrowLeft");
+  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(23);
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(1);
+  expect(await page.evaluate(() => history.length)).toBe(wrappedLength);
+
+  // Then every modified arrow remains native and does not navigate
+  for (const key of ["Alt+ArrowRight", "Control+ArrowRight", "Meta+ArrowRight", "Shift+ArrowRight"]) {
+    await page.keyboard.press(key);
+    expect(await page.evaluate(() => history.state.number)).toBe(1);
+    expect(await page.evaluate(() => history.length)).toBe(wrappedLength);
+  }
+});
+
+test("native link variants and every guarded arrow target pass through", async ({ page }) => {
+  // Given same-tab card enhancement and fetched prose with every guarded target kind
   await page.goto("/");
   expect(await observeNativeClick(page, 3, { target: "_blank" })).toBe(false);
   expect(await observeNativeClick(page, 4, { download: "study.html" })).toBe(false);
   expect(await observeNativeClick(page, 5, {}, { metaKey: true })).toBe(false);
   const path = await studyPath(page, 6);
-  await page.route(path, (route) => route.fulfill({ contentType: "text/html", body: fixture('<input aria-label="reader input" value="abc"><h2>input</h2>') }));
+  await page.route(path, (route) => route.fulfill({
+    contentType: "text/html",
+    body: fixture(`
+      <input data-arrow-guard="input" aria-label="reader input" value="abc">
+      <textarea data-arrow-guard="textarea" aria-label="reader textarea">abc</textarea>
+      <select data-arrow-guard="select" aria-label="reader select"><option>first</option><option data-arrow-guard="option">second</option></select>
+      <div data-arrow-guard="contenteditable" contenteditable="true">abc</div>
+      <audio data-arrow-guard="audio" aria-label="reader audio" controls></audio>
+      <video data-arrow-guard="video" aria-label="reader video" controls></video>
+      <div data-arrow-guard="textbox" role="textbox" tabindex="0">abc</div>
+      <div data-arrow-guard="searchbox" role="searchbox" tabindex="0">abc</div>
+      <div data-arrow-guard="spinbutton" role="spinbutton" tabindex="0" aria-valuenow="1"></div>
+      <div data-arrow-guard="slider" role="slider" tabindex="0" aria-valuenow="1"></div>
+      <h2>guarded targets</h2>
+    `),
+  }));
   await openStudy(page, 6);
-  const title = await reader(page).locator("[data-reader-title]").textContent();
   const input = reader(page).getByRole("textbox", { name: "reader input" });
   await input.focus();
   await input.evaluate((element) => element.setSelectionRange(1, 1));
 
-  // When native left/right keys edit the input and the dialog receives an arrow key
+  // When native arrows move carets and values in actual editable/form controls
   await page.keyboard.press("ArrowRight");
   expect(await input.evaluate((element) => element.selectionStart)).toBe(2);
-  await reader(page).locator("[data-reader-title]").focus();
-  await page.keyboard.press("ArrowLeft");
+  const textarea = reader(page).getByRole("textbox", { name: "reader textarea" });
+  await textarea.focus();
+  await textarea.evaluate((element) => element.setSelectionRange(1, 1));
+  await page.keyboard.press("ArrowRight");
+  expect(await textarea.evaluate((element) => element.selectionStart)).toBe(2);
+  const select = reader(page).getByRole("combobox", { name: "reader select" });
+  await select.focus();
+  const selectedIndex = await select.evaluate((element) => element.selectedIndex);
+  await page.keyboard.press("ArrowRight");
+  expect(await select.evaluate((element) => element.selectedIndex)).toBe(selectedIndex);
+  const editable = reader(page).locator('[data-arrow-guard="contenteditable"]');
+  await editable.focus();
+  await editable.evaluate((element) => {
+    const selection = getSelection();
+    selection.removeAllRanges();
+    selection.collapse(element.firstChild, 1);
+  });
+  await page.keyboard.press("ArrowRight");
+  expect(await page.evaluate(() => getSelection().focusOffset)).toBe(2);
+  await page.evaluate(() => {
+    document.addEventListener("keydown", (event) => {
+      const target = event.target.closest('[role="spinbutton"], [role="slider"]');
+      if (!target || event.defaultPrevented || event.key !== "ArrowRight") return;
+      target.setAttribute("aria-valuenow", String(Number(target.getAttribute("aria-valuenow")) + 1));
+    });
+  });
+  for (const role of ["spinbutton", "slider"]) {
+    const control = reader(page).getByRole(role);
+    await control.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect(control).toHaveAttribute("aria-valuenow", "2");
+  }
 
-  // Then no study navigation is attached to arrows
-  await expect(reader(page).locator("[data-reader-title]")).toHaveText(title ?? "");
+  // And plain plus modified arrows are never canceled for any exclusion boundary
+  const guards = ["input", "textarea", "select", "option", "contenteditable", "audio", "video", "textbox", "searchbox", "spinbutton", "slider"];
+  for (const guard of guards) {
+    const target = reader(page).locator(`[data-arrow-guard="${guard}"]`);
+    for (const init of [
+      { key: "ArrowLeft" },
+      { key: "ArrowRight", altKey: true, ctrlKey: true, metaKey: true, shiftKey: true },
+    ]) {
+      expect(await target.evaluate((element, eventInit) => {
+        const event = new KeyboardEvent("keydown", { bubbles: true, cancelable: true, ...eventInit });
+        element.dispatchEvent(event);
+        return event.defaultPrevented;
+      }, init)).toBe(false);
+    }
+  }
+
+  // Then guarded interactions retain the current study and fixed history entry
   expect(await page.evaluate(() => history.state.number)).toBe(6);
 });
 

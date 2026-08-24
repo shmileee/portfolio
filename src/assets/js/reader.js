@@ -7,6 +7,19 @@ const FOCUSABLE_SELECTOR = [
   "textarea:not([disabled])",
   "[tabindex]:not([tabindex='-1'])",
 ].join(",");
+const ARROW_GUARD_SELECTOR = [
+  "input",
+  "textarea",
+  "select",
+  "option",
+  "[contenteditable]",
+  "audio",
+  "video",
+  '[role="textbox"]',
+  '[role="searchbox"]',
+  '[role="spinbutton"]',
+  '[role="slider"]',
+].join(",");
 
 function createManifestIndex(manifestNode) {
   const entries = JSON.parse(manifestNode.textContent || "[]");
@@ -79,6 +92,10 @@ function isReaderState(state) {
   return state?.portfolioReader === true && Number.isInteger(state.number);
 }
 
+function isGuardedArrowTarget(target) {
+  return target instanceof Element && Boolean(target.closest(ARROW_GUARD_SELECTOR));
+}
+
 export function setupReader() {
   const dialog = document.querySelector("[data-reader]");
   if (!(dialog instanceof HTMLDialogElement)) return;
@@ -93,7 +110,17 @@ export function setupReader() {
   const closeButton = dialog.querySelector("[data-reader-close]");
   const previousButton = dialog.querySelector('[data-reader-direction="previous"]');
   const nextButton = dialog.querySelector('[data-reader-direction="next"]');
-  if (!manifestNode || !study || !title || !prose || !status || !metaNumber || !metaTopics) return;
+  const previousKicker = previousButton?.querySelector("[data-reader-direction-kicker]");
+  const previousNumber = previousButton?.querySelector("[data-reader-case-number]");
+  const previousTitle = previousButton?.querySelector("[data-reader-case-title]");
+  const nextKicker = nextButton?.querySelector("[data-reader-direction-kicker]");
+  const nextNumber = nextButton?.querySelector("[data-reader-case-number]");
+  const nextTitle = nextButton?.querySelector("[data-reader-case-title]");
+  if (
+    !manifestNode || !study || !title || !prose || !status || !metaNumber || !metaTopics || !closeButton ||
+    !previousButton || !previousKicker || !previousNumber || !previousTitle ||
+    !nextButton || !nextKicker || !nextNumber || !nextTitle
+  ) return;
 
   const manifest = createManifestIndex(manifestNode);
   const loadContent = createContentLoader();
@@ -154,8 +181,14 @@ export function setupReader() {
     metaTopics.textContent = ` · ${entry.topics.join(" · ")}`;
     title.textContent = entry.title;
     prose.innerHTML = content;
-    if (previousButton) previousButton.textContent = `← ${String(previous.number).padStart(2, "0")} · ${previous.title}`;
-    if (nextButton) nextButton.textContent = `${String(next.number).padStart(2, "0")} · ${next.title} →`;
+    previousKicker.textContent = "Previous";
+    previousNumber.textContent = `Case ${String(previous.number).padStart(2, "0")}`;
+    previousTitle.textContent = previous.title;
+    previousButton.setAttribute("aria-label", `Previous case study: ${previousNumber.textContent} — ${previous.title}`);
+    nextKicker.textContent = "Next";
+    nextNumber.textContent = `Case ${String(next.number).padStart(2, "0")}`;
+    nextTitle.textContent = next.title;
+    nextButton.setAttribute("aria-label", `Next case study: ${nextNumber.textContent} — ${next.title}`);
     study.removeAttribute("aria-busy");
     status.textContent = `${entry.title} loaded.`;
     if (!dialog.open) dialog.showModal();
@@ -182,9 +215,13 @@ export function setupReader() {
 
   const navigate = (direction) => {
     const current = manifest.numbers.indexOf(activeNumber);
+    if (current < 0) return false;
     const offset = direction === "next" ? 1 : -1;
     const number = manifest.numbers[(current + offset + manifest.numbers.length) % manifest.numbers.length];
-    showStudy(manifest.byNumber.get(number), "replace");
+    const entry = manifest.byNumber.get(number);
+    if (!entry) return false;
+    showStudy(entry, "replace");
+    return true;
   };
 
   const handleLocation = () => {
@@ -228,6 +265,12 @@ export function setupReader() {
     if (event.target === dialog) closeReader();
   });
   dialog.addEventListener("keydown", (event) => {
+    const isArrow = event.key === "ArrowLeft" || event.key === "ArrowRight";
+    const isModified = event.altKey || event.ctrlKey || event.metaKey || event.shiftKey;
+    if (dialog.open && isArrow && !isModified && !isGuardedArrowTarget(event.target)) {
+      if (navigate(event.key === "ArrowRight" ? "next" : "previous")) event.preventDefault();
+      return;
+    }
     if (event.key !== "Tab") return;
     const focusables = visibleFocusables(dialog);
     const first = focusables[0];
