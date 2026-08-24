@@ -1257,7 +1257,7 @@ h3 {
   display: flex;
   justify-content: flex-end;
   margin-bottom: var(--space-8);
-  background: var(--surface-primary);
+  background: transparent;
   pointer-events: none;
 }
 

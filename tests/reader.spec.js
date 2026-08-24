@@ -40,6 +40,89 @@ async function closeContentOverlaps(page) {
   });
 }
 
+async function stickyOcclusionFacts(target) {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await target.evaluate((element) => {
+      const dialog = document.querySelector("dialog[data-reader]");
+      const toolbar = document.querySelector(".reader-toolbar");
+      const targetRect = element.getBoundingClientRect();
+      const toolbarRect = toolbar.getBoundingClientRect();
+      dialog.scrollTop += targetRect.top - toolbarRect.top - 4;
+    });
+  }
+
+  return target.evaluate((element) => {
+    const area = (first, second) => {
+      const width = Math.max(0, Math.min(first.right, second.right) - Math.max(first.left, second.left));
+      const height = Math.max(0, Math.min(first.bottom, second.bottom) - Math.max(first.top, second.top));
+      return width * height;
+    };
+    const toolbar = document.querySelector(".reader-toolbar");
+    const close = document.querySelector(".reader-close");
+    const toolbarRect = toolbar.getBoundingClientRect();
+    const closeRect = close.getBoundingClientRect();
+    const targetRect = element.getBoundingClientRect();
+    const background = getComputedStyle(toolbar).backgroundColor;
+    const channels = background.match(/[\d.]+/g)?.map(Number) ?? [];
+    const backgroundAlpha = background === "transparent" ? 0 : (channels[3] ?? 1);
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const lineRects = [...range.getClientRects()].map((rect) => ({
+      bottom: rect.bottom,
+      left: rect.left,
+      right: rect.right,
+      top: rect.top,
+    }));
+    const borderWidth = Number.parseFloat(getComputedStyle(element).borderLeftWidth) || 0;
+    const ruleRect = {
+      bottom: targetRect.bottom,
+      left: targetRect.left,
+      right: targetRect.left + borderWidth,
+      top: targetRect.top,
+    };
+    const targetRects = lineRects.length > 0 ? lineRects : [targetRect];
+
+    return {
+      background,
+      backgroundAlpha,
+      close: {
+        height: closeRect.height,
+        hitTarget: document.elementFromPoint(
+          closeRect.left + closeRect.width / 2,
+          closeRect.top + closeRect.height / 2,
+        ) === close,
+        pointerEvents: getComputedStyle(close).pointerEvents,
+        width: closeRect.width,
+      },
+      closeIntersectionAreas: targetRects.map((rect) => area(closeRect, rect)).filter(Boolean),
+      opaqueLineIntersectionAreas: backgroundAlpha > 0
+        ? targetRects.map((rect) => area(toolbarRect, rect)).filter(Boolean)
+        : [],
+      opaqueRuleIntersectionArea: backgroundAlpha > 0 ? area(toolbarRect, ruleRect) : 0,
+      pointerEvents: getComputedStyle(toolbar).pointerEvents,
+      scroll: {
+        clientHeight: document.querySelector("dialog[data-reader]").clientHeight,
+        scrollHeight: document.querySelector("dialog[data-reader]").scrollHeight,
+        scrollTop: document.querySelector("dialog[data-reader]").scrollTop,
+      },
+      target: {
+        bottom: targetRect.bottom,
+        tag: element.tagName,
+        text: element.textContent.trim().slice(0, 80),
+        top: targetRect.top,
+      },
+      targetIntersectsToolbar: area(toolbarRect, targetRect) > 0,
+      toolbar: {
+        bottom: toolbarRect.bottom,
+        height: toolbarRect.height,
+        left: toolbarRect.left,
+        right: toolbarRect.right,
+        top: toolbarRect.top,
+      },
+    };
+  });
+}
+
 async function manifestEntries(page) {
   return JSON.parse(await reader(page).locator("[data-reader-manifest]").textContent());
 }
@@ -361,6 +444,37 @@ test("Task 6 sticky Close and adjacent cards keep exact responsive geometry", as
     expect(await closeContentOverlaps(page)).toEqual([]);
     await reader(page).locator("[data-reader-close]").click();
     await expect(reader(page)).toBeHidden();
+  }
+});
+
+test("Task 6 sticky toolbar never paints over reader prose or section rules", async ({ page }) => {
+  for (const width of [320, 375, 768, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+
+    for (const { heading, number } of [
+      { heading: "WHAT IT CHANGED", number: 3 },
+      { heading: "What I did", number: 12 },
+    ]) {
+      await page.goto(`/#study-${number}`, { waitUntil: "networkidle" });
+      await expect(reader(page)).toBeVisible();
+      const sectionHeading = reader(page).locator(".reader-prose h3").filter({ hasText: heading });
+      const paragraph = sectionHeading.locator("xpath=following-sibling::p[1]");
+
+      for (const target of [sectionHeading, paragraph]) {
+        const facts = await stickyOcclusionFacts(target);
+        expect(
+          facts.targetIntersectsToolbar,
+          `${width}px Study ${number} target must exercise sticky region: ${JSON.stringify(facts)}`,
+        ).toBe(true);
+        expect(facts.backgroundAlpha, `${width}px Study ${number} toolbar background ${facts.background}`).toBe(0);
+        expect(facts.opaqueLineIntersectionAreas, `${width}px Study ${number} text hidden by toolbar`).toEqual([]);
+        expect(facts.opaqueRuleIntersectionArea, `${width}px Study ${number} left rule hidden by toolbar`).toBe(0);
+        expect(facts.closeIntersectionAreas, `${width}px Study ${number} Close overlaps content`).toEqual([]);
+        expect(facts.close).toEqual({ height: 44, hitTarget: true, pointerEvents: "auto", width: 44 });
+        expect(facts.pointerEvents).toBe("none");
+        expect(facts.toolbar.height).toBeGreaterThanOrEqual(44);
+      }
+    }
   }
 });
 
