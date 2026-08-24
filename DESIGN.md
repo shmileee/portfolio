@@ -6,7 +6,7 @@ A calm, technical field report: dark by default, editorial rather than dashboard
 
 Primary visitors are engineering leaders, hiring managers, and senior platform engineers scanning for evidence before reading deeply. The secondary user is the author, who needs new Markdown content to inherit the same hierarchy without making visual decisions.
 
-The homepage is ordered for that scan: a hero that pairs the name with a short hiring snapshot (role, scope of ownership, AWS/Kubernetes/delivery/reliability focus, and contact links), then the full case-study index (section 01), a concise metadata-driven spotlight proof (02), the narrative arc (03), and working principles (04). The spotlight section shows the study's title, summary, `spotlightProof` sentence, and topics with a single link to the case study — never the full inline story. Primary navigation is Work, The arc, How I work, and Contact.
+The homepage is ordered for that scan: a hero pairing the name with a short hiring snapshot (role, scope of ownership, and AWS/Kubernetes/delivery/reliability focus), then the six-beat four-year platform arc (section 01), a concise metadata-driven spotlight proof (02), the full case-study index (03), and working principles (04). The hero actions link to the case-study index and contact footer. GitHub, LinkedIn, and email live in that footer rather than the hero. The spotlight section shows the study's title, summary, `spotlightProof` sentence, and topics with a single link to the case study — never the full inline story. Primary navigation is Work, The arc, How I work, and Contact.
 
 ## 2. Color
 
@@ -35,7 +35,8 @@ The homepage is ordered for that scan: a hero that pairs the name with a short h
 - Dark is the default; the user choice persists under the existing `om-theme` local-storage key.
 - Blue communicates navigation, selection, and emphasis. Red is reserved for reading progress.
 - Keyboard focus is a 3px solid `--focus-ring` outline with a 3px offset and no shadow; under `forced-colors: active` the outline color becomes the system `Highlight`.
-- Code comments and meaningful labels inside the always-dark exhibits use opaque `#9CA3AF` so they stay readable on the dark exhibit ramp in both page themes.
+- Code exhibits use the active theme's `--code-surface`, `--code-toolbar`, `--code-border`, `--code-text`, `--code-muted`, `--code-keyword`, and `--code-value` tokens. Inline diagrams use `--diagram-surface` plus theme-resolved SVG variables such as `--bg`, `--w88`, `--w45`, `--w42`, `--w5`, `--w7`, and `--ab4`, so both surfaces become light with the page theme and preserve their contrast roles.
+- Image and video media frames keep their intentionally dark frame and stage palette in both page themes; they do not inherit the adaptive code/diagram surfaces.
 - New colors are added here before use. Decorative gradients are not part of this system.
 
 ## 3. Typography
@@ -94,7 +95,7 @@ Spacing follows a 4px base with these intent tokens:
 - Page maximum: 1140px with `clamp(20px, 5vw, 48px)` gutters.
 - Reader maximum: 840px shell with `clamp(24px, 5vw, 56px)` padding; the standalone study column is also 840px wide.
 - Card grid: `repeat(auto-fill, minmax(min(17.5rem, 100%), 1fr))`.
-- Breakpoints: at 900px the header wraps into a compact multi-row layout (with matching `scroll-padding-top`), the back-to-top control joins the document flow, and reader padding tightens; at 480px hero actions and footer columns stack.
+- Breakpoints: at 900px the header wraps into a compact multi-row layout (with matching `scroll-padding-top`), the back-to-top control joins the document flow, and reader padding tightens; at 600px and below reader and standalone adjacent-study cards stack into one column; at 480px hero actions and footer columns stack.
 - Primary content must remain one readable column at 375px with no horizontal page scroll.
 
 ## 5. Components
@@ -129,30 +130,40 @@ Spacing follows a 4px base with these intent tokens:
 - **Accessibility**: real anchor, never a clickable `div` or a button.
 
 ### Case Study Reader
-- **Structure**: one reusable native dialog shell — sticky close control, metadata line, a single `h2` title with `tabindex="-1"`, an `aria-live` status target, one prose container, and previous/next controls — plus an embedded JSON manifest listing each study's number, canonical URL, title, and topics. No study body is pre-rendered into the page.
+- **Structure**: one reusable native dialog shell — a sticky toolbar containing an icon-only Close button with the accessible name “Close case study,” metadata line, a single `h2` title with `tabindex="-1"`, an `aria-live` status target, one prose container, and previous/next controls — plus an embedded JSON manifest listing each study's number, canonical URL, title, and topics. Each adjacent control has separate direction kicker, case number, and title nodes. No study body is pre-rendered into the page.
 - **Loading**: opening a study fetches its canonical standalone page on demand, extracts `.case-detail-prose`, rewrites relative `src`/`poster`/`href` values against the response URL, demotes fetched `h2` headings to `h3`, and caches the result so each study is requested at most once per page session. While loading, the shell is `aria-busy` and the status region announces progress.
 - **Failure**: if the fetch fails or the response has no canonical prose, the browser navigates to the study's standalone URL instead of leaving an empty dialog.
 - **History**: opening from the page pushes one marked `#study-N` history entry; in-reader previous/next and prose-link navigation replace it. Browser Back closes an open reader; the explicit close control consumes the marked entry via `history.back()`, so Back never reopens it. Arriving on an unmarked `#study-N` hash still opens the reader, and closing it then rewrites the URL to path plus query with `replaceState`.
-- **Interception**: only unmodified primary same-tab clicks on `[data-open-study]` anchors (or canonical study links inside fetched prose) are intercepted; modifier, middle-click, `target`, and `download` activations pass through to the browser. There is no arrow-key study navigation — unmodified ArrowLeft/ArrowRight are never intercepted.
+- **Interception**: homepage cards, arc labels, and spotlight entry points are canonical `/case-studies/…/` anchors carrying `[data-open-study]`. Only an ordinary unmodified primary same-tab activation is progressively enhanced into the reader; modified or middle-button activation, `target`, `download`, Copy Link Address, and JavaScript-disabled use retain the canonical standalone URL. While the reader is open, ordinary canonical study links inside fetched prose receive the same enhancement.
+- **Keyboard navigation**: unmodified `ArrowLeft` and `ArrowRight` move to the previous and next manifest entries with wraparound and replace the marked reader history entry. Modified arrows remain native. Arrow navigation is also guarded when the event originates in or below editable/form targets (`input`, `textarea`, `select`, `option`, or `[contenteditable]`), media (`audio` or `video`), an inline `.diagram-exhibit`, or ARIA textbox, searchbox, spinbutton, and slider roles, preserving caret, value, playback, and local diagram-scrolling behavior.
 - **Focus**: focus starts on the study title, Tab and Shift+Tab wrap among the dialog's visible controls, and closing restores focus to the invoking element. Escape, backdrop click, and the close control all close the dialog; body scroll locks while it is open.
-- **Layout**: viewport-scrolling scrim with `clamp(16px, 4vw, 48px)` inset, 840px shell, 12px radius, and a close button absolutely anchored at `right: 0; top: -14px` inside a sticky `top: 16px; height: 0` toolbar.
+- **Layout**: viewport-scrolling scrim with `clamp(16px, 4vw, 48px)` inset, an 840px shell, and 12px radius. The toolbar keeps normal sticky height and spacing so its 44px circular Close control remains visible and clickable during deep reader scroll. Previous and next are equal `minmax(0, 1fr)` cards in a two-column grid, with the next card aligned to the right; their kicker, number, and naturally wrapping title never truncate, and the pair stacks at 600px and below.
+
+### Standalone Study Navigation
+- **Structure**: every canonical standalone study ends with an “Adjacent case studies” navigation containing ordinary previous and next anchors with the same separate kicker, case number, and title anatomy as the reader controls.
+- **Sequence**: neighbors follow numeric study order and wrap in both directions, including Study 01 previous to Study 23 and Study 23 next to Study 01. These links stay canonical anchors without reader hooks, so they work without JavaScript.
+- **Separation**: the adjacent-study pair is distinct from the following “Portfolio navigation,” which continues to link to View all work and Contact.
+- **Layout**: the links use the same equal two-column card geometry, natural title wrapping, directional alignment, and 600px one-column breakpoint as the reader controls.
 
 ### Exhibit Frame
-- **Structure**: dark 8px-radius frame, 1px subtle border, 10px × 16px header, three 9px dots, filename, compact language badge, and a horizontally scrollable body.
+- **Structure**: 8px-radius frame, 1px border, 10px × 16px header, three 9px dots, filename, compact language badge, and a horizontally scrollable body.
 - **Variants**: code, image, video recording, and inline architecture diagram. Image and video media share identical frame styling.
 - **Video**: an `.mp4` source renders a native `<video>` with `controls`, a required poster image, `playsinline`, and `preload="metadata"`; it starts paused and never autoplays or loops. Recordings are converted locally before commit; the build does not transcode.
 - **Typography**: filename 12px mono; badge 10px mono with `.12em` tracking; code 13px mono at 1.75 line height with 20px × 24px padding.
-- **Theme**: exhibits intentionally remain dark in both page themes and use the dark token ramp.
+- **Theme**: code frames adapt their surface, toolbar, border, text, comment, keyword, and value tokens to the selected page theme. Image and video media frames intentionally stay on the dark frame/stage palette in both themes.
+- **Media layout**: standalone media may break out wider than the prose measure up to its authored `maxWidth` and page gutters. The same canonical media loaded in `.reader-prose` is contained to the reader prose width with no breakout transform; this containment applies only inside the reader.
 - **Accessibility**: authored filename/language remain visible text; images keep descriptive alt text and videos an equivalent `aria-label`; wide bodies scroll within the frame.
 
 ### Architecture Diagram
 - **Structure**: authored SVG is inserted inline inside an exhibit wrapper so the original CSS custom properties, marker IDs, and geometry remain active.
-- **Layout**: diagram SVGs are width 100%, height auto, max-width 720px, and centered; the wrapper does not redraw or approximate the source.
+- **Theme**: the wrapper surface and shared SVG custom properties resolve separately for light and dark themes, preserving readable node fills, labels, emphasis, connectors, and markers on both standalone and reader surfaces.
+- **Layout**: diagram SVGs are width 100%, height auto, max-width 720px, and centered; the wrapper does not redraw or approximate the source. At narrow widths, the wrapper owns horizontal overflow so the diagram remains locally scrollable rather than widening the page.
 
 ### Markdown Prose
 - **Structure**: headings, paragraphs, links, lists, blockquotes, code, and responsive exhibits.
 - **Variants**: dialog reader and standalone detail page. The standalone page renders authored `h2` sections under its `h1`; the reader shows the same content with sections demoted to `h3` under its `h2` title.
-- **Accessibility**: links remain underlined in prose; paragraphs are left-aligned; code scrolls within its own box; images have authored alt text.
+- **Wrapping**: prose paragraphs and list items use pretty wrapping without automatic hyphenation and may break otherwise unbroken tokens to protect the page width. Inline code outside `pre` stays on one line as an `inline-block`, is capped at its container width, and owns local horizontal scrolling when the command cannot fit; its border, background, and box-decoration styling stay intact.
+- **Accessibility**: links remain underlined in prose; paragraphs are left-aligned; block and inline code scroll within their own boxes rather than widening the page; images have authored alt text.
 
 ### Back To Top
 - **Structure**: on wide viewports, a fixed button appearing after meaningful scroll; at 900px and below it becomes a static in-flow control aligned right before the footer, so it never overlaps content.
@@ -182,9 +193,10 @@ The strategy is **mixed tonal shift plus borders**, with no decorative shadows o
 
 - Target WCAG 2.2 AA: 4.5:1 body contrast and 3:1 large text/UI contrast.
 - Every interactive element has a visible keyboard focus state: a 3px solid opaque `--focus-ring` outline offset by 3px, overridden to the system `Highlight` color under forced colors.
-- Named non-inline controls (header, hero actions, arc chips, filters, grid toggle, reader controls, back link, detail footer, contact links, back-to-top) enforce a 40px (2.5rem) minimum hit area; inline prose links are exempt.
+- Named non-inline controls (header, hero actions, arc chips, filters, grid toggle, reader controls, back link, detail footer, footer destinations, back-to-top) enforce a 40px (2.5rem) minimum hit area; inline prose links are exempt.
 - Native landmarks, headings, buttons, links, and dialog behavior take precedence over recreating legacy non-semantic wrappers.
 - Reader focus is trapped by an explicit Tab/Shift+Tab handler among the dialog's visible controls, starts on the study title, and is restored to the invoker on close; the floating close control must remain visible and clickable after internal scrolling.
+- Reader arrow shortcuts yield to modified keys and focused editable, form, media, ARIA widget, and locally scrollable diagram targets so native interaction is not canceled.
 - Videos expose native controls and never autoplay; theme respects saved user choice; motion respects `prefers-reduced-motion`.
 - Content must remain legible under 200% zoom, narrow mobile width, long titles, and unbroken code strings.
 
