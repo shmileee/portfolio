@@ -95,6 +95,62 @@ test("all standalone studies expose canonical wraparound adjacency", async ({ pa
   }
 });
 
+test("Task 6 standalone adjacent cards wrap long titles in equal responsive columns", async ({ page }) => {
+  const studies = await getStudyManifest(page);
+  const longest = studies.reduce((candidate, study) =>
+    study.title.length > candidate.title.length ? study : candidate,
+  );
+  const longestIndex = studies.findIndex(({ number }) => number === longest.number);
+  const current = studies[(longestIndex - 1 + studies.length) % studies.length];
+
+  for (const width of [320, 375, 768, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(current.url);
+    const facts = await page.locator(".case-detail-adjacent").evaluate((navigation) => {
+      const style = getComputedStyle(navigation);
+      const links = [...navigation.querySelectorAll("a")].map((link) => {
+        const rect = link.getBoundingClientRect();
+        const title = link.querySelector(".case-detail-adjacent-title");
+        return {
+          direction: link.dataset.studyDirection,
+          height: rect.height,
+          textAlign: getComputedStyle(link).textAlign,
+          titleClientWidth: title.clientWidth,
+          titleOverflow: getComputedStyle(title).overflow,
+          titleScrollWidth: title.scrollWidth,
+          titleWhiteSpace: getComputedStyle(title).whiteSpace,
+          width: rect.width,
+        };
+      });
+      return {
+        display: style.display,
+        gridTemplateColumns: style.gridTemplateColumns,
+        links,
+        pageClientWidth: document.documentElement.clientWidth,
+        pageScrollWidth: document.documentElement.scrollWidth,
+      };
+    });
+
+    expect(facts.display).toBe("grid");
+    expect(facts.links).toHaveLength(2);
+    expect(facts.pageScrollWidth).toBeLessThanOrEqual(facts.pageClientWidth);
+    for (const link of facts.links) {
+      expect(link.height).toBeGreaterThanOrEqual(40);
+      expect(link.titleOverflow).toBe("visible");
+      expect(link.titleWhiteSpace).toBe("normal");
+      expect(link.titleScrollWidth).toBeLessThanOrEqual(link.titleClientWidth + 0.01);
+    }
+    if (width <= 600) {
+      expect(facts.gridTemplateColumns.split(" ")).toHaveLength(1);
+    } else {
+      expect(facts.gridTemplateColumns.split(" ")).toHaveLength(2);
+      expect(Math.abs(facts.links[0].width - facts.links[1].width)).toBeLessThanOrEqual(0.02);
+      expect(facts.links[0].textAlign).toBe("left");
+      expect(facts.links[1].textAlign).toBe("right");
+    }
+  }
+});
+
 test("all standalone studies expose canonical, semantic, and navigation contracts", async ({
   page,
 }) => {

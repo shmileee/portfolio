@@ -5,8 +5,11 @@ const VIEWPORTS = [
   { width: 375, height: 667 },
   { width: 768, height: 1024 },
   { width: 1024, height: 768 },
+  { width: 1280, height: 900 },
   { width: 1440, height: 900 },
 ];
+const ACCEPTANCE_WIDTHS = [320, 375, 768, 1280, 1440];
+const APPROVE_STUDY_PATH = "/case-studies/02-approve-the-audited-escape-hatch/";
 const STUDY_PATH = "/case-studies/14-environments-you-can-create-and-destroy-with-one-command/";
 const THEME_STUDY_PATH =
   "/case-studies/21-customer-code-running-safely-self-service-cloud-functions/";
@@ -71,6 +74,35 @@ async function expectNamedTargets(page) {
       .filter(({ width, height }) => width > 0 && height > 0 && (width < 39.99 || height < 39.99)),
   );
   expect(undersized).toEqual([]);
+}
+
+async function inlineCodeFacts(locator) {
+  return locator.evaluate((code) => {
+    const paragraph = code.closest("p");
+    const codeStyle = getComputedStyle(code);
+    const paragraphStyle = getComputedStyle(paragraph);
+    return {
+      code: {
+        clientWidth: code.clientWidth,
+        display: codeStyle.display,
+        lineRects: code.getClientRects().length,
+        maxWidth: codeStyle.maxWidth,
+        overflowX: codeStyle.overflowX,
+        scrollWidth: code.scrollWidth,
+        whiteSpace: codeStyle.whiteSpace,
+      },
+      containerWidth: paragraph.clientWidth,
+      paragraph: {
+        hyphens: paragraphStyle.hyphens,
+        overflowWrap: paragraphStyle.overflowWrap,
+        textWrap: paragraphStyle.textWrap,
+      },
+      page: {
+        clientWidth: document.documentElement.clientWidth,
+        scrollWidth: document.documentElement.scrollWidth,
+      },
+    };
+  });
 }
 
 async function getContrastFacts(page) {
@@ -467,6 +499,75 @@ for (const viewport of VIEWPORTS) {
     expect(["left", "start"]).toContain(standaloneAlignment);
   });
 }
+
+test("Task 6 arc labels use the exact dense geometry at every acceptance width", async ({ page }) => {
+  for (const width of ACCEPTANCE_WIDTHS) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const facts = await page.locator(".arc-links").first().evaluate((links) => {
+      const link = links.querySelector("a");
+      const linksStyle = getComputedStyle(links);
+      const linkStyle = getComputedStyle(link);
+      const rect = link.getBoundingClientRect();
+      return {
+        columnGap: linksStyle.columnGap,
+        fontFamily: linkStyle.fontFamily,
+        fontSize: linkStyle.fontSize,
+        height: rect.height,
+        lineHeight: parseFloat(linkStyle.lineHeight),
+        paddingLeft: linkStyle.paddingLeft,
+        paddingRight: linkStyle.paddingRight,
+        rowGap: linksStyle.rowGap,
+      };
+    });
+
+    expect(facts, `${width}px arc geometry`).toMatchObject({
+      columnGap: "6px",
+      fontSize: "11.5px",
+      paddingLeft: "10px",
+      paddingRight: "10px",
+      rowGap: "6px",
+    });
+    expect(facts.fontFamily).toContain("IBM Plex Mono");
+    expect(facts.lineHeight).toBeGreaterThanOrEqual(16);
+    expect(facts.height).toBeGreaterThanOrEqual(40);
+    await expectNoOverflow(page);
+  }
+});
+
+test("Task 6 prose and approve commands wrap editorially without escaping their local box", async ({ page }) => {
+  for (const width of ACCEPTANCE_WIDTHS) {
+    await page.setViewportSize({ width, height: 900 });
+
+    for (const surface of ["standalone", "reader"]) {
+      await page.goto(surface === "standalone" ? APPROVE_STUDY_PATH : "/#study-2", {
+        waitUntil: "networkidle",
+      });
+      if (surface === "reader") await expect(page.locator("[data-reader]")).toBeVisible();
+      const root = page.locator(surface === "standalone" ? ".case-detail-prose" : ".reader-prose");
+      const command = root.locator("code").filter({ hasText: '/approve reason="emergency: prod fix"' });
+      const facts = await inlineCodeFacts(command);
+
+      expect(facts.paragraph, `${width}px ${surface} prose wrapping`).toEqual({
+        hyphens: "none",
+        overflowWrap: "break-word",
+        textWrap: "pretty",
+      });
+      expect(facts.code, `${width}px ${surface} inline code`).toMatchObject({
+        display: "inline-block",
+        lineRects: 1,
+        maxWidth: "100%",
+        overflowX: "auto",
+        whiteSpace: "nowrap",
+      });
+      expect(facts.code.clientWidth).toBeLessThanOrEqual(facts.containerWidth + 0.01);
+      if (facts.code.scrollWidth > facts.code.clientWidth) {
+        expect(facts.code.scrollWidth).toBeGreaterThan(facts.containerWidth);
+      }
+      expect(facts.page.scrollWidth).toBeLessThanOrEqual(facts.page.clientWidth);
+    }
+  }
+});
 
 test("320px layout fits beside a classic vertical scrollbar", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });

@@ -17,6 +17,29 @@ async function openStudy(page, number) {
   await expect(reader(page)).toBeVisible();
 }
 
+async function closeContentOverlaps(page) {
+  return page.evaluate(() => {
+    const close = document.querySelector(".reader-close").getBoundingClientRect();
+    const selectors = [
+      ".reader-study > .reader-meta",
+      ".reader-study > .reader-title",
+      ".reader-prose > h3",
+      ".reader-prose > p",
+      ".reader-prose > ul",
+      ".reader-prose > .media-exhibit",
+      ".reader-prose > .diagram-exhibit",
+      ".reader-navigation",
+    ];
+    return [...document.querySelectorAll(selectors.join(","))].flatMap((element) => {
+      const rect = element.getBoundingClientRect();
+      if (rect.bottom <= 0 || rect.top >= innerHeight) return [];
+      const width = Math.max(0, Math.min(close.right, rect.right) - Math.max(close.left, rect.left));
+      const height = Math.max(0, Math.min(close.bottom, rect.bottom) - Math.max(close.top, rect.top));
+      return width * height > 0 ? [{ area: width * height, selector: element.className || element.tagName }] : [];
+    });
+  });
+}
+
 async function manifestEntries(page) {
   return JSON.parse(await reader(page).locator("[data-reader-manifest]").textContent());
 }
@@ -232,6 +255,112 @@ test("close and adjacent controls expose structured descriptive semantics", asyn
     await expect(control.locator("[data-reader-case-number]")).toHaveText(`Case ${String(entry.number).padStart(2, "0")}`);
     await expect(control.locator("[data-reader-case-title]")).toHaveText(entry.title);
     await expect(control).toHaveAccessibleName(`${kicker} case study: Case ${String(entry.number).padStart(2, "0")} — ${entry.title}`);
+  }
+});
+
+test("Task 6 sticky Close and adjacent cards keep exact responsive geometry", async ({ page }) => {
+  const widths = [320, 375, 768, 1280, 1440];
+
+  for (const width of widths) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/#study-12", { waitUntil: "networkidle" });
+    await expect(reader(page)).toBeVisible();
+    const close = reader(page).locator("[data-reader-close]");
+    const navigation = reader(page).locator(".reader-navigation");
+    const diagram = reader(page).locator(".diagram-exhibit").last();
+
+    await diagram.scrollIntoViewIfNeeded();
+    const settled = await page.evaluate(() => {
+      const closeElement = document.querySelector("[data-reader-close]");
+      const diagramElement = [...document.querySelectorAll(".reader-prose .diagram-exhibit")].at(-1);
+      const closeRect = closeElement.getBoundingClientRect();
+      const diagramRect = diagramElement.getBoundingClientRect();
+      const navigationElement = document.querySelector(".reader-navigation");
+      const navigationStyle = getComputedStyle(navigationElement);
+      const controls = [...navigationElement.querySelectorAll("button")].map((control) => {
+        const rect = control.getBoundingClientRect();
+        const title = control.querySelector("[data-reader-case-title]");
+        return {
+          direction: control.dataset.readerDirection,
+          height: rect.height,
+          left: rect.left,
+          textAlign: getComputedStyle(control).textAlign,
+          titleClientWidth: title.clientWidth,
+          titleOverflow: getComputedStyle(title).overflow,
+          titleScrollWidth: title.scrollWidth,
+          titleWhiteSpace: getComputedStyle(title).whiteSpace,
+          width: rect.width,
+        };
+      });
+      const overlapWidth = Math.max(
+        0,
+        Math.min(closeRect.right, diagramRect.right) - Math.max(closeRect.left, diagramRect.left),
+      );
+      const overlapHeight = Math.max(
+        0,
+        Math.min(closeRect.bottom, diagramRect.bottom) - Math.max(closeRect.top, diagramRect.top),
+      );
+      return {
+        close: {
+          borderRadius: getComputedStyle(closeElement).borderRadius,
+          height: closeRect.height,
+          width: closeRect.width,
+        },
+        controls,
+        display: navigationStyle.display,
+        gridTemplateColumns: navigationStyle.gridTemplateColumns,
+        overlapArea: overlapWidth * overlapHeight,
+        toolbarHeight: document.querySelector(".reader-toolbar").getBoundingClientRect().height,
+      };
+    });
+
+    expect(settled.close).toEqual({ borderRadius: "50%", height: 44, width: 44 });
+    expect(settled.toolbarHeight).toBeGreaterThanOrEqual(44);
+    expect(settled.overlapArea).toBe(0);
+    expect(await closeContentOverlaps(page)).toEqual([]);
+    expect(settled.display).toBe("grid");
+    expect(settled.controls).toHaveLength(2);
+    for (const control of settled.controls) {
+      expect(control.height).toBeGreaterThanOrEqual(40);
+      expect(control.titleOverflow).toBe("visible");
+      expect(control.titleWhiteSpace).toBe("normal");
+      expect(control.titleScrollWidth).toBeLessThanOrEqual(control.titleClientWidth + 0.01);
+    }
+    if (width <= 600) {
+      expect(settled.gridTemplateColumns.split(" ")).toHaveLength(1);
+    } else {
+      expect(settled.gridTemplateColumns.split(" ")).toHaveLength(2);
+      expect(Math.abs(settled.controls[0].width - settled.controls[1].width)).toBeLessThanOrEqual(0.02);
+      expect(settled.controls[0].textAlign).toBe("left");
+      expect(settled.controls[1].textAlign).toBe("right");
+    }
+
+    await reader(page).evaluate((dialog) => { dialog.scrollTop = dialog.scrollHeight; });
+    const deep = await close.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      return {
+        hitTarget: document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2) === element,
+        visible: rect.top >= 0 && rect.bottom <= innerHeight,
+      };
+    });
+    expect(deep).toEqual({ hitTarget: true, visible: true });
+    expect(await closeContentOverlaps(page)).toEqual([]);
+    await close.click();
+    await expect(reader(page)).toBeHidden();
+
+    await page.goto("/#study-3", { waitUntil: "networkidle" });
+    await expect(reader(page)).toBeVisible();
+    const media = reader(page).locator(".media-exhibit").first();
+    await media.scrollIntoViewIfNeeded();
+    await reader(page).locator("video").focus();
+    expect(await closeContentOverlaps(page)).toEqual([]);
+
+    await page.goto("/#study-4", { waitUntil: "networkidle" });
+    await expect(reader(page)).toBeVisible();
+    await reader(page).locator(".reader-navigation").scrollIntoViewIfNeeded();
+    expect(await closeContentOverlaps(page)).toEqual([]);
+    await reader(page).locator("[data-reader-close]").click();
+    await expect(reader(page)).toBeHidden();
   }
 });
 

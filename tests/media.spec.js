@@ -139,6 +139,49 @@ test("reduced motion never starts either recording", async ({ browser }) => {
   }
 });
 
+test("Task 6 contains Study 03 reader media while preserving the standalone breakout", async ({ page }) => {
+  for (const width of [320, 375, 768, 1280, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto(VIDEO_EXHIBITS[0].route, { waitUntil: "networkidle" });
+    const standalone = await page.evaluate(() => {
+      const prose = document.querySelector(".case-detail-prose").getBoundingClientRect();
+      return [...document.querySelectorAll(".case-detail-prose .media-exhibit")].map((element) => ({
+        left: getComputedStyle(element).left,
+        maxWidth: getComputedStyle(element).maxWidth,
+        proseWidth: prose.width,
+        transform: getComputedStyle(element).transform,
+        width: element.getBoundingClientRect().width,
+      }));
+    });
+    await page.goto("/#study-3", { waitUntil: "networkidle" });
+    await expect(page.locator("[data-reader]")).toBeVisible();
+    const readerMedia = await page.evaluate(() => {
+      const prose = document.querySelector(".reader-prose").getBoundingClientRect();
+      return [...document.querySelectorAll(".reader-prose .media-exhibit")].map((element) => ({
+        left: getComputedStyle(element).left,
+        maxWidth: getComputedStyle(element).maxWidth,
+        proseWidth: prose.width,
+        transform: getComputedStyle(element).transform,
+        width: element.getBoundingClientRect().width,
+      }));
+    });
+
+    expect(readerMedia).toHaveLength(2);
+    expect(standalone).toHaveLength(2);
+    for (const media of readerMedia) {
+      expect(media.left).toBe("0px");
+      expect(media.maxWidth).toBe("100%");
+      expect(media.transform).toBe("none");
+      expect(media.width).toBeLessThanOrEqual(media.proseWidth + 0.01);
+    }
+    for (const media of standalone) {
+      expect(media.left).not.toBe("auto");
+      expect(media.maxWidth).toBe("none");
+      if (width >= 1280) expect(media.width).toBeGreaterThan(media.proseWidth);
+    }
+  }
+});
+
 test("generated output contains exactly two videos and no GIF delivery", async () => {
   // Given the authored src tree and the freshly built site output
   const roots = [join(PROJECT_ROOT, "src"), join(PROJECT_ROOT, "_site")];
