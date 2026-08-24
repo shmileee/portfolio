@@ -1,6 +1,7 @@
 ---
 layout: layouts/base.njk
 ---
+{% set adjacentStudies = collections.caseStudies | studyNeighbors(number) %}
 <main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
@@ -12,7 +13,19 @@ layout: layouts/base.njk
     </div>
   </header>
   <article class="prose case-detail-prose">{{ content | safe }}</article>
-  <nav class="case-detail-footer" aria-label="Case study navigation">
+  <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
+    <a href="{{ adjacentStudies.previous.url }}" data-study-direction="previous">
+      <span class="case-detail-adjacent-kicker">Previous</span>
+      <span class="case-detail-adjacent-number">Case {{ adjacentStudies.previous.data.number | pad2 }}</span>
+      <span class="case-detail-adjacent-title">{{ adjacentStudies.previous.data.title }}</span>
+    </a>
+    <a href="{{ adjacentStudies.next.url }}" data-study-direction="next">
+      <span class="case-detail-adjacent-kicker">Next</span>
+      <span class="case-detail-adjacent-number">Case {{ adjacentStudies.next.data.number | pad2 }}</span>
+      <span class="case-detail-adjacent-title">{{ adjacentStudies.next.data.title }}</span>
+    </a>
+  </nav>
+  <nav class="case-detail-footer" aria-label="Portfolio navigation">
     <a href="/#index">View all work →</a>
     <a href="/#contact">Contact</a>
   </nav>
