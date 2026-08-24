@@ -8,6 +8,8 @@ const VIEWPORTS = [
   { width: 1440, height: 900 },
 ];
 const STUDY_PATH = "/case-studies/14-environments-you-can-create-and-destroy-with-one-command/";
+const THEME_STUDY_PATH =
+  "/case-studies/21-customer-code-running-safely-self-service-cloud-functions/";
 const CONTROL_SELECTOR = [
   ".brand-link",
   ".site-nav a",
@@ -81,6 +83,144 @@ async function getContrastFacts(page) {
       body: ratio(body.color, body.backgroundColor),
       focus: ratio(root.getPropertyValue("--focus-ring"), body.backgroundColor),
       tertiary: ratio(footer.color, body.backgroundColor),
+    };
+  });
+}
+
+async function getExhibitThemeFacts(page) {
+  return page.evaluate(() => {
+    const parseColor = (value) => {
+      const channels = value.match(/[\d.]+/g)?.map(Number);
+      if (!channels || channels.length < 3) throw new TypeError(`Unable to parse color: ${value}`);
+      return [channels[0], channels[1], channels[2], channels[3] ?? 1];
+    };
+    const composite = (foreground, background) => {
+      const alpha = foreground[3] + background[3] * (1 - foreground[3]);
+      if (alpha === 0) return [0, 0, 0, 0];
+      return [
+        ...foreground.slice(0, 3).map(
+          (channel, index) =>
+            (channel * foreground[3] + background[index] * background[3] * (1 - foreground[3])) /
+            alpha,
+        ),
+        alpha,
+      ];
+    };
+    const background = (element) => {
+      const layers = [];
+      for (let current = element; current; current = current.parentElement) {
+        layers.push(parseColor(getComputedStyle(current).backgroundColor));
+      }
+      return layers.reverse().reduce((result, layer) => composite(layer, result), [255, 255, 255, 1]);
+    };
+    const luminance = (color) => {
+      const linear = color.slice(0, 3).map((channel) => {
+        const value = channel / 255;
+        return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+    };
+    const ratio = (foreground, backdrop) => {
+      const foregroundLuminance = luminance(composite(parseColor(foreground), backdrop));
+      const backgroundLuminance = luminance(backdrop);
+      return (
+        (Math.max(foregroundLuminance, backgroundLuminance) + 0.05) /
+        (Math.min(foregroundLuminance, backgroundLuminance) + 0.05)
+      );
+    };
+    const query = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) throw new TypeError(`Missing exhibit element: ${selector}`);
+      return element;
+    };
+    const style = (selector) => getComputedStyle(query(selector));
+    const resolveColor = (value) => {
+      const probe = document.createElement("span");
+      probe.style.color = value;
+      document.body.append(probe);
+      const resolved = getComputedStyle(probe).color;
+      probe.remove();
+      return resolved;
+    };
+
+    const codeElement = query(".code-exhibit");
+    const toolbarElement = query(".code-exhibit .exhibit-toolbar");
+    const filenameElement = query(".code-exhibit .exhibit-filename");
+    const badgeElement = query(".code-exhibit .exhibit-badge");
+    const preElement = query(".code-exhibit pre");
+    const commentElement = query(".code-exhibit .token.comment");
+    const keywordElement = query(".code-exhibit .token.keyword, .code-exhibit .token.key");
+    const valueElement = query(".code-exhibit .token.string, .code-exhibit .token.number");
+    const diagramElement = query(".diagram-exhibit");
+    const diagramLabelElement = query(".diagram-exhibit-label");
+    const svgRectElement = query(".diagram-exhibit svg rect");
+    const svgPrimaryTextElement = query(".diagram-exhibit svg text[font-weight='500']");
+    const svgSecondaryTextElement = query(".diagram-exhibit svg text:not([font-weight='500'])");
+    const svgEmphasisTextElement = query(".diagram-exhibit svg text[fill*='--w7']");
+    const svgConnectorElement = query(".diagram-exhibit svg path[stroke]");
+    const svgMarkerElement = query(".diagram-exhibit svg marker path");
+    const codeStyle = getComputedStyle(codeElement);
+    const toolbarStyle = getComputedStyle(toolbarElement);
+    const preStyle = getComputedStyle(preElement);
+    const diagramStyle = getComputedStyle(diagramElement);
+    const svgRectStyle = getComputedStyle(svgRectElement);
+    const diagramBackground = background(diagramElement);
+    const codeBackground = background(codeElement);
+    const root = getComputedStyle(document.documentElement);
+    const variables = Object.fromEntries(
+      ["--bg", "--w88", "--w45", "--w42", "--w5", "--w7", "--ab4"].map((name) => [
+        name,
+        resolveColor(diagramStyle.getPropertyValue(name)),
+      ]),
+    );
+    const dialog = document.querySelector("[data-reader]");
+
+    return {
+      theme: document.documentElement.dataset.theme,
+      tokens: {
+        codeSurface: resolveColor(root.getPropertyValue("--code-surface")),
+        diagramSurface: resolveColor(root.getPropertyValue("--diagram-surface")),
+      },
+      styles: {
+        codeSurface: codeStyle.backgroundColor,
+        codeBorder: codeStyle.borderColor,
+        toolbarSurface: toolbarStyle.backgroundColor,
+        toolbarBorder: toolbarStyle.borderBottomColor,
+        codeText: preStyle.color,
+        diagramSurface: diagramStyle.backgroundColor,
+        diagramBorder: diagramStyle.borderColor,
+        svgNodeFill: svgRectStyle.fill,
+        svgNodeStroke: svgRectStyle.stroke,
+        svgPrimaryText: getComputedStyle(svgPrimaryTextElement).fill,
+        svgSecondaryText: getComputedStyle(svgSecondaryTextElement).fill,
+        svgEmphasisText: getComputedStyle(svgEmphasisTextElement).fill,
+        svgConnector: getComputedStyle(svgConnectorElement).stroke,
+        svgMarker: getComputedStyle(svgMarkerElement).fill,
+      },
+      variables,
+      contrast: {
+        codeText: ratio(preStyle.color, background(preElement)),
+        filename: ratio(getComputedStyle(filenameElement).color, background(filenameElement)),
+        badge: ratio(getComputedStyle(badgeElement).color, background(badgeElement)),
+        comment: ratio(getComputedStyle(commentElement).color, background(commentElement)),
+        keyword: ratio(getComputedStyle(keywordElement).color, background(keywordElement)),
+        value: ratio(getComputedStyle(valueElement).color, background(valueElement)),
+        diagramLabel: ratio(getComputedStyle(diagramLabelElement).color, diagramBackground),
+        diagramPrimary: ratio(getComputedStyle(svgPrimaryTextElement).fill, diagramBackground),
+        diagramSecondary: ratio(getComputedStyle(svgSecondaryTextElement).fill, diagramBackground),
+        diagramEmphasis: ratio(getComputedStyle(svgEmphasisTextElement).fill, diagramBackground),
+        codeBorder: ratio(codeStyle.borderColor, background(codeElement.parentElement)),
+        toolbarBorder: ratio(toolbarStyle.borderBottomColor, codeBackground),
+        diagramBorder: ratio(diagramStyle.borderColor, background(diagramElement.parentElement)),
+        nodeBorder: ratio(svgRectStyle.stroke, parseColor(svgRectStyle.fill)),
+        connector: ratio(getComputedStyle(svgConnectorElement).stroke, diagramBackground),
+      },
+      overflow: {
+        pageClientWidth: document.documentElement.clientWidth,
+        pageScrollWidth: document.documentElement.scrollWidth,
+        dialogClientWidth: dialog?.clientWidth ?? null,
+        dialogScrollWidth: dialog?.scrollWidth ?? null,
+      },
     };
   });
 }
@@ -200,6 +340,59 @@ for (const theme of ["dark", "light"]) {
     expect(focus.color).not.toBe("rgba(0, 0, 0, 0)");
   });
 }
+
+test("code and inline diagrams adapt across standalone and reader themes", async ({ browser }) => {
+  const facts = {};
+
+  for (const viewport of [{ width: 375, height: 900 }, { width: 1440, height: 900 }]) {
+    facts[viewport.width] = {};
+    for (const surface of ["standalone", "reader"]) {
+      facts[viewport.width][surface] = {};
+      for (const theme of ["dark", "light"]) {
+        const context = await browser.newContext({ viewport });
+        await context.addInitScript((selectedTheme) => {
+          localStorage.setItem("om-theme", selectedTheme);
+        }, theme);
+        const page = await context.newPage();
+        const path = surface === "standalone" ? THEME_STUDY_PATH : "/#study-21";
+        await page.goto(path, { waitUntil: "networkidle" });
+        if (surface === "reader") await expect(page.locator("[data-reader]")).toBeVisible();
+        await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+        const state = await getExhibitThemeFacts(page);
+        facts[viewport.width][surface][theme] = state;
+        expect(state.overflow.pageScrollWidth).toBeLessThanOrEqual(state.overflow.pageClientWidth);
+        if (surface === "reader") {
+          expect(state.overflow.dialogScrollWidth).toBeLessThanOrEqual(state.overflow.dialogClientWidth);
+        }
+        await context.close();
+      }
+
+      const { dark, light } = facts[viewport.width][surface];
+      expect(light.styles.codeSurface).not.toBe("rgb(11, 18, 32)");
+      expect(light.styles.diagramSurface).not.toBe("rgb(17, 24, 39)");
+      expect(light.styles.codeSurface).not.toBe(dark.styles.codeSurface);
+      expect(light.styles.diagramSurface).not.toBe(dark.styles.diagramSurface);
+      expect(light.styles.codeSurface).toBe(light.tokens.codeSurface);
+      expect(light.styles.diagramSurface).toBe(light.tokens.diagramSurface);
+
+      for (const state of [dark, light]) {
+        for (const [name, contrast] of Object.entries(state.contrast)) {
+          const threshold = /Border|connector/.test(name) ? 3 : 4.5;
+          expect(contrast, `${viewport.width}px ${surface} ${state.theme} ${name}`).toBeGreaterThanOrEqual(
+            threshold,
+          );
+        }
+        expect(state.styles.svgNodeFill).toBe(state.variables["--bg"]);
+        expect(state.styles.svgNodeStroke).toBe(state.variables["--ab4"]);
+        expect(state.styles.svgPrimaryText).toBe(state.variables["--w88"]);
+        expect(state.styles.svgSecondaryText).toBe(state.variables["--w45"]);
+        expect(state.styles.svgEmphasisText).toBe(state.variables["--w7"]);
+        expect(state.styles.svgConnector).toBe(state.variables["--w42"]);
+        expect(state.styles.svgMarker).toBe(state.variables["--w5"]);
+      }
+    }
+  }
+});
 
 test("forced colors uses a solid system focus outline", async ({ page }) => {
   await page.emulateMedia({ forcedColors: "active" });
