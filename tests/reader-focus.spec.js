@@ -3,6 +3,8 @@ import { expect, test } from "@playwright/test";
 const reader = (page) => page.locator("dialog[data-reader]");
 const card = (page, number) => page.locator(`[data-open-study="${number}"]`).first();
 const arcLink = (page, number) => page.locator(`#arc [data-arc-study="${number}"]`).first();
+const STUDY_03_URL = "/case-studies/03-buttons-instead-of-incantations/";
+const NEW_TAB_MODIFIER = process.platform === "darwin" ? "Meta" : "Control";
 
 async function openCard(page, number) {
   const opener = card(page, number);
@@ -50,13 +52,33 @@ test("direct hash navigation does not reuse a stale restoration target", async (
   await expect(staleCard).not.toBeFocused();
 });
 
-test("modified and middle arc clicks remain native", async ({ page }) => {
+test("modified and middle arc clicks remain native", async ({ context, page }) => {
+  // Given the canonical Study 03 arc anchor
   await page.goto("/");
-  const prevented = await arcLink(page, 3).evaluate((anchor) => [
-    new MouseEvent("click", { bubbles: true, cancelable: true, button: 0, metaKey: true }),
-    new MouseEvent("click", { bubbles: true, cancelable: true, button: 1 }),
-  ].map((event) => !anchor.dispatchEvent(event)));
+  const homepageUrl = page.url();
+  const invoker = arcLink(page, 3);
 
-  expect(prevented).toEqual([false, false]);
+  // When the visitor uses the platform new-tab modifier and then the middle button
+  const [modifiedPage] = await Promise.all([
+    context.waitForEvent("page"),
+    invoker.click({ modifiers: [NEW_TAB_MODIFIER] }),
+  ]);
+  await modifiedPage.waitForLoadState("domcontentloaded");
+
+  // Then the homepage remains unchanged and the canonical standalone route opens natively
+  expect(page.url()).toBe(homepageUrl);
+  expect(new URL(modifiedPage.url()).pathname).toBe(STUDY_03_URL);
   await expect(reader(page)).toBeHidden();
+  await modifiedPage.close();
+
+  const [middlePage] = await Promise.all([
+    context.waitForEvent("page"),
+    invoker.click({ button: "middle" }),
+  ]);
+  await middlePage.waitForLoadState("domcontentloaded");
+
+  expect(page.url()).toBe(homepageUrl);
+  expect(new URL(middlePage.url()).pathname).toBe(STUDY_03_URL);
+  await expect(reader(page)).toBeHidden();
+  await middlePage.close();
 });
