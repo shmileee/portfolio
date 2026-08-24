@@ -1103,8 +1103,11 @@ h3 {
   --w45: #aab4c3;
   --w42: #aab4c3;
   --w5: #aab4c3;
+  --w55: var(--w45);
   --w7: var(--w88);
   --ab4: #60a5fa;
+  --ok: var(--code-value);
+  --okb5: var(--ok);
   max-width: 100%;
   margin: 0 0 var(--space-6);
   overflow-x: auto;
@@ -1143,6 +1146,12 @@ h3 {
   height: auto;
   display: block;
   margin: 0 auto;
+}
+
+@media (max-width: 30rem) {
+  .diagram-exhibit svg {
+    min-width: 45rem;
+  }
 }
 
 .teardown-exhibit {

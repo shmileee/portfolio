@@ -10,6 +10,28 @@ const VIEWPORTS = [
 const STUDY_PATH = "/case-studies/14-environments-you-can-create-and-destroy-with-one-command/";
 const THEME_STUDY_PATH =
   "/case-studies/21-customer-code-running-safely-self-service-cloud-functions/";
+const DIAGRAM_STUDIES = [
+  {
+    number: "12",
+    path: "/case-studies/12-the-fleet-that-patches-itself/",
+    variables: [
+      ["--ab4", "--bg", "--w42", "--w45", "--w5", "--w88"],
+      ["--ab4", "--bg", "--w42", "--w45", "--w5", "--w55", "--w7", "--w88"],
+    ],
+  },
+  {
+    number: "21",
+    path: THEME_STUDY_PATH,
+    variables: [["--ab4", "--bg", "--w42", "--w45", "--w5", "--w7", "--w88"]],
+  },
+  {
+    number: "23",
+    path: "/case-studies/23-a-codebase-whose-newest-users-are-ai-agents/",
+    variables: [
+      ["--ab4", "--bg", "--ok", "--okb5", "--w42", "--w45", "--w5", "--w55", "--w7", "--w88"],
+    ],
+  },
+];
 const CONTROL_SELECTOR = [
   ".brand-link",
   ".site-nav a",
@@ -225,6 +247,156 @@ async function getExhibitThemeFacts(page) {
   });
 }
 
+async function getSharedDiagramFacts(page) {
+  return page.evaluate(() => {
+    const parseColor = (value) => {
+      const channels = value.match(/[\d.]+/g)?.map(Number);
+      if (!channels || channels.length < 3) throw new TypeError(`Unable to parse color: ${value}`);
+      return [channels[0], channels[1], channels[2], channels[3] ?? 1];
+    };
+    const composite = (foreground, background) => [
+      ...foreground.slice(0, 3).map(
+        (channel, index) => channel * foreground[3] + background[index] * (1 - foreground[3]),
+      ),
+      1,
+    ];
+    const luminance = (color) => {
+      const linear = color.slice(0, 3).map((channel) => {
+        const value = channel / 255;
+        return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+      });
+      return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+    };
+    const ratio = (foreground, background) => {
+      const first = luminance(composite(parseColor(foreground), background));
+      const second = luminance(background);
+      return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
+    };
+    const resolveVariable = (wrapper, name) => {
+      const probe = document.createElement("span");
+      probe.style.color = `var(${name})`;
+      wrapper.append(probe);
+      const value = getComputedStyle(probe).color;
+      probe.remove();
+      return value;
+    };
+    const dialog = document.querySelector("[data-reader]");
+    const wrappers = [...document.querySelectorAll(".diagram-exhibit")];
+
+    return {
+      diagrams: wrappers.flatMap((wrapper, wrapperIndex) => {
+        const wrapperStyle = getComputedStyle(wrapper);
+        const diagramBackground = parseColor(wrapperStyle.backgroundColor);
+        const svgs = [...wrapper.querySelectorAll(":scope > svg")];
+
+        return svgs.map((svg, svgIndex) => {
+          const variableElements = [...svg.querySelectorAll("[fill*='var(--'], [stroke*='var(--']")];
+          const usedVariables = [...new Set(variableElements.flatMap((element) =>
+            [element.getAttribute("fill"), element.getAttribute("stroke")]
+              .filter(Boolean)
+              .map((value) => value.match(/var\((--[\w-]+)/)?.[1])
+              .filter(Boolean),
+          ))].sort();
+          const variables = Object.fromEntries(usedVariables.map((name) => [
+            name,
+            {
+              raw: wrapperStyle.getPropertyValue(name).trim(),
+              resolved: resolveVariable(wrapper, name),
+            },
+          ]));
+          const nodeBackground = parseColor(variables["--bg"]?.resolved || wrapperStyle.backgroundColor);
+          const checks = [];
+
+          for (const element of variableElements) {
+            const tag = element.tagName.toLowerCase();
+            for (const attribute of ["fill", "stroke"]) {
+              const authored = element.getAttribute(attribute);
+              const variable = authored?.match(/var\((--[\w-]+)/)?.[1];
+              if (!variable) continue;
+              const style = getComputedStyle(element);
+              const color = style[attribute];
+
+              if (tag === "text" && attribute === "fill") {
+                checks.push({
+                  color,
+                  contrast: Math.min(ratio(color, diagramBackground), ratio(color, nodeBackground)),
+                  label: element.textContent.trim(),
+                  role: "text",
+                  threshold: 4.5,
+                  variable,
+                });
+              } else if (attribute === "stroke" && parseFloat(style.strokeWidth) > 0) {
+                const background = tag === "rect" ? parseColor(style.fill) : diagramBackground;
+                checks.push({
+                  color,
+                  contrast: ratio(color, background),
+                  label: tag,
+                  role: "boundary",
+                  threshold: 3,
+                  variable,
+                });
+              } else if (attribute === "fill" && element.closest("marker")) {
+                checks.push({
+                  color,
+                  contrast: ratio(color, diagramBackground),
+                  label: "marker",
+                  role: "marker",
+                  threshold: 3,
+                  variable,
+                });
+              }
+            }
+          }
+
+          const svgRect = svg.getBoundingClientRect();
+          const viewBoxWidth = svg.viewBox.baseVal.width;
+          const scale = svgRect.width / viewBoxWidth;
+          const fontSizes = [...svg.querySelectorAll("text")].map((element) =>
+            parseFloat(element.getAttribute("font-size")),
+          );
+          const textHeights = [...svg.querySelectorAll("text")].map(
+            (element) => element.getBoundingClientRect().height,
+          );
+          const strokeWidths = [...svg.querySelectorAll("[stroke*='var(--']")].map((element) =>
+            parseFloat(element.getAttribute("stroke-width")),
+          );
+
+          return {
+            checks,
+            geometry: {
+              minimumConnectorWidth: Math.min(...strokeWidths) * scale,
+              minimumFontSize: Math.min(...fontSizes) * scale,
+              minimumTextHeight: Math.min(...textHeights),
+              svgHeight: svgRect.height,
+              svgWidth: svgRect.width,
+              viewBoxWidth,
+            },
+            svgIndex,
+            usedVariables,
+            variables,
+            wrapperIndex,
+          };
+        });
+      }),
+      overflow: {
+        dialogClientWidth: dialog?.clientWidth ?? null,
+        dialogScrollWidth: dialog?.scrollWidth ?? null,
+        pageClientWidth: document.documentElement.clientWidth,
+        pageScrollWidth: document.documentElement.scrollWidth,
+        wrappers: wrappers.map((wrapper) => {
+          const style = getComputedStyle(wrapper);
+          return {
+            clientWidth: wrapper.clientWidth,
+            overflowX: style.overflowX,
+            scrollWidth: wrapper.scrollWidth,
+            touchAction: style.touchAction,
+          };
+        }),
+      },
+    };
+  });
+}
+
 for (const viewport of VIEWPORTS) {
   test(`responsive geometry and targets at ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport);
@@ -392,6 +564,153 @@ test("code and inline diagrams adapt across standalone and reader themes", async
       }
     }
   }
+});
+
+test("shared inline diagram variables meet contrast across themes and surfaces", async ({ browser }) => {
+  const failures = [];
+
+  for (const study of DIAGRAM_STUDIES) {
+    for (const surface of ["standalone", "reader"]) {
+      for (const theme of ["dark", "light"]) {
+        const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+        await context.addInitScript((selectedTheme) => localStorage.setItem("om-theme", selectedTheme), theme);
+        const page = await context.newPage();
+        await page.goto(surface === "standalone" ? study.path : `/#study-${study.number}`, {
+          waitUntil: "networkidle",
+        });
+        if (surface === "reader") await expect(page.locator("[data-reader]")).toBeVisible();
+        const facts = await getSharedDiagramFacts(page);
+        const state = `study ${study.number} ${surface} ${theme}`;
+
+        if (facts.diagrams.length !== study.variables.length) {
+          failures.push(`${state}: expected ${study.variables.length} SVGs, found ${facts.diagrams.length}`);
+        }
+        for (const [index, diagram] of facts.diagrams.entries()) {
+          const expectedVariables = study.variables[index] ?? [];
+          if (JSON.stringify(diagram.usedVariables) !== JSON.stringify(expectedVariables)) {
+            failures.push(
+              `${state} SVG ${index}: variables ${diagram.usedVariables.join(",")} != ${expectedVariables.join(",")}`,
+            );
+          }
+          for (const [name, variable] of Object.entries(diagram.variables)) {
+            if (!variable.raw) failures.push(`${state} SVG ${index}: ${name} is undefined`);
+            if (!/^rgba?\(/.test(variable.resolved)) {
+              failures.push(`${state} SVG ${index}: ${name} did not resolve (${variable.resolved})`);
+            }
+          }
+          for (const check of diagram.checks) {
+            if (check.contrast < check.threshold) {
+              failures.push(
+                `${state} SVG ${index}: ${check.variable} ${check.role} ${check.label} ` +
+                  `${check.contrast.toFixed(4)} < ${check.threshold}`,
+              );
+            }
+          }
+        }
+        if (facts.overflow.pageScrollWidth > facts.overflow.pageClientWidth) {
+          failures.push(`${state}: page overflow ${facts.overflow.pageScrollWidth}/${facts.overflow.pageClientWidth}`);
+        }
+        if (
+          surface === "reader" &&
+          facts.overflow.dialogScrollWidth > facts.overflow.dialogClientWidth
+        ) {
+          failures.push(
+            `${state}: dialog overflow ${facts.overflow.dialogScrollWidth}/${facts.overflow.dialogClientWidth}`,
+          );
+        }
+        await context.close();
+      }
+    }
+  }
+
+  expect(failures).toEqual([]);
+});
+
+test("mobile inline diagrams remain readable through local scrolling", async ({ browser }) => {
+  test.setTimeout(120_000);
+  const failures = [];
+
+  for (const viewport of [{ width: 375, height: 900 }, { width: 1440, height: 900 }]) {
+    for (const study of DIAGRAM_STUDIES) {
+      for (const surface of ["standalone", "reader"]) {
+        const context = await browser.newContext({ hasTouch: viewport.width === 375, viewport });
+        await context.addInitScript(() => localStorage.setItem("om-theme", "dark"));
+        const page = await context.newPage();
+        await page.goto(surface === "standalone" ? study.path : `/#study-${study.number}`, {
+          waitUntil: "domcontentloaded",
+        });
+        if (surface === "reader") await expect(page.locator("[data-reader]")).toBeVisible();
+        const facts = await getSharedDiagramFacts(page);
+        const state = `study ${study.number} ${surface} ${viewport.width}px`;
+
+        if (facts.overflow.pageScrollWidth > facts.overflow.pageClientWidth) {
+          failures.push(`${state}: page overflow ${facts.overflow.pageScrollWidth}/${facts.overflow.pageClientWidth}`);
+        }
+        if (
+          surface === "reader" &&
+          facts.overflow.dialogScrollWidth > facts.overflow.dialogClientWidth
+        ) {
+          failures.push(
+            `${state}: dialog overflow ${facts.overflow.dialogScrollWidth}/${facts.overflow.dialogClientWidth}`,
+          );
+        }
+
+        for (const diagram of facts.diagrams) {
+          const geometry = diagram.geometry;
+          if (viewport.width === 375) {
+            if (geometry.minimumFontSize < 9.5) {
+              failures.push(`${state} SVG ${diagram.svgIndex}: font ${geometry.minimumFontSize.toFixed(2)}px`);
+            }
+            if (geometry.minimumTextHeight < 8) {
+              failures.push(`${state} SVG ${diagram.svgIndex}: text ${geometry.minimumTextHeight.toFixed(2)}px high`);
+            }
+            if (geometry.minimumConnectorWidth < 0.95) {
+              failures.push(
+                `${state} SVG ${diagram.svgIndex}: connector ${geometry.minimumConnectorWidth.toFixed(2)}px`,
+              );
+            }
+          } else if (geometry.svgWidth > geometry.viewBoxWidth + 0.01) {
+            failures.push(`${state} SVG ${diagram.svgIndex}: desktop width grew to ${geometry.svgWidth}px`);
+          }
+        }
+
+        for (const [index, overflow] of facts.overflow.wrappers.entries()) {
+          if (viewport.width === 375) {
+            const locallyScrollable = overflow.overflowX === "auto" && overflow.scrollWidth > overflow.clientWidth;
+            if (!locallyScrollable) {
+              failures.push(
+                `${state} exhibit ${index}: no local scroll ${overflow.scrollWidth}/${overflow.clientWidth}`,
+              );
+            }
+            if (overflow.touchAction === "none") failures.push(`${state} exhibit ${index}: touch disabled`);
+            if (locallyScrollable) {
+              const wrapper = page.locator(".diagram-exhibit").nth(index);
+              const keyboardFocused = await wrapper.evaluate((element) => {
+                element.scrollLeft = 0;
+                element.focus();
+                return document.activeElement === element;
+              });
+              const keyboardScrollLeft = await wrapper.evaluate((element) => {
+                element.scrollLeft = 100;
+                return element.scrollLeft;
+              });
+              if (!keyboardFocused || keyboardScrollLeft <= 0) {
+                failures.push(
+                  `${state} exhibit ${index}: focusable local scroll unavailable ` +
+                    `(focused=${keyboardFocused}, scrollLeft=${keyboardScrollLeft})`,
+                );
+              }
+            }
+          } else if (overflow.scrollWidth > overflow.clientWidth) {
+            failures.push(`${state} exhibit ${index}: desktop forced scroll ${overflow.scrollWidth}/${overflow.clientWidth}`);
+          }
+        }
+        await context.close();
+      }
+    }
+  }
+
+  expect(failures).toEqual([]);
 });
 
 test("forced colors uses a solid system focus outline", async ({ page }) => {
