@@ -17,6 +17,84 @@ async function getStandalonePaths(page) {
   );
 }
 
+async function getStudyManifest(page) {
+  await page.goto("/");
+  return page.locator("[data-reader-manifest]").evaluate((manifest) =>
+    JSON.parse(manifest.textContent),
+  );
+}
+
+test("all standalone studies expose canonical wraparound adjacency", async ({ page }) => {
+  // Given the complete, number-ordered canonical study manifest
+  test.setTimeout(120_000);
+  const studies = await getStudyManifest(page);
+  expect(studies).toHaveLength(23);
+
+  for (const viewport of VIEWPORTS) {
+    await page.setViewportSize(viewport);
+
+    for (const [index, study] of studies.entries()) {
+      const previous = studies[(index - 1 + studies.length) % studies.length];
+      const next = studies[(index + 1) % studies.length];
+
+      // When the standalone route renders its adjacent and portfolio navigation
+      const response = await page.goto(study.url);
+      const adjacentNavigation = page.getByRole("navigation", {
+        name: "Adjacent case studies",
+      });
+      const previousLink = adjacentNavigation.locator(
+        'a[data-study-direction="previous"]',
+      );
+      const nextLink = adjacentNavigation.locator('a[data-study-direction="next"]');
+
+      // Then the canonical previous/next pair wraps and preserves the reader anatomy
+      expect(response?.status()).toBe(200);
+      await expect(page.locator("main h1")).toHaveText(study.title);
+      await expect(adjacentNavigation).toHaveCount(1);
+      await expect(adjacentNavigation.locator("a")).toHaveCount(2);
+      expect(
+        await adjacentNavigation.locator("a").evaluateAll((links) =>
+          links.map((link) => link.dataset.studyDirection),
+        ),
+      ).toEqual(["previous", "next"]);
+
+      for (const [link, direction, neighbor] of [
+        [previousLink, "Previous", previous],
+        [nextLink, "Next", next],
+      ]) {
+        await expect(link).toHaveCount(1);
+        await expect(link).toHaveAttribute("href", neighbor.url);
+        await expect(link).not.toHaveAttribute("href", /#/);
+        await expect(link).not.toHaveAttribute("data-open-study", /.+/);
+        await expect(link.locator(".case-detail-adjacent-kicker")).toHaveText(direction);
+        await expect(link.locator(".case-detail-adjacent-number")).toHaveText(
+          `Case ${String(neighbor.number).padStart(2, "0")}`,
+        );
+        await expect(link.locator(".case-detail-adjacent-title")).toHaveText(
+          neighbor.title,
+        );
+      }
+
+      const portfolioNavigation = page.getByRole("navigation", {
+        name: "Portfolio navigation",
+      });
+      await expect(portfolioNavigation).toHaveCount(1);
+      await expect(
+        portfolioNavigation.getByRole("link", { name: "View all work →" }),
+      ).toHaveAttribute("href", "/#index");
+      await expect(
+        portfolioNavigation.getByRole("link", { name: "Contact" }),
+      ).toHaveAttribute("href", "/#contact");
+      await expect(page.locator('a[href^="/#study-"]')).toHaveCount(0);
+      expect(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+        ),
+      ).toBe(false);
+    }
+  }
+});
+
 test("all standalone studies expose canonical, semantic, and navigation contracts", async ({
   page,
 }) => {
@@ -47,7 +125,7 @@ test("all standalone studies expose canonical, semantic, and navigation contract
         "← all case studies",
       );
       const studyNavigation = page.getByRole("navigation", {
-        name: "Case study navigation",
+        name: "Portfolio navigation",
       });
       await expect(studyNavigation.getByRole("link", { name: "View all work →" })).toHaveAttribute(
         "href",
@@ -84,7 +162,7 @@ test("standalone navigation returns to work and contact without JavaScript", asy
   // Then the canonical page and both homepage destinations remain ordinary links
   await expect(page).toHaveURL(new RegExp(`${standalonePath}$`));
   await expect(page.locator("main#main-content")).toHaveAttribute("tabindex", "-1");
-  const studyNavigation = page.getByRole("navigation", { name: "Case study navigation" });
+  const studyNavigation = page.getByRole("navigation", { name: "Portfolio navigation" });
   await expect(studyNavigation.getByRole("link", { name: "View all work →" })).toHaveAttribute(
     "href",
     "/#index",
@@ -93,6 +171,49 @@ test("standalone navigation returns to work and contact without JavaScript", asy
     "href",
     "/#contact",
   );
+
+  await context.close();
+});
+
+test("both adjacent directions navigate on every standalone study without JavaScript", async ({
+  browser,
+  baseURL,
+}) => {
+  // Given every canonical study in a JavaScript-disabled browser context
+  test.setTimeout(120_000);
+  const discoveryContext = await browser.newContext();
+  const discoveryPage = await discoveryContext.newPage();
+  await discoveryPage.goto(baseURL ?? "/");
+  const studies = await getStudyManifest(discoveryPage);
+  await discoveryContext.close();
+
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+
+  for (const [index, study] of studies.entries()) {
+    for (const [direction, neighbor] of [
+      ["previous", studies[(index - 1 + studies.length) % studies.length]],
+      ["next", studies[(index + 1) % studies.length]],
+    ]) {
+      await page.goto(`${baseURL}${study.url}`);
+      const responsePromise = page.waitForNavigation();
+      await page
+        .getByRole("navigation", { name: "Adjacent case studies" })
+        .locator(`a[data-study-direction="${direction}"]`)
+        .click();
+      const response = await responsePromise;
+
+      // Then the ordinary anchor reaches the expected canonical HTTP route
+      expect(response?.status()).toBe(200);
+      await expect(page).toHaveURL(new RegExp(`${neighbor.url}$`));
+      await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+        "href",
+        `${PUBLIC_ORIGIN}${neighbor.url}`,
+      );
+      await expect(page.locator("dialog[open]")).toHaveCount(0);
+      expect(new URL(page.url()).hash).toBe("");
+    }
+  }
 
   await context.close();
 });
@@ -115,13 +236,15 @@ test("studies 04 and 05 retain reciprocal canonical links", async ({ page }) => 
   await page.goto(STUDY_04_PATH);
 
   // When its sequence link is inspected
-  const sequel = page.locator(`a[href="${STUDY_05_PATH}"]`);
+  const sequel = page.locator(`.case-detail-prose a[href="${STUDY_05_PATH}"]`);
 
   // Then it points to Study 05, whose reciprocal link returns to Study 04
   await expect(sequel).toHaveCount(1);
   await sequel.click();
   await expect(page).toHaveURL(new RegExp(`${STUDY_05_PATH}$`));
-  await expect(page.locator(`a[href="${STUDY_04_PATH}"]`)).toHaveCount(1);
+  await expect(
+    page.locator(`.case-detail-prose a[href="${STUDY_04_PATH}"]`),
+  ).toHaveCount(1);
 });
 
 test("missing routes recover through the canonical noindex 404", async ({ page }) => {
