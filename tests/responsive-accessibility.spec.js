@@ -92,6 +92,76 @@ async function adjacentControlFacts(control) {
   });
 }
 
+async function closeControlFacts(control) {
+  return control.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const icon = element.querySelector("svg");
+    const rect = element.getBoundingClientRect();
+    return {
+      geometry: {
+        height: rect.height,
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+      },
+      interaction: {
+        background: style.backgroundColor,
+        border: style.borderColor,
+        boxShadow: style.boxShadow,
+        iconColor: icon ? getComputedStyle(icon).color : null,
+        outlineColor: style.outlineColor,
+        outlineOffset: Number.parseFloat(style.outlineOffset),
+        outlineStyle: style.outlineStyle,
+        outlineWidth: Number.parseFloat(style.outlineWidth),
+        text: style.color,
+        transform: style.transform,
+        transitionProperty: style.transitionProperty,
+      },
+    };
+  });
+}
+
+async function paddedControlScreenshot(page, control, padding = 8) {
+  const rect = await control.boundingBox();
+  if (!rect) throw new Error("Close control has no bounding box");
+  const viewport = page.viewportSize();
+  const x = Math.max(0, rect.x - padding);
+  const y = Math.max(0, rect.y - padding);
+  const right = Math.min(viewport.width, rect.x + rect.width + padding);
+  const bottom = Math.min(viewport.height, rect.y + rect.height + padding);
+  return page.screenshot({ clip: { x, y, width: right - x, height: bottom - y } });
+}
+
+async function screenshotDiffRatio(page, before, after) {
+  return page.evaluate(async ({ beforeBase64, afterBase64 }) => {
+    const decode = async (base64) => {
+      const image = new Image();
+      image.src = `data:image/png;base64,${base64}`;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = image.width;
+      canvas.height = image.height;
+      const context = canvas.getContext("2d", { willReadFrequently: true });
+      context.drawImage(image, 0, 0);
+      return { data: context.getImageData(0, 0, image.width, image.height).data, width: image.width, height: image.height };
+    };
+    const first = await decode(beforeBase64);
+    const second = await decode(afterBase64);
+    if (first.width !== second.width || first.height !== second.height) throw new Error("Screenshot dimensions differ");
+    let changed = 0;
+    for (let index = 0; index < first.data.length; index += 4) {
+      const channelDelta = Math.max(
+        Math.abs(first.data[index] - second.data[index]),
+        Math.abs(first.data[index + 1] - second.data[index + 1]),
+        Math.abs(first.data[index + 2] - second.data[index + 2]),
+        Math.abs(first.data[index + 3] - second.data[index + 3]),
+      );
+      if (channelDelta >= 12) changed += 1;
+    }
+    return changed / (first.width * first.height);
+  }, { beforeBase64: before.toString("base64"), afterBase64: after.toString("base64") });
+}
+
 async function expectNamedTargets(page) {
   const undersized = await page.locator(CONTROL_SELECTOR).evaluateAll((elements) =>
     elements
@@ -698,6 +768,69 @@ test("Task 6 adjacent cards expose perceptible hover without moving and keep str
       expect(focused.interaction.outlineWidth).toBeGreaterThanOrEqual(3);
       expect(focused.interaction.outlineColor).not.toBe(hovered.interaction.outlineColor);
       expect(focused.interaction.transform).toBe("none");
+      await context.close();
+    }
+  }
+});
+
+test("Task 6 reader Close hover is perceptible without moving and focus remains stronger", async ({ browser }) => {
+  test.setTimeout(120_000);
+
+  for (const viewport of [{ width: 375, height: 900 }, { width: 1280, height: 900 }]) {
+    for (const theme of ["dark", "light"]) {
+      const context = await browser.newContext({ viewport });
+      await context.addInitScript((selectedTheme) => localStorage.setItem("om-theme", selectedTheme), theme);
+      const page = await context.newPage();
+      await page.goto("/#study-12", { waitUntil: "networkidle" });
+      await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+      await expect(page.locator("[data-reader]")).toBeVisible();
+      const control = page.locator("[data-reader-close]");
+      await page.mouse.move(0, 0);
+      const resting = await closeControlFacts(control);
+      const restingCrop = await paddedControlScreenshot(page, control);
+
+      await control.hover();
+      expect(await control.evaluate((element) => element.matches(":hover"))).toBe(true);
+      await control.evaluate((element) => Promise.all(element.getAnimations().map((animation) => animation.finished)));
+      const hovered = await closeControlFacts(control);
+      const hoveredCrop = await paddedControlScreenshot(page, control);
+      const hoverDiffRatio = await screenshotDiffRatio(page, restingCrop, hoveredCrop);
+      const deltas = ["border", "background", "text", "boxShadow"].filter(
+        (property) => resting.interaction[property] !== hovered.interaction[property],
+      );
+      expect(
+        deltas.length,
+        `${viewport.width}px ${theme} Close hover needs at least two painted deltas: ` +
+          JSON.stringify({ resting: resting.interaction, hovered: hovered.interaction, hoverDiffRatio }),
+      ).toBeGreaterThanOrEqual(2);
+      expect(
+        hovered.interaction.background,
+        `${viewport.width}px ${theme} Close hover must tint its fill: ` +
+          JSON.stringify({ resting: resting.interaction, hovered: hovered.interaction, hoverDiffRatio }),
+      ).not.toBe(resting.interaction.background);
+      expect(hoverDiffRatio, `${viewport.width}px ${theme} Close hover crop is not perceptibly different`).toBeGreaterThanOrEqual(0.2);
+      expect(hovered.geometry).toEqual(resting.geometry);
+      expect(resting.geometry.width).toBe(44);
+      expect(resting.geometry.height).toBe(44);
+      expect(hovered.interaction.transform).toBe(resting.interaction.transform);
+      expect(hovered.interaction.transitionProperty).not.toContain("transform");
+
+      await page.mouse.move(0, 0);
+      await control.focus();
+      await expect(control).toBeFocused();
+      await control.evaluate((element) => Promise.all(element.getAnimations().map((animation) => animation.finished)));
+      const focused = await closeControlFacts(control);
+      const focusedCrop = await paddedControlScreenshot(page, control);
+      const focusDiffRatio = await screenshotDiffRatio(page, restingCrop, focusedCrop);
+      const hoverFocusDiffRatio = await screenshotDiffRatio(page, hoveredCrop, focusedCrop);
+      expect(focused.geometry).toEqual(resting.geometry);
+      expect(focused.interaction.outlineStyle).toBe("solid");
+      expect(focused.interaction.outlineWidth).toBeGreaterThanOrEqual(3);
+      expect(focused.interaction.outlineOffset).toBeGreaterThanOrEqual(3);
+      expect(focusDiffRatio).toBeGreaterThanOrEqual(0.15);
+      expect(hoverFocusDiffRatio).toBeGreaterThanOrEqual(0.1);
+      expect(focused.interaction.outlineColor).not.toBe(hovered.interaction.outlineColor);
+      expect(focused.interaction.transform).toBe(resting.interaction.transform);
       await context.close();
     }
   }
