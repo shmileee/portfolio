@@ -67,6 +67,14 @@
   --progress: #f9423a;
   --focus-ring: #93c5fd;
   --reader-shadow: 0 10px 20px -6px rgba(0, 0, 0, 0.5), 0 4px 8px -4px rgba(0, 0, 0, 0.4);
+  --code-surface: #0b1220;
+  --code-toolbar: rgba(255, 255, 255, 0.03);
+  --code-border: #aab4c3;
+  --code-text: rgba(255, 255, 255, 0.82);
+  --code-muted: #9ca3af;
+  --code-keyword: #93c5fd;
+  --code-value: #60a5fa;
+  --diagram-surface: #111827;
   --space-1: 0.25rem;
   --space-2: 0.5rem;
   --space-3: 0.75rem;
@@ -103,6 +111,14 @@
   --accent-border: rgba(37, 99, 235, 0.4);
   --focus-ring: #1d4ed8;
   --reader-shadow: 0 10px 20px -6px rgba(0, 0, 0, 0.5), 0 4px 8px -4px rgba(0, 0, 0, 0.4);
+  --code-surface: #ffffff;
+  --code-toolbar: #f4f5f7;
+  --code-border: #4b5563;
+  --code-text: #111827;
+  --code-muted: #4b5563;
+  --code-keyword: #1d4ed8;
+  --code-value: #0f766e;
+  --diagram-surface: #ffffff;
 }
 
 html {
@@ -892,14 +908,13 @@ h3 {
   padding-left: clamp(1rem, 3.5vw, 1.625rem);
 }
 
-.code-exhibit,
-.media-exhibit-frame {
+.code-exhibit {
   margin: 0 0 var(--space-6);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--code-border);
   border-radius: 0.5rem;
-  background: #0b1220;
-  color: rgba(255, 255, 255, 0.82);
+  background: var(--code-surface);
+  color: var(--code-text);
 }
 
 .media-exhibit {
@@ -913,6 +928,11 @@ h3 {
 
 .media-exhibit-frame {
   margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  background: #0b1220;
+  color: rgba(255, 255, 255, 0.82);
   box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.18);
 }
 
@@ -934,6 +954,11 @@ h3 {
   background: rgba(255, 255, 255, 0.03);
 }
 
+.code-exhibit .exhibit-toolbar {
+  border-bottom-color: var(--code-border);
+  background: var(--code-toolbar);
+}
+
 .exhibit-dots {
   display: flex;
   gap: var(--space-2);
@@ -948,6 +973,10 @@ h3 {
   background: rgba(255, 255, 255, 0.14);
 }
 
+.code-exhibit .exhibit-dots i {
+  background: var(--code-border);
+}
+
 .exhibit-filename {
   min-width: 0;
   margin-left: var(--space-2);
@@ -956,6 +985,10 @@ h3 {
   font: 0.75rem/normal "IBM Plex Mono", ui-monospace, monospace;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.code-exhibit .exhibit-filename {
+  color: var(--code-muted);
 }
 
 .exhibit-badge {
@@ -969,6 +1002,11 @@ h3 {
   letter-spacing: 0.12em;
 }
 
+.code-exhibit .exhibit-badge {
+  border-color: var(--code-border);
+  color: var(--code-muted);
+}
+
 .prose .code-exhibit pre {
   max-width: 100%;
   margin: 0;
@@ -976,8 +1014,8 @@ h3 {
   border: 0;
   border-radius: 0;
   padding: 1.25rem 1.5rem;
-  background: #0b1220;
-  color: rgba(255, 255, 255, 0.82);
+  background: var(--code-surface);
+  color: var(--code-text);
   font: 0.8125rem/1.75 "IBM Plex Mono", ui-monospace, monospace;
   tab-size: 2;
 }
@@ -986,7 +1024,7 @@ h3 {
 .code-exhibit .token.prolog,
 .code-exhibit .token.doctype,
 .code-exhibit .token.cdata {
-  color: #9ca3af;
+  color: var(--code-muted);
   font-style: italic;
 }
 
@@ -997,7 +1035,7 @@ h3 {
 .code-exhibit .token.attr-name,
 .code-exhibit .token.key,
 .code-exhibit .token.keyword {
-  color: #93c5fd;
+  color: var(--code-keyword);
 }
 
 .code-exhibit .token.boolean,
@@ -1008,7 +1046,7 @@ h3 {
 .code-exhibit .token.builtin,
 .code-exhibit .token.inserted,
 .code-exhibit .token.selector {
-  color: #60a5fa;
+  color: var(--code-value);
 }
 
 .prose :not(pre) > code {
@@ -1060,20 +1098,36 @@ h3 {
 }
 
 .diagram-exhibit {
+  --bg: #0b1220;
+  --w88: #ffffff;
+  --w45: #aab4c3;
+  --w42: #aab4c3;
+  --w5: #aab4c3;
+  --w7: var(--w88);
+  --ab4: #60a5fa;
   max-width: 100%;
   margin: 0 0 var(--space-6);
   overflow-x: auto;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--code-border);
   border-radius: 0.5rem;
   padding: 1.125rem 1.375rem;
-  background: #111827;
+  background: var(--diagram-surface);
+}
+
+:root[data-theme="light"] .diagram-exhibit {
+  --bg: #ffffff;
+  --w88: #111827;
+  --w45: #4b5563;
+  --w42: #4b5563;
+  --w5: #4b5563;
+  --ab4: #1d4ed8;
 }
 
 .diagram-exhibit-label {
   width: 100%;
   max-width: none;
   margin-bottom: 0.875rem;
-  color: #9ca3af;
+  color: var(--code-muted);
   font: 0.65625rem/normal "IBM Plex Mono", ui-monospace, monospace;
   letter-spacing: 0.16em;
   text-align: center;
