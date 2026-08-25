@@ -1,11 +1,13 @@
 // Crawl-surface invariants: sitemap contents, robots declaration, every
-// root-relative href (with fragments), legacy reader hashes, media outputs.
+// root-relative href (with fragments), forbidden study hashes, canonical arc
+// links, and media outputs.
 
 import { routeToFile } from "./context.mjs";
 import { decodeEntities, MalformedMarkupError } from "./html.mjs";
 import { outcome } from "./report.mjs";
 
 const EXPECTED_SITEMAP_LOCATIONS = 24; // homepage + 23 studies
+const EXPECTED_ARC_LINKS = 18;
 const EXPECTED_VIDEO_COUNT = 2;
 
 function parseSitemapLocations(xml, file) {
@@ -121,20 +123,76 @@ function checkInternalLinks(site) {
   );
 }
 
-// Homepage arc chips still emit same-page "#study-N" fragments on purpose:
-// site.js keeps that reader compatibility. The retired form is the
-// route-style "/#study-N" href that used to replace canonical study links.
 function checkLegacyStudyHashes(site) {
   const problems = [];
   for (const file of site.htmlFiles) {
     for (const tag of site.tagsOf(file)) {
       const href = tag.attrs.get("href");
-      if (href !== undefined && href.includes("/#study-")) {
+      if (href !== undefined && href.includes("#study-")) {
         problems.push(`${file}: legacy reader hash href ${href}`);
       }
     }
   }
-  return outcome(problems, `0 "/#study-" hrefs across ${site.htmlFiles.length} pages`);
+  return outcome(problems, `0 "#study-" hrefs across ${site.htmlFiles.length} pages`);
+}
+
+function checkCanonicalArcLinks(site) {
+  const problems = [];
+  const manifest = site.readerManifest();
+  const entries = site
+    .tagsOf("index.html")
+    .filter((tag) => tag.name === "a" && tag.attrs.has("data-arc-study"));
+  const routeSet = new Set(site.studyRoutes);
+  const numberByRoute = new Map();
+  if (manifest.entries) {
+    for (const entry of manifest.entries) {
+      if (entry !== null && typeof entry === "object" && typeof entry.url === "string") {
+        numberByRoute.set(entry.url, entry.number);
+      }
+    }
+  } else {
+    problems.push(`cannot verify arc-to-manifest binding: ${manifest.error}`);
+  }
+  if (entries.length !== EXPECTED_ARC_LINKS) {
+    problems.push(`expected ${EXPECTED_ARC_LINKS} arc anchors, found ${entries.length}`);
+  }
+  const uniqueNumbers = new Set();
+  const uniqueRoutes = new Set();
+  entries.forEach((tag, index) => {
+    const href = tag.attrs.get("href") ?? "";
+    const arc = tag.attrs.get("data-arc-study") ?? "";
+    const open = tag.attrs.get("data-open-study") ?? "";
+    if (!routeSet.has(href)) {
+      problems.push(`arc[${index}] href ${href === "" ? "(empty)" : href} is not a built study route`);
+    }
+    if (open !== arc) {
+      problems.push(`${href === "" ? `arc[${index}]` : href}: data-open-study is ${open}, expected ${arc}`);
+    }
+    if (uniqueNumbers.has(arc)) {
+      problems.push(`duplicate data-arc-study ${arc}`);
+    }
+    uniqueNumbers.add(arc);
+    if (uniqueRoutes.has(href)) {
+      problems.push(`duplicate arc href ${href === "" ? "(empty)" : href}`);
+    }
+    uniqueRoutes.add(href);
+    if (manifest.entries && routeSet.has(href)) {
+      const expectedNumber = numberByRoute.get(href);
+      if (String(expectedNumber) !== arc) {
+        problems.push(`${href}: data-arc-study is ${arc}, manifest says ${expectedNumber}`);
+      }
+    }
+  });
+  if (uniqueNumbers.size !== EXPECTED_ARC_LINKS) {
+    problems.push(`expected ${EXPECTED_ARC_LINKS} unique data-arc-study values, found ${uniqueNumbers.size}`);
+  }
+  if (uniqueRoutes.size !== EXPECTED_ARC_LINKS) {
+    problems.push(`expected ${EXPECTED_ARC_LINKS} unique arc hrefs, found ${uniqueRoutes.size}`);
+  }
+  return outcome(
+    problems,
+    `${entries.length} arc anchors align with canonical routes, reader manifest, and data-open-study`,
+  );
 }
 
 function checkMediaOutputs(site) {
@@ -164,6 +222,7 @@ export const CRAWL_CHECKS = [
   ["sitemap", checkSitemap],
   ["robots", checkRobots],
   ["internal-links", checkInternalLinks],
+  ["canonical-arc-links", checkCanonicalArcLinks],
   ["legacy-study-hashes", checkLegacyStudyHashes],
   ["media-outputs", checkMediaOutputs],
 ];
