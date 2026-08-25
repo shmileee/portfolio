@@ -21,7 +21,7 @@
     <meta property="og:url" content="{{ canonical or (site.origin + page.url) }}">
     <meta property="og:image" content="{{ site.ogImage }}">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/assets/css/site.css">
+    <link rel="stylesheet" href="/assets/css/site.css?v={{ assetVersion }}">
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -29,6 +29,6 @@
     {{ content | safe }}
     <button class="back-to-top" type="button" aria-label="Back to top" data-back-to-top>↑ top</button>
     {% include "partials/footer.njk" %}
-    <script type="module" src="/assets/js/site.js"></script>
+    <script type="module" src="/assets/js/site.js?v={{ assetVersion }}"></script>
   </body>
 </html>

@@ -31,6 +31,25 @@ test("homepage renders the case-study index without runtime errors", async ({ pa
   expect(errors).toEqual([]);
 });
 
+test("shared browser assets carry one deployment version", async ({ page }) => {
+  // Given the generated homepage and its shared browser assets
+  await page.goto("/");
+  const stylesheetHref = await page
+    .locator('link[rel="stylesheet"][href^="/assets/css/site.css"]')
+    .getAttribute("href");
+  const moduleSource = await page
+    .locator('script[type="module"][src^="/assets/js/site.js"]')
+    .getAttribute("src");
+
+  // When each URL's deployment version is read
+  const stylesheetVersion = new URL(stylesheetHref, page.url()).searchParams.get("v");
+  const moduleVersion = new URL(moduleSource, page.url()).searchParams.get("v");
+
+  // Then CSS and the entry module bypass stale CDN objects together
+  expect(stylesheetVersion).toMatch(/^[a-f0-9]{12}$/);
+  expect(moduleVersion).toBe(stylesheetVersion);
+});
+
 test("theme choice persists across a reload", async ({ page }) => {
   // Given the homepage in its default dark theme
   await page.goto("/");

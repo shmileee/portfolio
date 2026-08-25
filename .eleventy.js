@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { basename, dirname, extname, relative, resolve } from "node:path";
 import syntaxHighlight from "@11ty/eleventy-plugin-syntaxhighlight";
@@ -14,6 +15,17 @@ const TOPICS = new Set([
 
 const byNumber = (left, right) => left.data.number - right.data.number;
 const sortCaseStudiesByNumber = (items) => [...items].sort(byNumber);
+const BROWSER_ASSET_PATHS = [
+  "src/assets/css/site.css",
+  "src/assets/js/reader.js",
+  "src/assets/js/site.js",
+];
+
+function createAssetVersion() {
+  const hash = createHash("sha256");
+  for (const path of BROWSER_ASSET_PATHS) hash.update(readFileSync(resolve(path)));
+  return hash.digest("hex").slice(0, 12);
+}
 
 function findCaseStudyByNumber(items, number) {
   const requestedNumber = Number(number);
@@ -190,6 +202,7 @@ export default function (eleventyConfig) {
     failOnError: true,
   });
 
+  eleventyConfig.addGlobalData("assetVersion", createAssetVersion);
   eleventyConfig.addFilter("pad2", (value) => String(value).padStart(2, "0"));
   eleventyConfig.addFilter("sortByNumber", (items) => [...items].sort(byNumber));
   eleventyConfig.addFilter("findByNumber", (items, number) => {
