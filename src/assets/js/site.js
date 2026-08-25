@@ -1,4 +1,7 @@
-import { setupReader } from "./reader.js";
+const readerUrl = new URL("./reader.js", import.meta.url);
+const assetVersion = new URL(import.meta.url).searchParams.get("v");
+if (assetVersion) readerUrl.searchParams.set("v", assetVersion);
+const { setupReader } = await import(readerUrl);
 
 const root = document.documentElement;
 

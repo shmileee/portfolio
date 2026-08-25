@@ -33,6 +33,9 @@ test("homepage renders the case-study index without runtime errors", async ({ pa
 
 test("shared browser assets carry one deployment version", async ({ page }) => {
   // Given the generated homepage and its shared browser assets
+  const readerRequest = page.waitForRequest(
+    (request) => new URL(request.url()).pathname === "/assets/js/reader.js",
+  );
   await page.goto("/");
   const stylesheetHref = await page
     .locator('link[rel="stylesheet"][href^="/assets/css/site.css"]')
@@ -40,14 +43,17 @@ test("shared browser assets carry one deployment version", async ({ page }) => {
   const moduleSource = await page
     .locator('script[type="module"][src^="/assets/js/site.js"]')
     .getAttribute("src");
+  const readerSource = (await readerRequest).url();
 
   // When each URL's deployment version is read
   const stylesheetVersion = new URL(stylesheetHref, page.url()).searchParams.get("v");
   const moduleVersion = new URL(moduleSource, page.url()).searchParams.get("v");
+  const readerVersion = new URL(readerSource).searchParams.get("v");
 
-  // Then CSS and the entry module bypass stale CDN objects together
+  // Then CSS, the entry module, and its reader dependency bypass stale CDN objects together
   expect(stylesheetVersion).toMatch(/^[a-f0-9]{12}$/);
   expect(moduleVersion).toBe(stylesheetVersion);
+  expect(readerVersion).toBe(stylesheetVersion);
 });
 
 test("theme choice persists across a reload", async ({ page }) => {
