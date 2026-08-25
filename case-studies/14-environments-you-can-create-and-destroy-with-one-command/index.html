@@ -28,11 +28,9 @@
     <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
     <nav class="site-nav" aria-label="Primary navigation">
       
+        <a href="/#index">Work</a>
+      
         <a href="/#arc">The arc</a>
-      
-        <a href="/#featured">Case studies</a>
-      
-        <a href="/#index">Index</a>
       
         <a href="/#how-i-work">How I work</a>
       
@@ -43,7 +41,8 @@
   </div>
 </header>
 
-    <main class="case-detail" id="main-content">
+    
+<main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 14 · featured</p>
@@ -59,7 +58,7 @@
 <h2>What I did</h2>
 <p>This is the work I consider my biggest win. I led the design and build of our take on cell-based architecture — an AWS-endorsed resilience pattern where, instead of one big shared environment, you run self-contained copies (&quot;cells&quot;) so that any failure is contained to one copy (<a href="https://docs.aws.amazon.com/wellarchitected/latest/reducing-scope-of-impact-with-cell-based-architecture/what-is-a-cell-based-architecture.html">AWS describes it in its Well-Architected guidance on reducing scope of impact ↗</a>).</p>
 <p>Our main driver was speed into new markets: the ability to stand up a complete environment in a new region, quickly. But the same primitive serves more: developers can spin up an ephemeral cell to test something and throw it away, and a cell can be dedicated to a single customer where data residency demands it.</p>
-<p>A cell is one Terraform stack that provisions everything — the VPC, the EKS cluster with its networking, IAM, DNS, and identity integration — and it joins the Cloud WAN network from <a href="/#study-13">case study 13</a> with one flag. Three design pieces I'm particularly proud of:</p>
+<p>A cell is one Terraform stack that provisions everything — the VPC, the EKS cluster with its networking, IAM, DNS, and identity integration — and it joins the Cloud WAN network from <a href="/case-studies/13-the-network-nobody-dared-touch/">case study 13</a> with one flag. Three design pieces I'm particularly proud of:</p>
 <ul>
 <li>
 <p><strong>The GitOps bridge.</strong> Terraform stops where it should. It builds the foundation, installs the Flux operator into the fresh cluster, declares the Flux runtime — and hands over: Flux finishes the bootstrap the GitOps way, pulling the remaining twenty-plus platform add-ons from the git repository. This solves the classic chicken-and-egg of cluster bootstrapping (you need a cluster to run the deployment system that deploys everything else), following the community &quot;GitOps Bridge&quot; pattern; cluster-specific values flow across the bridge through a metadata file Terraform writes and Flux substitutes.</p>
@@ -68,7 +67,7 @@
 <p><strong>A data-only brain.</strong> I wrote a companion module that creates no cloud resources at all: it validates every cell input at plan time (unsupported region? wrong size? rejected before anything runs), normalizes names, resolves network sizing from t-shirt sizes (small/medium/large map to precise subnet layouts), and auto-discovers which SSO roles should get cluster access. All the judgment in one testable place, all the resources elsewhere.</p>
 </li>
 <li>
-<p><strong>Togglable add-ons.</strong> Every piece of the platform a cell can carry — NAT optimization (<a href="/#study-15">case study 15</a>), the network attachment, each add-on — sits behind an explicit toggle, so a cell's consumer opts in or out per environment instead of inheriting one-size-fits-all.</p>
+<p><strong>Togglable add-ons.</strong> Every piece of the platform a cell can carry — NAT optimization (<a href="/case-studies/15-the-nat-bill-and-the-open-source-fix-i-helped-ship/">case study 15</a>), the network attachment, each add-on — sits behind an explicit toggle, so a cell's consumer opts in or out per environment instead of inheriting one-size-fits-all.</p>
 </li>
 </ul>
 <p>Every cell also registers itself in a central cell registry (a DynamoDB table) — the shared source of truth for what cells exist and how they're attached, consumed today by the secrets and network reconcilers, and designed to later feed a cell router that steers tenants and traffic to the right cell.</p>
@@ -87,9 +86,21 @@
 <h2>What it changed</h2>
 <p>Environments became genuinely independent — a problem in one cannot spread to the others — their costs actually end when they are deleted, and entering a new region became an infrastructure change, not an infrastructure project.</p>
 </article>
-  <nav class="case-detail-footer" aria-label="Case study navigation">
-    <a href="/#study-14">Open in the portfolio reader</a>
-    <a href="/#index">Browse all case studies →</a>
+  <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
+    <a href="/case-studies/13-the-network-nobody-dared-touch/" data-study-direction="previous">
+      <span class="case-detail-adjacent-kicker">Previous</span>
+      <span class="case-detail-adjacent-number">Case 13</span>
+      <span class="case-detail-adjacent-title">The network nobody dared touch</span>
+    </a>
+    <a href="/case-studies/15-the-nat-bill-and-the-open-source-fix-i-helped-ship/" data-study-direction="next">
+      <span class="case-detail-adjacent-kicker">Next</span>
+      <span class="case-detail-adjacent-number">Case 15</span>
+      <span class="case-detail-adjacent-title">The NAT bill, and the open-source fix I helped ship</span>
+    </a>
+  </nav>
+  <nav class="case-detail-footer" aria-label="Portfolio navigation">
+    <a href="/#index">View all work →</a>
+    <a href="/#contact">Contact</a>
   </nav>
 </main>
 

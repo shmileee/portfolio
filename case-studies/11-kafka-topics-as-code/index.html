@@ -28,11 +28,9 @@
     <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
     <nav class="site-nav" aria-label="Primary navigation">
       
+        <a href="/#index">Work</a>
+      
         <a href="/#arc">The arc</a>
-      
-        <a href="/#featured">Case studies</a>
-      
-        <a href="/#index">Index</a>
       
         <a href="/#how-i-work">How I work</a>
       
@@ -43,7 +41,8 @@
   </div>
 </header>
 
-    <main class="case-detail" id="main-content">
+    
+<main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 11</p>
@@ -86,13 +85,25 @@
 <p>It also cleaned as it went — stripping settings that merely repeated broker defaults, resolving each topic's owning team from our service catalog — and, my favorite part, it wrote a discrepancy report: a folder of everything the documentation claimed that reality disagreed with, and vice versa. The audit of doc-vs-truth fell out of the migration for free.</p>
 <h2>The interesting part</h2>
 <p>Adopting ~550 live topics without touching production data. The generated definitions matched live state exactly, so the topic operator's first pass had nothing to change — adoption, not recreation.</p>
-<p>Auto-deployment was turned on in its most conservative form: apply changes, never delete anything. And the door I closed behind me: admission policies (<a href="/#study-10">case study 10</a>) now reject replica changes outright, allow partition counts only to grow (Kafka cannot shrink them safely), and nobody can shell into a broker pod anymore — the manual workflow isn't just deprecated, it's impossible.</p>
+<p>Auto-deployment was turned on in its most conservative form: apply changes, never delete anything. And the door I closed behind me: admission policies (<a href="/case-studies/10-kyverno-at-the-cluster-door/">case study 10</a>) now reject replica changes outright, allow partition counts only to grow (Kafka cannot shrink them safely), and nobody can shell into a broker pod anymore — the manual workflow isn't just deprecated, it's impossible.</p>
 <h2>What it changed</h2>
 <p>Topic changes became pull requests with named owners, review, and history. The runbook retired. And &quot;what topics do we have?&quot; went from an investigation to <code>ls</code>.</p>
 </article>
-  <nav class="case-detail-footer" aria-label="Case study navigation">
-    <a href="/#study-11">Open in the portfolio reader</a>
-    <a href="/#index">Browse all case studies →</a>
+  <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
+    <a href="/case-studies/10-kyverno-at-the-cluster-door/" data-study-direction="previous">
+      <span class="case-detail-adjacent-kicker">Previous</span>
+      <span class="case-detail-adjacent-number">Case 10</span>
+      <span class="case-detail-adjacent-title">One policy engine, many jobs: Kyverno at the cluster door</span>
+    </a>
+    <a href="/case-studies/12-the-fleet-that-patches-itself/" data-study-direction="next">
+      <span class="case-detail-adjacent-kicker">Next</span>
+      <span class="case-detail-adjacent-number">Case 12</span>
+      <span class="case-detail-adjacent-title">The fleet that patches itself (while engineers are watching)</span>
+    </a>
+  </nav>
+  <nav class="case-detail-footer" aria-label="Portfolio navigation">
+    <a href="/#index">View all work →</a>
+    <a href="/#contact">Contact</a>
   </nav>
 </main>
 

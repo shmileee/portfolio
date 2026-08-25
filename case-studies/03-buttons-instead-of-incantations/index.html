@@ -28,11 +28,9 @@
     <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
     <nav class="site-nav" aria-label="Primary navigation">
       
+        <a href="/#index">Work</a>
+      
         <a href="/#arc">The arc</a>
-      
-        <a href="/#featured">Case studies</a>
-      
-        <a href="/#index">Index</a>
       
         <a href="/#how-i-work">How I work</a>
       
@@ -43,7 +41,8 @@
   </div>
 </header>
 
-    <main class="case-detail" id="main-content">
+    
+<main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 03</p>
@@ -54,7 +53,7 @@
     </div>
   </header>
   <article class="prose case-detail-prose"><h2>THE SITUATION</h2>
-<p>Atlantis is driven by typed pull-request comments: <code>atlantis plan</code>, <code>atlantis apply</code>, with project flags that must be exactly right. Power users type them from muscle memory; everyone else copies them from somewhere, gets a flag wrong, and waits for the bot to complain. During large migrations — dozens of pull requests a day — the typing itself became measurable friction.
+<p>Atlantis is driven by typed pull-request comments: <span class="inline-code-unit"><code>atlantis plan</code>,</span> <span class="inline-code-unit"><code>atlantis apply</code>,</span> with project flags that must be exactly right. Power users type them from muscle memory; everyone else copies them from somewhere, gets a flag wrong, and waits for the bot to complain. During large migrations — dozens of pull requests a day — the typing itself became measurable friction.
 The obvious fixes were all worse: a web service with GitHub tokens to manage, or yet another bot with write access.</p>
 <h2>WHAT I DID</h2>
 <p>I built a small browser extension that injects the commands as buttons directly into the GitHub pull-request page.</p>
@@ -80,19 +79,31 @@ The extension only activates on the right repositories, checks team membership b
   <div class="media-exhibit-frame">
     <div class="exhibit-toolbar">
       <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-      <span class="exhibit-filename">atlantis-pr-buttons-demo.gif</span>
-      <span class="exhibit-badge">GIF · REC</span>
+      <span class="exhibit-filename">atlantis-pr-buttons-demo.mp4</span>
+      <span class="exhibit-badge">MP4 · VIDEO</span>
     </div>
     <div class="media-exhibit-stage">
-      <img src="./atlantis-pr-buttons-demo.gif" alt="Screen recording: Atlantis plan and apply buttons injected into a GitHub pull request" width="880" height="587" loading="lazy" decoding="async">
+      <video src="./atlantis-pr-buttons-demo.mp4" poster="./atlantis-pr-buttons-demo-poster.png" width="880" height="588" controls="" playsinline="" preload="metadata" aria-label="Screen recording: Atlantis plan and apply buttons injected into a GitHub pull request"></video>
     </div>
   </div>
   <figcaption class="exhibit-caption"><span>EXHIBIT 02</span> — The one-click plan and apply flow in action</figcaption>
 </figure>
 </article>
-  <nav class="case-detail-footer" aria-label="Case study navigation">
-    <a href="/#study-3">Open in the portfolio reader</a>
-    <a href="/#index">Browse all case studies →</a>
+  <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
+    <a href="/case-studies/02-approve-the-audited-escape-hatch/" data-study-direction="previous">
+      <span class="case-detail-adjacent-kicker">Previous</span>
+      <span class="case-detail-adjacent-number">Case 02</span>
+      <span class="case-detail-adjacent-title">/approve: the audited escape hatch</span>
+    </a>
+    <a href="/case-studies/04-a-feedback-loop-measured-in-milliseconds/" data-study-direction="next">
+      <span class="case-detail-adjacent-kicker">Next</span>
+      <span class="case-detail-adjacent-number">Case 04</span>
+      <span class="case-detail-adjacent-title">A feedback loop measured in milliseconds</span>
+    </a>
+  </nav>
+  <nav class="case-detail-footer" aria-label="Portfolio navigation">
+    <a href="/#index">View all work →</a>
+    <a href="/#contact">Contact</a>
   </nav>
 </main>
 

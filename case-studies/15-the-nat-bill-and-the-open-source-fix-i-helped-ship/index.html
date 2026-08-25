@@ -28,11 +28,9 @@
     <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
     <nav class="site-nav" aria-label="Primary navigation">
       
+        <a href="/#index">Work</a>
+      
         <a href="/#arc">The arc</a>
-      
-        <a href="/#featured">Case studies</a>
-      
-        <a href="/#index">Index</a>
       
         <a href="/#how-i-work">How I work</a>
       
@@ -43,7 +41,8 @@
   </div>
 </header>
 
-    <main class="case-detail" id="main-content">
+    
+<main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 15</p>
@@ -57,16 +56,28 @@
 <p>One of AWS's quietest taxes: the managed NAT Gateway charges not just per hour but per gigabyte processed — about 4.5 cents/GB. Push serious traffic through it and the data-processing line dwarfs the gateways themselves; the project's own arithmetic shows ~10 TB/month costing roughly $950 through a managed gateway versus roughly half that through a self-managed NAT instance, which pays no per-gigabyte fee at all.</p>
 <h2>What I did</h2>
 <p>I adopted AlterNAT — an open-source project that replaces managed NAT gateways with auto-scaled EC2 NAT instances, while keeping a standby managed gateway as a safety net: a small function checks connectivity every minute and flips the route tables to the managed gateway if an instance ever fails, then back when it recovers. Cheap path by default, expensive path as insurance.</p>
-<p>I ran it first in our main VPCs, then designed it into the cell architecture (<a href="/#study-14">case study 14</a>) as a per-environment toggle — on ARM instances, naturally (<a href="/#study-19">case study 19</a> made that free). A later overhaul pre-allocates all the public IPs with the VPC — the NAT instances' and the standby gateways' — so flipping the toggle never changes the addresses the outside world has allowlisted.</p>
+<p>I ran it first in our main VPCs, then designed it into the cell architecture (<a href="/case-studies/14-environments-you-can-create-and-destroy-with-one-command/">case study 14</a>) as a per-environment toggle — on ARM instances, naturally (<a href="/case-studies/19-turning-container-images-from-a-liability-into-a-supply-chain/">case study 19</a> made that free). A later overhaul pre-allocates all the public IPs with the VPC — the NAT instances' and the standby gateways' — so flipping the toggle never changes the addresses the outside world has allowlisted.</p>
 <h2>The interesting part</h2>
 <p>I didn't just consume the project — I contributed the deployment model we needed upstream. Early AlterNAT required building and hosting a container image for its failover function; in shared automation (CI, pull-request-driven Terraform) that's a build dependency nobody wants.</p>
 <p>My merged upstream pull requests added the native Zip deployment path (<a href="https://github.com/chime/terraform-aws-alternat/pull/44">chime/terraform-aws-alternat#44 ↗</a>) — package the function for the standard runtime, no image registry involved — and then removed the last third-party dependency from the function so it runs on the standard library alone (<a href="https://github.com/chime/terraform-aws-alternat/pull/52">#52 ↗</a>). Production at our company runs on exactly the code path I upstreamed; four more filed issues fed the maintainers' roadmap.</p>
 <h2>What it changed</h2>
 <p>The per-gigabyte NAT tax is gone from the default path, failover to the managed gateway is automatic and tested every minute, and — the part I value most — the fix lives upstream where everyone gets it, instead of in a private fork only we maintain.</p>
 </article>
-  <nav class="case-detail-footer" aria-label="Case study navigation">
-    <a href="/#study-15">Open in the portfolio reader</a>
-    <a href="/#index">Browse all case studies →</a>
+  <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
+    <a href="/case-studies/14-environments-you-can-create-and-destroy-with-one-command/" data-study-direction="previous">
+      <span class="case-detail-adjacent-kicker">Previous</span>
+      <span class="case-detail-adjacent-number">Case 14</span>
+      <span class="case-detail-adjacent-title">Environments you can create and destroy with one command</span>
+    </a>
+    <a href="/case-studies/16-absorbing-an-acquisition-one-engineer-one-summer-an-entire-product-moved/" data-study-direction="next">
+      <span class="case-detail-adjacent-kicker">Next</span>
+      <span class="case-detail-adjacent-number">Case 16</span>
+      <span class="case-detail-adjacent-title">Absorbing an acquisition</span>
+    </a>
+  </nav>
+  <nav class="case-detail-footer" aria-label="Portfolio navigation">
+    <a href="/#index">View all work →</a>
+    <a href="/#contact">Contact</a>
   </nav>
 </main>
 

@@ -28,11 +28,9 @@
     <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
     <nav class="site-nav" aria-label="Primary navigation">
       
+        <a href="/#index">Work</a>
+      
         <a href="/#arc">The arc</a>
-      
-        <a href="/#featured">Case studies</a>
-      
-        <a href="/#index">Index</a>
       
         <a href="/#how-i-work">How I work</a>
       
@@ -43,7 +41,8 @@
   </div>
 </header>
 
-    <main class="case-detail" id="main-content">
+    
+<main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 04</p>
@@ -63,11 +62,23 @@ To make the loop fast in CI as well, I set up the company's internal GitHub Acti
 <p>I benchmarked instead of guessing. The old formatting hook took about seven seconds on our biggest repository; the rewritten one runs a fifty-file commit in 59 milliseconds.</p>
 <h2>WHAT IT CHANGED</h2>
 <p>Mistakes get fixed before they're even committed, review comments moved from formatting to substance, and the checks are self-contained enough that they spread to every repository without an installation guide.</p>
-<p>SEQUEL → <a href="/#study-5">case study 5 — one tool version, everywhere</a></p>
+<p>SEQUEL → <a href="/case-studies/05-one-tool-version-everywhere/">case study 5 — one tool version, everywhere</a></p>
 </article>
-  <nav class="case-detail-footer" aria-label="Case study navigation">
-    <a href="/#study-4">Open in the portfolio reader</a>
-    <a href="/#index">Browse all case studies →</a>
+  <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
+    <a href="/case-studies/03-buttons-instead-of-incantations/" data-study-direction="previous">
+      <span class="case-detail-adjacent-kicker">Previous</span>
+      <span class="case-detail-adjacent-number">Case 03</span>
+      <span class="case-detail-adjacent-title">Buttons instead of incantations</span>
+    </a>
+    <a href="/case-studies/05-one-tool-version-everywhere/" data-study-direction="next">
+      <span class="case-detail-adjacent-kicker">Next</span>
+      <span class="case-detail-adjacent-number">Case 05</span>
+      <span class="case-detail-adjacent-title">One tool version, everywhere: from decision record to a centrally cached CI</span>
+    </a>
+  </nav>
+  <nav class="case-detail-footer" aria-label="Portfolio navigation">
+    <a href="/#index">View all work →</a>
+    <a href="/#contact">Contact</a>
   </nav>
 </main>
 

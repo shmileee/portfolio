@@ -28,11 +28,9 @@
     <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
     <nav class="site-nav" aria-label="Primary navigation">
       
+        <a href="/#index">Work</a>
+      
         <a href="/#arc">The arc</a>
-      
-        <a href="/#featured">Case studies</a>
-      
-        <a href="/#index">Index</a>
       
         <a href="/#how-i-work">How I work</a>
       
@@ -43,7 +41,8 @@
   </div>
 </header>
 
-    <main class="case-detail" id="main-content">
+    
+<main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 07</p>
@@ -58,20 +57,20 @@
 <h2>WHAT I DID</h2>
 <p>I treated the repository as a product with users. I moved the state out of git and into S3 backends — every stack, in one focused campaign.
 I replaced hand-made tags with a real release pipeline: structured commit messages produce versioned, changelogged module releases automatically. I standardized the code itself — formatters and linters enforced automatically, guidelines and best practices written down, documentation curated and rewritten (including recorded terminal walkthroughs, so people could watch the workflow, not just read about it).
-I introduced Terramate to manage the growing estate of stacks, designed the repository layout and the reusable imports, then migrated every legacy stack onto it. I stood up an internal Terraform registry to host our own providers (<a href="/#study-18">case study 18</a>).
+I introduced Terramate to manage the growing estate of stacks, designed the repository layout and the reusable imports, then migrated every legacy stack onto it. I stood up an internal Terraform registry to host our own providers (<a href="/case-studies/18-the-fork-that-needed-a-home/">case study 18</a>).
 And when navigation itself became the problem — hundreds of stacks across many accounts and regions — I built a terminal tool that answers &quot;where is X deployed, and in which account?&quot; in seconds:</p>
 <figure class="media-exhibit" data-exhibit="" style="--media-exhibit-width: 840px">
   <div class="media-exhibit-frame">
     <div class="exhibit-toolbar">
       <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-      <span class="exhibit-filename">terramate-stacks-explorer</span>
-      <span class="exhibit-badge">TERMINAL · REC</span>
+      <span class="exhibit-filename">terramate-stacks-explorer.mp4</span>
+      <span class="exhibit-badge">MP4 · VIDEO</span>
     </div>
     <div class="media-exhibit-stage">
-      <img src="./terramate-stacks-explorer.gif" alt="Terminal recording: the terramate stacks explorer browsing stacks, with filters for group, environment and region" width="1440" height="820" loading="lazy" decoding="async">
+      <video src="./terramate-stacks-explorer.mp4" poster="./terramate-stacks-explorer-poster.png" width="1440" height="820" controls="" playsinline="" preload="metadata" aria-label="Terminal recording: the terramate stacks explorer browsing stacks, with filters for group, environment and region"></video>
     </div>
   </div>
-  <figcaption class="exhibit-caption"><span>EXHIBIT 02</span> — Where is X deployed, and in which account? Answered in seconds · case study 13</figcaption>
+  <figcaption class="exhibit-caption"><span>EXHIBIT 01</span> — Where is X deployed, and in which account? Answered in seconds</figcaption>
 </figure>
 <p>Alongside the tooling I started the company's Terraform community channel, answered beginner questions, and taught people their first steps.</p>
 <h2>THE INTERESTING PART</h2>
@@ -79,9 +78,21 @@ And when navigation itself became the problem — hundreds of stacks across many
 <h2>WHAT IT CHANGED</h2>
 <p>Terraform stopped being a specialist skill. Engineers across teams now propose infrastructure changes routinely, modules are versioned and reusable, and the repository scaled from dozens of stacks to hundreds without becoming unmanageable.</p>
 </article>
-  <nav class="case-detail-footer" aria-label="Case study navigation">
-    <a href="/#study-7">Open in the portfolio reader</a>
-    <a href="/#index">Browse all case studies →</a>
+  <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
+    <a href="/case-studies/06-teams-that-create-themselves/" data-study-direction="previous">
+      <span class="case-detail-adjacent-kicker">Previous</span>
+      <span class="case-detail-adjacent-number">Case 06</span>
+      <span class="case-detail-adjacent-title">Teams that create themselves</span>
+    </a>
+    <a href="/case-studies/08-dependency-updates-from-quarterly-panic-to-background-noise/" data-study-direction="next">
+      <span class="case-detail-adjacent-kicker">Next</span>
+      <span class="case-detail-adjacent-number">Case 08</span>
+      <span class="case-detail-adjacent-title">Dependency updates: from quarterly panic to background noise</span>
+    </a>
+  </nav>
+  <nav class="case-detail-footer" aria-label="Portfolio navigation">
+    <a href="/#index">View all work →</a>
+    <a href="/#contact">Contact</a>
   </nav>
 </main>
 

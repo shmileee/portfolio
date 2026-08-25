@@ -28,11 +28,9 @@
     <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
     <nav class="site-nav" aria-label="Primary navigation">
       
+        <a href="/#index">Work</a>
+      
         <a href="/#arc">The arc</a>
-      
-        <a href="/#featured">Case studies</a>
-      
-        <a href="/#index">Index</a>
       
         <a href="/#how-i-work">How I work</a>
       
@@ -43,7 +41,8 @@
   </div>
 </header>
 
-    <main class="case-detail" id="main-content">
+    
+<main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 10</p>
@@ -59,10 +58,10 @@
 <p>I introduced Kyverno, the policy engine that enforces rules at that door — with the rules themselves versioned in git like everything else. Then I kept finding jobs for it:</p>
 <ul>
 <li>
-<p>Protecting data infrastructure. After I codified all our Kafka topics as git-managed resources (<a href="/#study-11">case study 11</a>), policies made destructive edits impossible: replica settings are rejected outright, partition counts may only ever increase (Kafka can't shrink them safely), and nobody — however senior — can shell into a broker pod. The review comment &quot;are you sure?&quot; became a hard &quot;no&quot; from the cluster itself.</p>
+<p>Protecting data infrastructure. After I codified all our Kafka topics as git-managed resources (<a href="/case-studies/11-kafka-topics-as-code/">case study 11</a>), policies made destructive edits impossible: replica settings are rejected outright, partition counts may only ever increase (Kafka can't shrink them safely), and nobody — however senior — can shell into a broker pod. The review comment &quot;are you sure?&quot; became a hard &quot;no&quot; from the cluster itself.</p>
 </li>
 <li>
-<p>The invisible registry switch. During our Docker Hub exit (<a href="/#study-17">case study 17</a>), mutation policies rewrote every image reference on the fly to our own mirror — the mechanism that let the whole organization move registries without coordinating a single team.</p>
+<p>The invisible registry switch. During our Docker Hub exit (<a href="/case-studies/17-leaving-docker-hub-without-anyone-noticing/">case study 17</a>), mutation policies rewrote every image reference on the fly to our own mirror — the mechanism that let the whole organization move registries without coordinating a single team.</p>
 </li>
 <li>
 <p>Deployment safety. A policy preserves cloud resources when a GitOps application is deleted — so removing an app definition can't cascade into deleting what it managed.</p>
@@ -76,9 +75,21 @@
 <h2>What it changed</h2>
 <p>The difference between a convention and a rule: conventions rely on memory, rules are enforced at admission and reviewed as code. The clusters now say &quot;no&quot; politely, consistently, and in version control.</p>
 </article>
-  <nav class="case-detail-footer" aria-label="Case study navigation">
-    <a href="/#study-10">Open in the portfolio reader</a>
-    <a href="/#index">Browse all case studies →</a>
+  <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
+    <a href="/case-studies/09-kubernetes-upgrades/" data-study-direction="previous">
+      <span class="case-detail-adjacent-kicker">Previous</span>
+      <span class="case-detail-adjacent-number">Case 09</span>
+      <span class="case-detail-adjacent-title">Kubernetes upgrades became a checklist</span>
+    </a>
+    <a href="/case-studies/11-kafka-topics-as-code/" data-study-direction="next">
+      <span class="case-detail-adjacent-kicker">Next</span>
+      <span class="case-detail-adjacent-number">Case 11</span>
+      <span class="case-detail-adjacent-title">Kafka topics as code: 550 topics, zero surprises</span>
+    </a>
+  </nav>
+  <nav class="case-detail-footer" aria-label="Portfolio navigation">
+    <a href="/#index">View all work →</a>
+    <a href="/#contact">Contact</a>
   </nav>
 </main>
 

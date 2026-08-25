@@ -28,11 +28,9 @@
     <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
     <nav class="site-nav" aria-label="Primary navigation">
       
+        <a href="/#index">Work</a>
+      
         <a href="/#arc">The arc</a>
-      
-        <a href="/#featured">Case studies</a>
-      
-        <a href="/#index">Index</a>
       
         <a href="/#how-i-work">How I work</a>
       
@@ -43,7 +41,8 @@
   </div>
 </header>
 
-    <main class="case-detail" id="main-content">
+    
+<main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 12 · featured</p>
@@ -65,7 +64,7 @@
 <p>Development and staging track new images instantly (name-pattern match — nodes start rotating minutes after a build).</p>
 </li>
 <li>
-<p>Production pins exact image IDs — and the dependency bot (<a href="/#study-8">case study 8</a>) proposes the bump as a pull request. The merge button <em>is</em> the deployment gate: human review, full audit trail, no custom tooling.</p>
+<p>Production pins exact image IDs — and the dependency bot (<a href="/case-studies/08-dependency-updates-from-quarterly-panic-to-background-noise/">case study 8</a>) proposes the bump as a pull request. The merge button <em>is</em> the deployment gate: human review, full audit trail, no custom tooling.</p>
 </li>
 <li>
 <p>Rotation happens when engineers are watching. The core principle from the design doc: <em>drift is a controlled, planned operation triggered by a known image change — it should happen during coverage hours.</em> Our two on-call regions cover 07:00–20:00 weekdays; rotation windows close at 18:00 — two hours before coverage ends, so a bad image is caught on-shift, never discovered by the night. Weekends are blocked (&quot;no one gets paged on weekends for node rotation&quot;)… with one deliberate inversion: the development Kafka brokers rotate <em>on</em> weekends, because a rebalance hurts developers more on a Tuesday than it hurts a Saturday.</p>
@@ -88,9 +87,21 @@
 <h2>What it changed</h2>
 <p>Node patching went from &quot;images exist, nobody consumes them&quot; to a self-feeding loop: vendor announces a fix, the fleet is rotating onto it within hours in lower environments and one reviewed merge later in production — at a pace the on-call rota can actually absorb.</p>
 </article>
-  <nav class="case-detail-footer" aria-label="Case study navigation">
-    <a href="/#study-12">Open in the portfolio reader</a>
-    <a href="/#index">Browse all case studies →</a>
+  <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
+    <a href="/case-studies/11-kafka-topics-as-code/" data-study-direction="previous">
+      <span class="case-detail-adjacent-kicker">Previous</span>
+      <span class="case-detail-adjacent-number">Case 11</span>
+      <span class="case-detail-adjacent-title">Kafka topics as code: 550 topics, zero surprises</span>
+    </a>
+    <a href="/case-studies/13-the-network-nobody-dared-touch/" data-study-direction="next">
+      <span class="case-detail-adjacent-kicker">Next</span>
+      <span class="case-detail-adjacent-number">Case 13</span>
+      <span class="case-detail-adjacent-title">The network nobody dared touch</span>
+    </a>
+  </nav>
+  <nav class="case-detail-footer" aria-label="Portfolio navigation">
+    <a href="/#index">View all work →</a>
+    <a href="/#contact">Contact</a>
   </nav>
 </main>
 

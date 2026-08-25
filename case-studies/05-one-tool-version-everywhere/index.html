@@ -28,11 +28,9 @@
     <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
     <nav class="site-nav" aria-label="Primary navigation">
       
+        <a href="/#index">Work</a>
+      
         <a href="/#arc">The arc</a>
-      
-        <a href="/#featured">Case studies</a>
-      
-        <a href="/#index">Index</a>
       
         <a href="/#how-i-work">How I work</a>
       
@@ -43,7 +41,8 @@
   </div>
 </header>
 
-    <main class="case-detail" id="main-content">
+    
+<main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 05</p>
@@ -88,10 +87,23 @@ The same file drives CI: I rebuilt our centralized pre-commit workflow — one r
 Restoring the big tool archive can cost more than a fresh install — so tool caching is a per-repository toggle with that exact warning in its description. Cache uploads were dominating pull-request runs — so pull requests only restore the cache and only the main branch saves it. On our in-cluster runners the cache moved to the node's local disk — but the tool manager keeps one global directory, and a shared one leaks tools between repositories, so each repository gets its own isolated subdirectory. And pull requests from forks are excluded from writing entirely: untrusted code must never poison a shared cache.</p>
 <h2>WHAT IT CHANGED</h2>
 <p>Setup went from a wiki page to one command. Version drift — between two laptops, or between a laptop and CI — stopped being a category of bug. And because the workflow is centralized, the whole company's checks get faster every time one person improves one file. It also set a precedent I'm fond of: standards have lifecycles — the person who introduces one should be willing to replace it, in writing, when something better exists.</p>
+<p>PREQUEL ← <a href="/case-studies/04-a-feedback-loop-measured-in-milliseconds/">case study 4 — a feedback loop measured in milliseconds</a></p>
 </article>
-  <nav class="case-detail-footer" aria-label="Case study navigation">
-    <a href="/#study-5">Open in the portfolio reader</a>
-    <a href="/#index">Browse all case studies →</a>
+  <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
+    <a href="/case-studies/04-a-feedback-loop-measured-in-milliseconds/" data-study-direction="previous">
+      <span class="case-detail-adjacent-kicker">Previous</span>
+      <span class="case-detail-adjacent-number">Case 04</span>
+      <span class="case-detail-adjacent-title">A feedback loop measured in milliseconds</span>
+    </a>
+    <a href="/case-studies/06-teams-that-create-themselves/" data-study-direction="next">
+      <span class="case-detail-adjacent-kicker">Next</span>
+      <span class="case-detail-adjacent-number">Case 06</span>
+      <span class="case-detail-adjacent-title">Teams that create themselves</span>
+    </a>
+  </nav>
+  <nav class="case-detail-footer" aria-label="Portfolio navigation">
+    <a href="/#index">View all work →</a>
+    <a href="/#contact">Contact</a>
   </nav>
 </main>
 

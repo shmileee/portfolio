@@ -28,11 +28,9 @@
     <a class="brand-link" href="/#top">~/oleksandr-ponomarov</a>
     <nav class="site-nav" aria-label="Primary navigation">
       
+        <a href="/#index">Work</a>
+      
         <a href="/#arc">The arc</a>
-      
-        <a href="/#featured">Case studies</a>
-      
-        <a href="/#index">Index</a>
       
         <a href="/#how-i-work">How I work</a>
       
@@ -43,7 +41,8 @@
   </div>
 </header>
 
-    <main class="case-detail" id="main-content">
+    
+<main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 18</p>
@@ -54,7 +53,7 @@
     </div>
   </header>
   <article class="prose case-detail-prose"><h2>THE SITUATION</h2>
-<p>Our incident-management provider's Terraform plugin broke at our scale. With ~30 team stacks planning against one account, the upstream provider — which had removed its request throttling — died with rate-limit errors on parallel runs; two resources re-planned phantom changes on every single run; a data source hard-crashed on duplicate records. Team automation (<a href="/#study-6">case study 6</a>) depended on all of it.</p>
+<p>Our incident-management provider's Terraform plugin broke at our scale. With ~30 team stacks planning against one account, the upstream provider — which had removed its request throttling — died with rate-limit errors on parallel runs; two resources re-planned phantom changes on every single run; a data source hard-crashed on duplicate records. Team automation (<a href="/case-studies/06-teams-that-create-themselves/">case study 6</a>) depended on all of it.</p>
 <h2>WHAT I DID</h2>
 <p>Forked and fixed in four days: a rate-limited HTTP client with retries that back off and add jitter (so thirty stacks don't retry in lockstep), the phantom-diff suppressions, deterministic duplicate resolution. Versioned honestly as 0.15.2-company.1 — upstream base plus a visible patch train — and filed each fix as an upstream issue with a written report, keeping the fork rebaseable and the maintainers informed.</p>
 <blockquote>
@@ -71,15 +70,27 @@
   <span class="token property">version</span> <span class="token punctuation">=</span> <span class="token string">"0.15.2-company.5"</span>
 <span class="token punctuation">}</span></code></pre>
 
-</div><p>The registry immediately outgrew its first tenant: it now hosts our own environment-lifecycle provider (<a href="/#study-14">case study 14</a>) and mirrors the public registry for every provider we use — one governed, cached distribution point for all of Terraform.</p>
+</div><p>The registry immediately outgrew its first tenant: it now hosts our own environment-lifecycle provider (<a href="/case-studies/14-environments-you-can-create-and-destroy-with-one-command/">case study 14</a>) and mirrors the public registry for every provider we use — one governed, cached distribution point for all of Terraform.</p>
 <h2>THE INTERESTING PART</h2>
 <p>The host-everything layer mattered as much as the fix: the fork stayed rebaseable because its release train was explicit, and the registry made that fork the normal path instead of a special case.</p>
 <h2>WHAT IT CHANGED</h2>
 <p>A vendor's bug stopped being our outage; the escape hatch (fork + registry) became permanent infrastructure; and the whole org's provider supply chain got faster and more controlled as a side effect of fixing one broken plugin.</p>
 </article>
-  <nav class="case-detail-footer" aria-label="Case study navigation">
-    <a href="/#study-18">Open in the portfolio reader</a>
-    <a href="/#index">Browse all case studies →</a>
+  <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
+    <a href="/case-studies/17-leaving-docker-hub-without-anyone-noticing/" data-study-direction="previous">
+      <span class="case-detail-adjacent-kicker">Previous</span>
+      <span class="case-detail-adjacent-number">Case 17</span>
+      <span class="case-detail-adjacent-title">Leaving Docker Hub without anyone noticing</span>
+    </a>
+    <a href="/case-studies/19-turning-container-images-from-a-liability-into-a-supply-chain/" data-study-direction="next">
+      <span class="case-detail-adjacent-kicker">Next</span>
+      <span class="case-detail-adjacent-number">Case 19</span>
+      <span class="case-detail-adjacent-title">Turning container images from a liability into a supply chain</span>
+    </a>
+  </nav>
+  <nav class="case-detail-footer" aria-label="Portfolio navigation">
+    <a href="/#index">View all work →</a>
+    <a href="/#contact">Contact</a>
   </nav>
 </main>
 
