@@ -127,40 +127,20 @@ for (const width of [375, 768, 1280]) {
   });
 }
 
-test("ordinary primary activation remains available to progressive enhancement", async ({ page }) => {
+test("ordinary primary activation opens the reader without replacing the homepage", async ({ page }) => {
   // Given a canonical card with an enhancement hook
   await page.goto("/");
   const card = page.locator(CARD_SELECTOR).first();
   await expect(card).toHaveAttribute("data-open-study", /^\d+$/);
-  await card.evaluate((element) => {
-    element.addEventListener(
-      "click",
-      (event) => {
-        event.preventDefault();
-        window.__primaryActivation = {
-          button: event.button,
-          ctrlKey: event.ctrlKey,
-          defaultPrevented: event.defaultPrevented,
-          metaKey: event.metaKey,
-          shiftKey: event.shiftKey,
-        };
-      },
-      { capture: true, once: true },
-    );
-  });
+  const studyNumber = await card.getAttribute("data-open-study");
 
   // When the card receives an unmodified primary click
   await card.click();
 
-  // Then enhancement code can observe and take ownership of that ordinary activation
-  const activation = await page.evaluate(() => window.__primaryActivation);
-  expect(activation).toEqual({
-    button: 0,
-    ctrlKey: false,
-    defaultPrevented: true,
-    metaKey: false,
-    shiftKey: false,
-  });
+  // Then progressive enhancement opens the reader while keeping the homepage document
+  await expect(page.locator("[data-reader]")).toBeVisible();
+  expect(new URL(page.url()).pathname).toBe("/");
+  expect(new URL(page.url()).hash).toBe(`#study-${studyNumber}`);
 });
 
 test("canonical href remains suitable for browser copy-link behavior", async ({ page }) => {
