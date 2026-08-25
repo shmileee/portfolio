@@ -1,8 +1,8 @@
-// Page-structure invariants: study routes, canonical metadata, the 04/05
-// sequence, the 404 page, homepage payload, card anchors, and reader shell.
+// Page-structure invariants: study routes, canonical metadata, adjacency cards,
+// the 04/05 sequence, the 404 page, homepage payload, card anchors, and reader shell.
 
 import { STUDY_PAGE_PATTERN } from "./context.mjs";
-import { MalformedMarkupError, normalizeText } from "./html.mjs";
+import { MalformedMarkupError, normalizeText, scanTags } from "./html.mjs";
 import { outcome } from "./report.mjs";
 
 export const EXPECTED_STUDY_COUNT = 23;
@@ -26,6 +26,59 @@ function soleElementText(site, file, tagName) {
     throw new MalformedMarkupError(file, `<${tagName}> never closed`);
   }
   return normalizeText(html.slice(matches[0].contentStart, close), file);
+}
+
+function hasClass(tag, className) {
+  return (tag.attrs.get("class") ?? "").split(/\s+/).includes(className);
+}
+
+function elementText(raw, tag, file) {
+  const close = raw.indexOf(`</${tag.name}>`, tag.contentStart);
+  if (close === -1) {
+    throw new MalformedMarkupError(file, `<${tag.name}> never closed`);
+  }
+  return normalizeText(raw.slice(tag.contentStart, close), file);
+}
+
+function readManifestOrder(site, problems) {
+  const manifest = site.readerManifest();
+  if (!manifest.entries) {
+    problems.push(`reader manifest unavailable: ${manifest.error}`);
+    return null;
+  }
+  const entries = manifest.entries;
+  if (entries.length !== EXPECTED_STUDY_COUNT) {
+    problems.push(`manifest has ${entries.length} entries, expected ${EXPECTED_STUDY_COUNT}`);
+  }
+  const routeToIndex = new Map();
+  entries.forEach((entry, index) => {
+    if (entry === null || typeof entry !== "object") {
+      problems.push(`manifest[${index}] is not an object`);
+      return;
+    }
+    if (typeof entry.url !== "string" || entry.url.trim() === "") {
+      problems.push(`manifest[${index}] url is empty or invalid`);
+    } else if (routeToIndex.has(entry.url)) {
+      problems.push(`manifest[${index}] url is duplicated: ${entry.url}`);
+    } else {
+      routeToIndex.set(entry.url, index);
+    }
+    if (!Number.isInteger(entry.number) || entry.number < 1) {
+      problems.push(`manifest[${index}] number is invalid: ${entry.number}`);
+    }
+    if (typeof entry.title !== "string" || entry.title.trim() === "") {
+      problems.push(`manifest[${index}] title is empty`);
+    }
+  });
+  for (const route of site.studyRoutes) {
+    if (!routeToIndex.has(route)) {
+      problems.push(`manifest is missing route ${route}`);
+    }
+  }
+  if (problems.length > 0) {
+    return null;
+  }
+  return { entries, routeToIndex };
 }
 
 function checkStudyPages(site) {
@@ -113,6 +166,134 @@ function checkSequenceLinks(site) {
     }
   }
   return outcome(problems, "studies 04 and 05 link to each other canonically");
+}
+
+function checkStandaloneStudyAdjacency(site) {
+  const problems = [];
+  const manifestOrder = readManifestOrder(site, problems);
+  if (!manifestOrder) {
+    return outcome(problems, "");
+  }
+  const { entries, routeToIndex } = manifestOrder;
+  for (const route of site.studyRoutes) {
+    const index = routeToIndex.get(route);
+    if (index === undefined) {
+      problems.push(`${route}: manifest is missing the study entry`);
+      continue;
+    }
+    const file = studyFile(route);
+    try {
+      const raw = site.rawOf(file);
+      const adjacentRegions = site.tagsOf(file).filter(
+        (tag) =>
+          tag.name === "nav" &&
+          hasClass(tag, "case-detail-adjacent") &&
+          tag.attrs.get("aria-label") === "Adjacent case studies",
+      );
+      if (adjacentRegions.length !== 1) {
+        problems.push(`${route}: expected exactly one adjacent-study region, found ${adjacentRegions.length}`);
+        continue;
+      }
+      const region = adjacentRegions[0];
+      const regionClose = raw.indexOf("</nav>", region.contentStart);
+      if (regionClose === -1) {
+        throw new MalformedMarkupError(file, "<nav> never closed");
+      }
+      const regionHtml = raw.slice(region.contentStart, regionClose);
+      const regionTags = [...scanTags(regionHtml, file)];
+      const anchors = regionTags.filter((tag) => tag.name === "a");
+      if (anchors.length !== 2) {
+        problems.push(`${route}: expected exactly 2 adjacency links, found ${anchors.length}`);
+      }
+      const anchorByDirection = new Map();
+      for (const anchor of anchors) {
+        const direction = anchor.attrs.get("data-study-direction");
+        if (direction !== "previous" && direction !== "next") {
+          problems.push(`${route}: adjacency link is missing a valid data-study-direction`);
+          continue;
+        }
+        if (anchorByDirection.has(direction)) {
+          problems.push(`${route}: duplicate ${direction} adjacency link`);
+          continue;
+        }
+        anchorByDirection.set(direction, anchor);
+      }
+
+      const expectedLinks = {
+        previous: entries[(index - 1 + entries.length) % entries.length],
+        next: entries[(index + 1) % entries.length],
+      };
+      for (const direction of ["previous", "next"]) {
+        const anchor = anchorByDirection.get(direction);
+        if (!anchor) {
+          problems.push(`${route}: missing ${direction} adjacency link`);
+          continue;
+        }
+        const anchorClose = regionHtml.indexOf("</a>", anchor.contentStart);
+        if (anchorClose === -1) {
+          throw new MalformedMarkupError(file, "<a> never closed");
+        }
+        const anchorHtml = regionHtml.slice(anchor.contentStart, anchorClose);
+        const spanTags = [...scanTags(anchorHtml, file)].filter((tag) => tag.name === "span");
+        if (spanTags.length !== 3) {
+          problems.push(`${route}: ${direction} adjacency card should contain exactly 3 spans, found ${spanTags.length}`);
+        }
+        const spanByClass = new Map();
+        for (const span of spanTags) {
+          const classNames = (span.attrs.get("class") ?? "").split(/\s+/).filter(Boolean);
+          const match = classNames.find((className) =>
+            [
+              "case-detail-adjacent-kicker",
+              "case-detail-adjacent-number",
+              "case-detail-adjacent-title",
+            ].includes(className),
+          );
+          if (!match) {
+            problems.push(`${route}: ${direction} adjacency card has an unexpected span class`);
+            continue;
+          }
+          if (spanByClass.has(match)) {
+            problems.push(`${route}: ${direction} adjacency card duplicates ${match}`);
+            continue;
+          }
+          spanByClass.set(match, span);
+        }
+        const expected = expectedLinks[direction];
+        const expectedNumber = `Case ${String(expected.number).padStart(2, "0")}`;
+        const actualHref = anchor.attrs.get("href");
+        if (actualHref !== expected.url) {
+          problems.push(`${route}: ${direction} href is ${actualHref ?? "(missing)"}, expected ${expected.url}`);
+        }
+        const kicker = spanByClass.get("case-detail-adjacent-kicker");
+        if (!kicker) {
+          problems.push(`${route}: ${direction} adjacency card is missing its kicker`);
+        } else if (elementText(anchorHtml, kicker, file) !== direction[0].toUpperCase() + direction.slice(1)) {
+          problems.push(`${route}: ${direction} kicker text is wrong`);
+        }
+        const number = spanByClass.get("case-detail-adjacent-number");
+        if (!number) {
+          problems.push(`${route}: ${direction} adjacency card is missing its number`);
+        } else if (elementText(anchorHtml, number, file) !== expectedNumber) {
+          problems.push(`${route}: ${direction} number is ${elementText(anchorHtml, number, file)}, expected ${expectedNumber}`);
+        }
+        const title = spanByClass.get("case-detail-adjacent-title");
+        if (!title) {
+          problems.push(`${route}: ${direction} adjacency card is missing its title`);
+        } else if (elementText(anchorHtml, title, file) !== expected.title) {
+          problems.push(`${route}: ${direction} title is ${elementText(anchorHtml, title, file)}, expected ${expected.title}`);
+        }
+      }
+    } catch (error) {
+      if (!(error instanceof MalformedMarkupError)) {
+        throw error;
+      }
+      problems.push(error.message);
+    }
+  }
+  return outcome(
+    problems,
+    `${site.studyRoutes.length} study pages expose one explicit adjacent region with 2 canonical wraparound cards`,
+  );
 }
 
 function checkNotFoundPage(site) {
@@ -248,6 +429,7 @@ export const STRUCTURE_CHECKS = [
   ["study-pages", checkStudyPages],
   ["study-metadata", checkStudyMetadata],
   ["sequence-links", checkSequenceLinks],
+  ["standalone-study-adjacency", checkStandaloneStudyAdjacency],
   ["not-found-page", checkNotFoundPage],
   ["homepage-payload", checkHomepagePayload],
   ["card-anchors", checkCardAnchors],
