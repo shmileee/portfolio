@@ -1072,8 +1072,13 @@ h3 {
   font-size: 0.88em;
   font-weight: 500;
   line-height: 1;
+  vertical-align: -0.35em;
   white-space: nowrap;
   -webkit-box-decoration-break: clone;
+}
+
+.prose .inline-code-unit {
+  white-space: nowrap;
 }
 
 .prose img {

@@ -11,7 +11,7 @@ spotlight: false
 
 ## THE SITUATION
 
-Atlantis is driven by typed pull-request comments: `atlantis plan`, `atlantis apply`, with project flags that must be exactly right. Power users type them from muscle memory; everyone else copies them from somewhere, gets a flag wrong, and waits for the bot to complain. During large migrations — dozens of pull requests a day — the typing itself became measurable friction.
+Atlantis is driven by typed pull-request comments: <span class="inline-code-unit"><code>atlantis plan</code>,</span> <span class="inline-code-unit"><code>atlantis apply</code>,</span> with project flags that must be exactly right. Power users type them from muscle memory; everyone else copies them from somewhere, gets a flag wrong, and waits for the bot to complain. During large migrations — dozens of pull requests a day — the typing itself became measurable friction.
 The obvious fixes were all worse: a web service with GitHub tokens to manage, or yet another bot with write access.
 
 ## WHAT I DID
