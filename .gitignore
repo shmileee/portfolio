@@ -1,5 +1,7 @@
 .DS_Store
 .codegraph/
+.omo/
 .playwright-mcp/
 node_modules/
 _site/
+/*.png
