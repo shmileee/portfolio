@@ -5,7 +5,6 @@ import { STUDY_PAGE_PATTERN } from "./context.mjs";
 import { MalformedMarkupError, normalizeText, scanTags } from "./html.mjs";
 import { outcome } from "./report.mjs";
 
-export const EXPECTED_STUDY_COUNT = 22;
 const TITLE_SUFFIX = " — Oleksandr Ponomarov"; // base.njk appends this to every page <title>
 const HOMEPAGE_BYTE_BUDGET = 75 * 1024;
 const EMBEDDED_BODY_SIGNATURES = ["case-detail-prose", "media-exhibit", "code-exhibit", "diagram-exhibit"];
@@ -47,9 +46,10 @@ function readManifestOrder(site, problems) {
     return null;
   }
   const entries = manifest.entries;
-  if (entries.length !== EXPECTED_STUDY_COUNT) {
-    problems.push(`manifest has ${entries.length} entries, expected ${EXPECTED_STUDY_COUNT}`);
+  if (entries.length !== site.studyRoutes.length) {
+    problems.push(`manifest has ${entries.length} entries, expected ${site.studyRoutes.length}`);
   }
+  const ids = new Set();
   const routeToIndex = new Map();
   entries.forEach((entry, index) => {
     if (entry === null || typeof entry !== "object") {
@@ -63,8 +63,15 @@ function readManifestOrder(site, problems) {
     } else {
       routeToIndex.set(entry.url, index);
     }
-    if (!Number.isInteger(entry.number) || entry.number < 1) {
-      problems.push(`manifest[${index}] number is invalid: ${entry.number}`);
+    if (typeof entry.id !== "string" || entry.id.trim() === "" || ids.has(entry.id)) {
+      problems.push(`manifest[${index}] id is empty or duplicated: ${entry.id}`);
+    }
+    ids.add(entry.id);
+    if (entry.number !== index + 1) {
+      problems.push(`manifest[${index}] number is ${entry.number}, expected ${index + 1}`);
+    }
+    if (entry.legacyNumber !== null && (!Number.isInteger(entry.legacyNumber) || entry.legacyNumber < 1)) {
+      problems.push(`manifest[${index}] legacyNumber is invalid: ${entry.legacyNumber}`);
     }
     if (typeof entry.title !== "string" || entry.title.trim() === "") {
       problems.push(`manifest[${index}] title is empty`);
@@ -83,16 +90,22 @@ function readManifestOrder(site, problems) {
 
 function checkStudyPages(site) {
   const problems = [];
-  if (site.studyRoutes.length !== EXPECTED_STUDY_COUNT) {
-    problems.push(`expected ${EXPECTED_STUDY_COUNT} study pages, found ${site.studyRoutes.length}`);
+  const generatedRoutes = new Set(site.generatedStudyRoutes);
+  const expectedRoutes = new Set([...site.studyRoutes, ...site.legacyStudyRoutes]);
+  for (const route of expectedRoutes) {
+    if (!generatedRoutes.has(route)) problems.push(`missing generated study route ${route}`);
   }
-  const strays = site.htmlFiles.filter(
+  for (const route of generatedRoutes) {
+    if (!expectedRoutes.has(route)) problems.push(`unexpected generated study route ${route}`);
+  }
+  const malformedFiles = site.htmlFiles.filter(
     (file) => file.startsWith("case-studies/") && !STUDY_PAGE_PATTERN.test(file),
   );
-  for (const stray of strays) {
-    problems.push(`unexpected HTML under case-studies/: ${stray}`);
-  }
-  return outcome(problems, `${site.studyRoutes.length}/${EXPECTED_STUDY_COUNT} standalone study pages built`);
+  for (const file of malformedFiles) problems.push(`unexpected HTML under case-studies/: ${file}`);
+  return outcome(
+    problems,
+    `${site.studyRoutes.length} canonical study pages and ${site.legacyStudyRoutes.length} redirects built`,
+  );
 }
 
 function checkStudyMetadata(site) {
@@ -144,18 +157,41 @@ function checkStudyMetadata(site) {
   );
 }
 
-function singleRouteByPrefix(site, prefix) {
-  const matches = site.studyRoutes.filter((route) => route.startsWith(`/case-studies/${prefix}`));
-  if (matches.length !== 1) {
-    throw new Error(`expected exactly one study route with prefix ${prefix}, found ${matches.length}`);
+function checkLegacyRedirects(site) {
+  const problems = [];
+  for (const { route, target } of site.legacyStudyRedirects) {
+    const file = studyFile(route);
+    const tags = site.tagsOf(file);
+    const canonical = tags.find(
+      (tag) => tag.name === "link" && tag.attrs.get("rel") === "canonical",
+    );
+    const refresh = tags.find(
+      (tag) => tag.name === "meta" && tag.attrs.get("http-equiv") === "refresh",
+    );
+    const robots = tags.find(
+      (tag) => tag.name === "meta" && tag.attrs.get("name") === "robots",
+    );
+    const targetLink = tags.find(
+      (tag) => tag.name === "a" && tag.attrs.get("href") === target,
+    );
+    if (canonical?.attrs.get("href") !== `${site.origin}${target}`) {
+      problems.push(`${route}: canonical does not point to ${target}`);
+    }
+    if (refresh?.attrs.get("content") !== `0; url=${target}`) {
+      problems.push(`${route}: refresh does not point to ${target}`);
+    }
+    if (robots?.attrs.get("content") !== "noindex,follow") {
+      problems.push(`${route}: redirect must be noindex,follow`);
+    }
+    if (!targetLink) problems.push(`${route}: fallback link does not point to ${target}`);
   }
-  return matches[0];
+  return outcome(problems, `${site.legacyStudyRoutes.length} legacy routes redirect canonically`);
 }
 
 function checkSequenceLinks(site) {
   const problems = [];
-  const feedbackLoop = singleRouteByPrefix(site, "04-");
-  const oneToolVersion = singleRouteByPrefix(site, "05-");
+  const feedbackLoop = site.studyRouteById.get("fast-feedback");
+  const oneToolVersion = site.studyRouteById.get("tool-versions");
   for (const [from, to] of [
     [feedbackLoop, oneToolVersion],
     [oneToolVersion, feedbackLoop],
@@ -165,7 +201,7 @@ function checkSequenceLinks(site) {
       problems.push(`${from} has no anchor to ${to}`);
     }
   }
-  return outcome(problems, "studies 04 and 05 link to each other canonically");
+  return outcome(problems, "the feedback-loop sequence links both canonical studies");
 }
 
 function checkStandaloneStudyAdjacency(site) {
@@ -331,8 +367,8 @@ function checkCardAnchors(site) {
     .filter(
       (tag) => tag.name === "a" && (tag.attrs.get("class") ?? "").split(/\s+/).includes("case-card"),
     );
-  if (cards.length !== EXPECTED_STUDY_COUNT) {
-    problems.push(`expected ${EXPECTED_STUDY_COUNT} case-card anchors, found ${cards.length}`);
+  if (cards.length !== site.studyRoutes.length) {
+    problems.push(`expected ${site.studyRoutes.length} case-card anchors, found ${cards.length}`);
   }
   const hrefs = cards.map((tag) => tag.attrs.get("href") ?? "");
   const routeSet = new Set(site.studyRoutes);
@@ -349,13 +385,13 @@ function checkCardAnchors(site) {
   }
   const manifest = site.readerManifest();
   if (manifest.entries) {
-    const numberByRoute = new Map(
+    const idByRoute = new Map(
       manifest.entries
         .filter((entry) => entry !== null && typeof entry === "object")
-        .map((entry) => [entry.url, entry.number]),
+        .map((entry) => [entry.url, entry.id]),
     );
     for (const card of cards) {
-      const expected = numberByRoute.get(card.attrs.get("href"));
+      const expected = idByRoute.get(card.attrs.get("href"));
       if (String(expected) !== card.attrs.get("data-open-study")) {
         problems.push(
           `${card.attrs.get("href")}: data-open-study is ${card.attrs.get("data-open-study")}, manifest says ${expected}`,
@@ -389,10 +425,11 @@ function checkReaderShell(site) {
     problems.push(manifest.error);
     return outcome(problems, "");
   }
-  if (manifest.entries.length !== EXPECTED_STUDY_COUNT) {
-    problems.push(`manifest has ${manifest.entries.length} entries, expected ${EXPECTED_STUDY_COUNT}`);
+  if (manifest.entries.length !== site.studyRoutes.length) {
+    problems.push(`manifest has ${manifest.entries.length} entries, expected ${site.studyRoutes.length}`);
   }
   const routeSet = new Set(site.studyRoutes);
+  const ids = new Set();
   const numbers = new Set();
   const urls = new Set();
   manifest.entries.forEach((entry, index) => {
@@ -400,7 +437,11 @@ function checkReaderShell(site) {
       problems.push(`manifest[${index}] is not an object`);
       return;
     }
-    if (!Number.isInteger(entry.number) || entry.number < 1 || numbers.has(entry.number)) {
+    if (typeof entry.id !== "string" || entry.id.trim() === "" || ids.has(entry.id)) {
+      problems.push(`manifest[${index}] id is invalid or duplicated: ${entry.id}`);
+    }
+    ids.add(entry.id);
+    if (entry.number !== index + 1 || numbers.has(entry.number)) {
       problems.push(`manifest[${index}] number is invalid or duplicated: ${entry.number}`);
     }
     numbers.add(entry.number);
@@ -428,6 +469,7 @@ function checkReaderShell(site) {
 export const STRUCTURE_CHECKS = [
   ["study-pages", checkStudyPages],
   ["study-metadata", checkStudyMetadata],
+  ["legacy-study-redirects", checkLegacyRedirects],
   ["sequence-links", checkSequenceLinks],
   ["standalone-study-adjacency", checkStandaloneStudyAdjacency],
   ["not-found-page", checkNotFoundPage],

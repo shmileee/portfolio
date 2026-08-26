@@ -4,6 +4,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
+import caseStudyCatalog from "../../src/_data/caseStudyCatalog.js";
 import { scanTags } from "./html.mjs";
 
 export const STUDY_PAGE_PATTERN = /^case-studies\/([^/]+)\/index\.html$/;
@@ -52,11 +53,21 @@ export function loadSite(rootDir, siteDir) {
   const files = walkFiles(siteDir).sort();
   const fileSet = new Set(files);
   const htmlFiles = files.filter((file) => file.endsWith(".html"));
-  const studyRoutes = files
+  const generatedStudyRoutes = files
     .map((file) => STUDY_PAGE_PATTERN.exec(file))
     .filter((match) => match !== null)
-    .map((match) => `/case-studies/${match[1]}/`)
-    .sort();
+    .map((match) => `/case-studies/${match[1]}/`);
+  const studyRoutes = caseStudyCatalog.map(({ folder }) => `/case-studies/${folder}/`);
+  const legacyStudyRedirects = caseStudyCatalog
+    .filter(({ legacyFolder }) => legacyFolder)
+    .map(({ folder, legacyFolder }) => ({
+      route: `/case-studies/${legacyFolder}/`,
+      target: `/case-studies/${folder}/`,
+    }));
+  const legacyStudyRoutes = legacyStudyRedirects.map(({ route }) => route);
+  const studyRouteById = new Map(
+    caseStudyCatalog.map(({ folder, id }) => [id, `/case-studies/${folder}/`]),
+  );
 
   const rawCache = new Map();
   const tagsCache = new Map();
@@ -68,6 +79,10 @@ export function loadSite(rootDir, siteDir) {
     files,
     fileSet,
     htmlFiles,
+    generatedStudyRoutes,
+    legacyStudyRedirects,
+    legacyStudyRoutes,
+    studyRouteById,
     studyRoutes,
     rawOf(file) {
       if (!rawCache.has(file)) {
