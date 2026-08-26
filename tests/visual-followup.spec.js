@@ -1,8 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-const CASE_03_PATH = "/case-studies/03-buttons-instead-of-incantations/";
-const CASE_05_PATH = "/case-studies/05-one-tool-version-everywhere/";
-const CASE_14_PATH = "/case-studies/14-environments-you-can-create-and-destroy-with-one-command/";
+import { caseStudy, caseStudyHash } from "./case-studies.js";
+
+const BUTTONS_STUDY = caseStudy("self-service-buttons");
+const TOOL_VERSIONS_STUDY = caseStudy("tool-versions");
+const ENVIRONMENTS_STUDY = caseStudy("ephemeral-environments");
 
 async function inlineCenterDelta(code) {
   return code.evaluate((element) => {
@@ -30,8 +32,8 @@ async function inlineCenterDelta(code) {
 test("inline code aligns vertically with adjacent prose", async ({ page }) => {
   // Given representative commands rendered in standalone and reader prose
   for (const [command, standalonePath, readerPath] of [
-    ["atlantis plan", CASE_03_PATH, "/#study-3"],
-    ["mise install", CASE_05_PATH, "/#study-5"],
+    ["atlantis plan", BUTTONS_STUDY.url, `/${caseStudyHash(BUTTONS_STUDY.id)}`],
+    ["mise install", TOOL_VERSIONS_STUDY.url, `/${caseStudyHash(TOOL_VERSIONS_STUDY.id)}`],
   ]) {
     for (const [surface, path, root] of [
       ["standalone", standalonePath, ".case-detail-prose"],
@@ -53,7 +55,7 @@ test("inline code aligns vertically with adjacent prose", async ({ page }) => {
 test("narrow reader keeps punctuation with inline code", async ({ page }) => {
   // Given the command pair rendered near the reader's mobile wrap boundary
   await page.setViewportSize({ width: 375, height: 900 });
-  await page.goto("/#study-3", { waitUntil: "networkidle" });
+  await page.goto(`/${caseStudyHash(BUTTONS_STUDY.id)}`, { waitUntil: "networkidle" });
   await expect(page.locator("[data-reader]")).toBeVisible();
 
   // When the first command and its trailing comma are measured
@@ -85,8 +87,8 @@ test("recording captions center beneath their media", async ({ page }) => {
   for (const width of [375, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     for (const [surface, path, root] of [
-      ["standalone", CASE_03_PATH, ".case-detail-prose"],
-      ["reader", "/#study-3", ".reader-prose"],
+      ["standalone", BUTTONS_STUDY.url, ".case-detail-prose"],
+      ["reader", `/${caseStudyHash(BUTTONS_STUDY.id)}`, ".reader-prose"],
     ]) {
       await page.goto(path, { waitUntil: "networkidle" });
       if (surface === "reader") await expect(page.locator("[data-reader]")).toBeVisible();
@@ -107,8 +109,8 @@ test("adjacent cards align outward and share a top line across surfaces", async 
   for (const width of [375, 1280]) {
     await page.setViewportSize({ width, height: 900 });
     for (const [surface, path, selector] of [
-      ["standalone", CASE_14_PATH, ".case-detail-adjacent a[data-study-direction]"],
-      ["reader", "/#study-14", ".reader-navigation [data-reader-direction]"],
+      ["standalone", ENVIRONMENTS_STUDY.url, ".case-detail-adjacent a[data-study-direction]"],
+      ["reader", `/${caseStudyHash(ENVIRONMENTS_STUDY.id)}`, ".reader-navigation [data-reader-direction]"],
     ]) {
       await page.goto(path, { waitUntil: "networkidle" });
       if (surface === "reader") await expect(page.locator("[data-reader]")).toBeVisible();
@@ -141,11 +143,11 @@ test("adjacent cards align outward and share a top line across surfaces", async 
   }
 });
 
-test("Case Study 14 teardown diagram adapts to the light theme", async ({ browser }) => {
+test("the environments-study teardown diagram adapts to the light theme", async ({ browser }) => {
   // Given the diagram on both standalone and reader surfaces in light mode
   for (const [surface, path] of [
-    ["standalone", CASE_14_PATH],
-    ["reader", "/#study-14"],
+    ["standalone", ENVIRONMENTS_STUDY.url],
+    ["reader", `/${caseStudyHash(ENVIRONMENTS_STUDY.id)}`],
   ]) {
     const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
     await context.addInitScript(() => localStorage.setItem("om-theme", "light"));

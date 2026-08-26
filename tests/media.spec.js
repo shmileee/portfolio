@@ -6,18 +6,21 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { expect, test } from "@playwright/test";
 
+import { caseStudy, caseStudyHash } from "./case-studies.js";
+
 const PROJECT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const runFile = promisify(execFile);
+const BUTTONS_STUDY = caseStudy("self-service-buttons");
 const VIDEO_EXHIBITS = [
   {
-    route: "/case-studies/03-buttons-instead-of-incantations/",
+    route: BUTTONS_STUDY.url,
     source: "./atlantis-pr-buttons-demo.mp4",
     poster: "./atlantis-pr-buttons-demo-poster.png",
     width: 880,
     height: 588,
   },
   {
-    route: "/case-studies/07-turning-a-terraform-repository-into-a-product/",
+    route: caseStudy("terraform-product").url,
     source: "./terramate-stacks-explorer.mp4",
     poster: "./terramate-stacks-explorer-poster.png",
     width: 1440,
@@ -139,7 +142,7 @@ test("reduced motion never starts either recording", async ({ browser }) => {
   }
 });
 
-test("Task 6 contains Study 03 reader media while preserving the standalone breakout", async ({ page }) => {
+test("contains buttons-study reader media while preserving the standalone breakout", async ({ page }) => {
   for (const width of [320, 375, 768, 1280, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto(VIDEO_EXHIBITS[0].route, { waitUntil: "networkidle" });
@@ -153,7 +156,7 @@ test("Task 6 contains Study 03 reader media while preserving the standalone brea
         width: element.getBoundingClientRect().width,
       }));
     });
-    await page.goto("/#study-3", { waitUntil: "networkidle" });
+    await page.goto(`/${caseStudyHash(BUTTONS_STUDY.id)}`, { waitUntil: "networkidle" });
     await expect(page.locator("[data-reader]")).toBeVisible();
     const readerMedia = await page.evaluate(() => {
       const prose = document.querySelector(".reader-prose").getBoundingClientRect();
@@ -212,7 +215,7 @@ test("an MP4 without a poster fails at the shortcode boundary", async () => {
   const fixtureRoot = await mkdtemp(join(tmpdir(), "portfolio-media-missing-poster-"));
   const studyPath = join(
     fixtureRoot,
-    "src/content/case-studies/03-buttons-instead-of-incantations/index.md",
+    `src/content/case-studies/${BUTTONS_STUDY.folder}/index.md`,
   );
 
   try {
