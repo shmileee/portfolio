@@ -3,6 +3,8 @@ number: 23
 slug: a-codebase-whose-newest-users-are-ai-agents
 title: A codebase whose newest users are AI agents
 summary: Every merge still crosses the same gates as human work.
+role: Defined repository guidance, safe-tool defaults, supervised skills, and merge controls for agent-assisted work.
+evidence: Repository-local maps and playbooks route every change through the same plans, diffs, CI, and human merge gate.
 topics:
   - ai
   - developer experience
@@ -31,4 +33,4 @@ I treated agents as first-class users of the codebase and built them the same fo
 
 ## WHAT IT CHANGED
 
-Agent-assisted work stopped being a personal experiment and became a platform capability: fleet-wide migrations run as supervised campaigns at many times human pace, every merge still crosses the same gates as human work — and the guidance, tools, and limits live in the repository, versioned, where the next agent (and the next engineer) finds them.
+Agent-assisted work became a supervised platform capability: campaign changes still cross the same plans, rendered diffs, CI checks, and human merge gates as other work, while guidance and limits remain versioned beside the code they govern.
