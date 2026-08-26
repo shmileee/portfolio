@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { caseStudy, caseStudyHash } from "./case-studies.js";
+
 const VIEWPORTS = [
   { width: 320, height: 568 },
   { width: 375, height: 667 },
@@ -9,27 +11,24 @@ const VIEWPORTS = [
   { width: 1440, height: 900 },
 ];
 const ACCEPTANCE_WIDTHS = [320, 375, 768, 1280, 1440];
-const APPROVE_STUDY_PATH = "/case-studies/02-approve-the-audited-escape-hatch/";
-const STUDY_PATH = "/case-studies/14-environments-you-can-create-and-destroy-with-one-command/";
-const THEME_STUDY_PATH =
-  "/case-studies/21-customer-code-running-safely-self-service-cloud-functions/";
+const APPROVE_STUDY = caseStudy("audited-approve");
+const RESPONSIVE_STUDY = caseStudy("ephemeral-environments");
+const THEME_STUDY = caseStudy("cloud-functions");
+const FLEET_STUDY = caseStudy("fleet-patching");
 const DIAGRAM_STUDIES = [
   {
-    number: "12",
-    path: "/case-studies/12-the-fleet-that-patches-itself/",
+    ...FLEET_STUDY,
     variables: [
       ["--ab4", "--bg", "--w42", "--w45", "--w5", "--w88"],
       ["--ab4", "--bg", "--w42", "--w45", "--w5", "--w55", "--w7", "--w88"],
     ],
   },
   {
-    number: "21",
-    path: THEME_STUDY_PATH,
+    ...THEME_STUDY,
     variables: [["--ab4", "--bg", "--w42", "--w45", "--w5", "--w7", "--w88"]],
   },
   {
-    number: "23",
-    path: "/case-studies/23-a-codebase-whose-newest-users-are-ai-agents/",
+    ...caseStudy("agent-ready-codebase"),
     variables: [
       ["--ab4", "--bg", "--ok", "--okb5", "--w42", "--w45", "--w5", "--w55", "--w7", "--w88"],
     ],
@@ -561,7 +560,7 @@ for (const viewport of VIEWPORTS) {
     });
     expect(overlap).toBe(0);
 
-    await page.locator('[data-open-study="14"]:visible').first().click();
+    await page.locator(`[data-open-study="${RESPONSIVE_STUDY.id}"]:visible`).first().click();
     await expect(page.locator("[data-reader]")).toBeVisible();
     await expectNoOverflow(page);
     const reader = await page.locator(".reader-shell").boundingBox();
@@ -592,7 +591,7 @@ for (const viewport of VIEWPORTS) {
     expect(["left", "start"]).toContain(readerAlignment);
     await page.locator("[data-reader]").evaluate((dialog) => dialog.close());
 
-    await page.goto(STUDY_PATH);
+    await page.goto(RESPONSIVE_STUDY.url);
     await expectNoOverflow(page);
     await expectNamedTargets(page);
     const standaloneAlignment = await page.locator(".case-detail-prose > p").first().evaluate(
@@ -642,7 +641,7 @@ test("Task 6 prose and approve commands wrap editorially without escaping their 
     await page.setViewportSize({ width, height: 900 });
 
     for (const surface of ["standalone", "reader"]) {
-      await page.goto(surface === "standalone" ? APPROVE_STUDY_PATH : "/#study-2", {
+      await page.goto(surface === "standalone" ? APPROVE_STUDY.url : `/${caseStudyHash(APPROVE_STUDY.id)}`, {
         waitUntil: "networkidle",
       });
       if (surface === "reader") await expect(page.locator("[data-reader]")).toBeVisible();
@@ -674,7 +673,7 @@ test("Task 6 prose and approve commands wrap editorially without escaping their 
 test("320px layout fits beside a classic vertical scrollbar", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
 
-  for (const path of ["/", STUDY_PATH]) {
+  for (const path of ["/", RESPONSIVE_STUDY.url]) {
     await page.goto(path);
     await page.addStyleTag({ content: "html { overflow-y: scroll; scrollbar-gutter: stable; }" });
     const geometry = await page.evaluate(() => {
@@ -727,7 +726,7 @@ test("Task 6 adjacent cards expose perceptible hover without moving and keep str
       await context.addInitScript((selectedTheme) => localStorage.setItem("om-theme", selectedTheme), theme);
       const page = await context.newPage();
       await page.goto(
-        surface === "reader" ? "/#study-12" : "/case-studies/12-the-fleet-that-patches-itself/",
+        surface === "reader" ? `/${caseStudyHash(FLEET_STUDY.id)}` : FLEET_STUDY.url,
         { waitUntil: "networkidle" },
       );
       await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
@@ -781,7 +780,7 @@ test("Task 6 reader Close hover is perceptible without moving and focus remains 
       const context = await browser.newContext({ viewport });
       await context.addInitScript((selectedTheme) => localStorage.setItem("om-theme", selectedTheme), theme);
       const page = await context.newPage();
-      await page.goto("/#study-12", { waitUntil: "networkidle" });
+      await page.goto(`/${caseStudyHash(FLEET_STUDY.id)}`, { waitUntil: "networkidle" });
       await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
       await expect(page.locator("[data-reader]")).toBeVisible();
       const control = page.locator("[data-reader-close]");
@@ -849,7 +848,7 @@ test("code and inline diagrams adapt across standalone and reader themes", async
           localStorage.setItem("om-theme", selectedTheme);
         }, theme);
         const page = await context.newPage();
-        const path = surface === "standalone" ? THEME_STUDY_PATH : "/#study-21";
+        const path = surface === "standalone" ? THEME_STUDY.url : `/${caseStudyHash(THEME_STUDY.id)}`;
         await page.goto(path, { waitUntil: "networkidle" });
         if (surface === "reader") await expect(page.locator("[data-reader]")).toBeVisible();
         await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
@@ -898,7 +897,7 @@ test("shared inline diagram variables meet contrast across themes and surfaces",
         const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
         await context.addInitScript((selectedTheme) => localStorage.setItem("om-theme", selectedTheme), theme);
         const page = await context.newPage();
-        await page.goto(surface === "standalone" ? study.path : `/#study-${study.number}`, {
+        await page.goto(surface === "standalone" ? study.url : `/${caseStudyHash(study.id)}`, {
           waitUntil: "networkidle",
         });
         if (surface === "reader") await expect(page.locator("[data-reader]")).toBeVisible();
@@ -959,7 +958,7 @@ test("mobile inline diagrams remain readable through local scrolling", async ({ 
         const context = await browser.newContext({ hasTouch: viewport.width === 375, viewport });
         await context.addInitScript(() => localStorage.setItem("om-theme", "dark"));
         const page = await context.newPage();
-        await page.goto(surface === "standalone" ? study.path : `/#study-${study.number}`, {
+        await page.goto(surface === "standalone" ? study.url : `/${caseStudyHash(study.id)}`, {
           waitUntil: "domcontentloaded",
         });
         if (surface === "reader") await expect(page.locator("[data-reader]")).toBeVisible();
