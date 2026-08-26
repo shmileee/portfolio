@@ -1,11 +1,11 @@
 ---
 number: 1
 links:
-  - number: 1
+  - study: infrastructure-changes
     label: infrastructure changes
-  - number: 2
+  - study: audited-approve
     label: /approve
-  - number: 3
+  - study: self-service-buttons
     label: buttons
 ---
 
