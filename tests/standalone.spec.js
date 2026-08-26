@@ -1,14 +1,15 @@
 import { expect, test } from "@playwright/test";
 
+import { caseStudies, caseStudy } from "./case-studies.js";
+
 const PUBLIC_ORIGIN = "https://portfolio.oponomarov.com";
 const VIEWPORTS = [
   { width: 375, height: 667 },
   { width: 768, height: 1024 },
   { width: 1440, height: 900 },
 ];
-const STUDY_04_PATH =
-  "/case-studies/04-a-feedback-loop-measured-in-milliseconds/";
-const STUDY_05_PATH = "/case-studies/05-one-tool-version-everywhere/";
+const FEEDBACK_STUDY = caseStudy("fast-feedback");
+const TOOL_VERSIONS_STUDY = caseStudy("tool-versions");
 
 async function getStandalonePaths(page) {
   await page.goto("/");
@@ -28,7 +29,7 @@ test("all standalone studies expose canonical wraparound adjacency", async ({ pa
   // Given the complete, number-ordered canonical study manifest
   test.setTimeout(120_000);
   const studies = await getStudyManifest(page);
-  expect(studies).toHaveLength(22);
+  expect(studies).toHaveLength(caseStudies.length);
 
   for (const viewport of VIEWPORTS) {
     await page.setViewportSize(viewport);
@@ -100,7 +101,7 @@ test("Task 6 standalone adjacent cards wrap long titles in equal responsive colu
   const longest = studies.reduce((candidate, study) =>
     study.title.length > candidate.title.length ? study : candidate,
   );
-  const longestIndex = studies.findIndex(({ number }) => number === longest.number);
+  const longestIndex = studies.findIndex(({ id }) => id === longest.id);
   const current = studies[(longestIndex - 1 + studies.length) % studies.length];
 
   for (const width of [320, 375, 768, 1280, 1440]) {
@@ -157,7 +158,7 @@ test("all standalone studies expose canonical, semantic, and navigation contract
   // Given the complete canonical work index
   test.setTimeout(120_000);
   const paths = await getStandalonePaths(page);
-  expect(paths).toHaveLength(22);
+  expect(paths).toHaveLength(caseStudies.length);
 
   for (const viewport of VIEWPORTS) {
     await page.setViewportSize(viewport);
@@ -276,7 +277,7 @@ test("both adjacent directions navigate on every standalone study without JavaSc
 
 test("standalone skip navigation can focus the main study", async ({ page }) => {
   // Given a standalone study at the top of the document
-  await page.goto(STUDY_04_PATH);
+  await page.goto(FEEDBACK_STUDY.url);
 
   // When the keyboard visitor activates the first focusable control
   await page.keyboard.press("Tab");
@@ -287,20 +288,35 @@ test("standalone skip navigation can focus the main study", async ({ page }) => 
   await expect(page.locator("main#main-content")).toBeFocused();
 });
 
-test("studies 04 and 05 retain reciprocal canonical links", async ({ page }) => {
-  // Given Study 04
-  await page.goto(STUDY_04_PATH);
+test("the feedback-loop studies retain reciprocal canonical links", async ({ page }) => {
+  // Given the feedback-loop study
+  await page.goto(FEEDBACK_STUDY.url);
 
   // When its sequence link is inspected
-  const sequel = page.locator(`.case-detail-prose a[href="${STUDY_05_PATH}"]`);
+  const sequel = page.locator(`.case-detail-prose a[href="${TOOL_VERSIONS_STUDY.url}"]`);
 
   // Then it points to Study 05, whose reciprocal link returns to Study 04
   await expect(sequel).toHaveCount(1);
   await sequel.click();
-  await expect(page).toHaveURL(new RegExp(`${STUDY_05_PATH}$`));
+  await expect(page).toHaveURL(new RegExp(`${TOOL_VERSIONS_STUDY.url}$`));
   await expect(
-    page.locator(`.case-detail-prose a[href="${STUDY_04_PATH}"]`),
+    page.locator(`.case-detail-prose a[href="${FEEDBACK_STUDY.url}"]`),
   ).toHaveCount(1);
+});
+
+test("published numbered routes redirect to number-free canonical routes", async ({ page }) => {
+  // Given a previously published numbered case-study route
+  const legacyPath = `/case-studies/${FEEDBACK_STUDY.legacyFolder}/`;
+
+  // When a visitor follows the old address
+  await page.goto(legacyPath);
+
+  // Then the browser lands on the catalog-owned canonical route
+  await expect(page).toHaveURL(new RegExp(`${FEEDBACK_STUDY.url}$`));
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    `${PUBLIC_ORIGIN}${FEEDBACK_STUDY.url}`,
+  );
 });
 
 test("missing routes recover through the canonical noindex 404", async ({ page }) => {
@@ -349,8 +365,9 @@ test("sitemap and robots expose the canonical route inventory", async ({ page })
   const paths = await getStandalonePaths(page);
   const expectedLocations = [
     `${PUBLIC_ORIGIN}/`,
-    ...paths.map((path) => `${PUBLIC_ORIGIN}${path}`),
+    ...caseStudies.map(({ url }) => `${PUBLIC_ORIGIN}${url}`),
   ];
+  expect(paths).toEqual(caseStudies.map(({ url }) => url).sort());
 
   // When crawlers request the discovery endpoints
   const sitemapResponse = await page.request.get("/sitemap.xml");
@@ -359,11 +376,11 @@ test("sitemap and robots expose the canonical route inventory", async ({ page })
   const robots = await robotsResponse.text();
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 
-  // Then exactly home plus 22 canonical studies are discoverable and 404 stays excluded
+  // Then exactly home plus every canonical study is discoverable and redirects stay excluded
   expect(sitemapResponse.ok()).toBe(true);
   expect(robotsResponse.ok()).toBe(true);
   expect(locations).toEqual(expectedLocations);
-  expect(new Set(locations).size).toBe(23);
+  expect(new Set(locations).size).toBe(caseStudies.length + 1);
   expect(sitemap).not.toContain("/404.html");
   expect(sitemap).not.toContain("#study-");
   expect(robots).toContain(`Sitemap: ${PUBLIC_ORIGIN}/sitemap.xml`);
