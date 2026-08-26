@@ -3,8 +3,6 @@ number: 6
 links:
   - number: 19
     label: container images
-  - number: 20
-    label: source code
   - number: 21
     label: cloud functions
   - number: 22
