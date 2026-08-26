@@ -1,6 +1,4 @@
 ---
-number: 16
-slug: absorbing-an-acquisition-one-engineer-one-summer-an-entire-product-moved
 title: Absorbing an acquisition
 summary: Six services moved from Heroku to AWS and onto the shared platform in about two months.
 topics:
