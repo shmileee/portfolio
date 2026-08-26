@@ -1,6 +1,4 @@
 ---
-number: 21
-slug: customer-code-running-safely-self-service-cloud-functions
 title: "Customer code, running safely: self-service cloud functions"
 summary: Uploaded customer code becomes an isolated, observable function without per-function platform intervention.
 topics:
