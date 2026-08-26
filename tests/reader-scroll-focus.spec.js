@@ -1,9 +1,13 @@
 import { expect, test } from "@playwright/test";
 
-test("Study 19 reader focus traverses both scroll owners and adjacent controls", async ({ page }) => {
+import { caseStudy, caseStudyHash } from "./case-studies.js";
+
+const CONTAINER_STUDY = caseStudy("container-supply-chain");
+
+test("the container study reader focus traverses both scroll owners and adjacent controls", async ({ page }) => {
   // Given the mobile reader with code and diagram scroll containers
   await page.setViewportSize({ width: 375, height: 900 });
-  await page.goto("/#study-19");
+  await page.goto(`/${caseStudyHash(CONTAINER_STUDY.id)}`);
   const reader = page.locator("dialog[data-reader]");
   const close = reader.locator("[data-reader-close]");
   const code = reader.locator(".code-exhibit pre");
@@ -26,10 +30,10 @@ test("Study 19 reader focus traverses both scroll owners and adjacent controls",
   }
 });
 
-test("Study 19 code scroller keeps unmodified arrow keys native", async ({ page }) => {
+test("the container study code scroller keeps unmodified arrow keys native", async ({ page }) => {
   // Given the mobile reader with its overflowing manifest focused
   await page.setViewportSize({ width: 375, height: 900 });
-  await page.goto("/#study-19");
+  await page.goto(`/${caseStudyHash(CONTAINER_STUDY.id)}`);
   const code = page.locator("dialog[data-reader] .code-exhibit pre");
   await code.focus();
   await expect(code).toBeFocused();
@@ -47,6 +51,6 @@ test("Study 19 code scroller keeps unmodified arrow keys native", async ({ page 
 
   // Then the manifest scrolls without replacing the active reader study
   expect(await page.evaluate(() => window.__codeArrowDefaultPrevented)).toBe(false);
-  expect(new URL(page.url()).hash).toBe("#study-19");
+  expect(new URL(page.url()).hash).toBe(caseStudyHash(CONTAINER_STUDY.id));
   await expect.poll(() => code.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
 });
