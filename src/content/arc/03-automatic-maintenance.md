@@ -1,13 +1,13 @@
 ---
 number: 3
 links:
-  - number: 7
+  - study: terraform-product
     label: terraform repository
-  - number: 8
+  - study: dependency-updates
     label: dependency updates
-  - number: 9
+  - study: kubernetes-upgrades
     label: kubernetes upgrades
-  - number: 12
+  - study: fleet-patching
     label: fleet patching
 ---
 

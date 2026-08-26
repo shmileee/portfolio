@@ -1,9 +1,9 @@
 ---
 number: 2
 links:
-  - number: 4
+  - study: fast-feedback
     label: feedback loop
-  - number: 5
+  - study: tool-versions
     label: tool versions
 ---
 
