@@ -2,7 +2,7 @@
 number: 9
 slug: kubernetes-upgrades
 title: Kubernetes upgrades became a checklist
-summary: What used to be a dreaded annual project became routine maintenance.
+summary: Deprecated-API signals and a staged four-cluster sequence made upgrade risk visible before production.
 topics:
   - reliability
 featured: false
@@ -23,4 +23,4 @@ I built the practice that turned upgrades from an event into a checklist:
 The old scanner was only the start; once the API server itself began surfacing deprecated usage, the dashboarding practice simply moved to the native signal and kept the same flow.
 
 ## What it changed
-The risky discovery work moved onto dashboards, the rollout became a rehearsed sequence instead of a leap, and what used to be a dreaded annual project became routine maintenance.
+Deprecated-API discovery moved onto dashboards, and upgrades now follow the same rehearsed sequence from operations through production.
