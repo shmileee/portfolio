@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { caseStudy } from "./case-studies.js";
+
 const VIEWPORTS = [
   { name: "narrow", width: 375, height: 667 },
   { name: "desktop", width: 1440, height: 900 },
@@ -31,24 +33,25 @@ const EXPECTED_ARC_COPY = [
   "The work did not arrive as isolated projects. Each layer unlocked the next: reviewable changes made faster feedback safe; automation turned maintenance into background work; rebuilt foundations made self-service possible; and those foundations supported the newest chapter in secure AI tooling and customer-facing platforms.",
   "This is that four-year story in the order it happened. Each label opens the case study behind the step:",
 ];
+const arcLabel = (id, label) => `${caseStudy(id).number} · ${label}`;
 const EXPECTED_ARC_LABELS = [
-  "1 · infrastructure changes",
-  "2 · /approve",
-  "3 · buttons",
-  "4 · feedback loop",
-  "5 · tool versions",
-  "7 · terraform repository",
-  "8 · dependency updates",
-  "9 · kubernetes upgrades",
-  "12 · fleet patching",
-  "13 · the network",
-  "14 · environments",
-  "16 · acquisition",
-  "17 · docker hub",
-  "19 · container images",
-  "21 · cloud functions",
-  "22 · ai tooling",
-  "23 · ai agents",
+  arcLabel("infrastructure-changes", "infrastructure changes"),
+  arcLabel("audited-approve", "/approve"),
+  arcLabel("self-service-buttons", "buttons"),
+  arcLabel("fast-feedback", "feedback loop"),
+  arcLabel("tool-versions", "tool versions"),
+  arcLabel("terraform-product", "terraform repository"),
+  arcLabel("dependency-updates", "dependency updates"),
+  arcLabel("kubernetes-upgrades", "kubernetes upgrades"),
+  arcLabel("fleet-patching", "fleet patching"),
+  arcLabel("network-rebuild", "the network"),
+  arcLabel("ephemeral-environments", "environments"),
+  arcLabel("acquisition-migration", "acquisition"),
+  arcLabel("registry-migration", "docker hub"),
+  arcLabel("container-supply-chain", "container images"),
+  arcLabel("cloud-functions", "cloud functions"),
+  arcLabel("ai-tooling", "ai tooling"),
+  arcLabel("agent-ready-codebase", "ai agents"),
 ];
 const SPOTLIGHT_PROOF =
   "Each cell contains its own failure domain, joins the network by policy, and verifies teardown before infrastructure state can disappear.";
@@ -151,7 +154,7 @@ for (const viewport of VIEWPORTS) {
       await expect(featured.locator(".topic-featured")).toHaveCount(0);
       await expect(featured).not.toContainText("The teardown problem had no off-the-shelf solution");
       expect(spotlightHref).toMatch(/^\/case-studies\/[a-z0-9-]+\/$/);
-      await expect(spotlightLink).toHaveAttribute("data-open-study", /^\d+$/);
+      await expect(spotlightLink).toHaveAttribute("data-open-study", /^[a-z0-9-]+$/);
 
       // When the canonical study is loaded
       await page.goto(spotlightHref ?? "/");

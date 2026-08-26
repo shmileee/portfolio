@@ -34,8 +34,8 @@ canonical: https://portfolio.oponomarov.com/
               <div class="arc-copy">{{ beat.templateContent | safe }}</div>
               <div class="arc-links">
                 {% for link in beat.data.links %}
-                  {% set study = collections.caseStudies | findByNumber(link.number) %}
-                  <a href="{{ study.url }}" data-open-study="{{ study.data.number }}" data-arc-study="{{ study.data.number }}">{{ link.number }} · {{ link.label }}</a>
+                  {% set study = collections.caseStudies | findByCaseStudyId(link.study) %}
+                  <a href="{{ study.url }}" data-open-study="{{ study.data.caseStudyId }}" data-arc-study="{{ study.data.caseStudyId }}">{{ study.data.number }} · {{ link.label }}</a>
                 {% endfor %}
               </div>
             </div>
@@ -63,7 +63,7 @@ canonical: https://portfolio.oponomarov.com/
           </div>
         </header>
         <div class="hero-actions">
-          <a class="primary-link" href="{{ spotlight.url }}" data-open-study="{{ spotlight.data.number }}">Read case study →</a>
+          <a class="primary-link" href="{{ spotlight.url }}" data-open-study="{{ spotlight.data.caseStudyId }}">Read case study →</a>
         </div>
       </article>
     </div>
