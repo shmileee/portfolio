@@ -1,3 +1,13 @@
+{% macro caseProof(summary, role, evidence, classes = "") %}
+  {% if role and evidence %}
+    <dl class="case-proof {{ classes }}" data-case-proof>
+      <div><dt>Impact</dt><dd>{{ summary }}</dd></div>
+      <div><dt>My role</dt><dd>{{ role }}</dd></div>
+      <div><dt>Evidence</dt><dd>{{ evidence }}</dd></div>
+    </dl>
+  {% endif %}
+{% endmacro %}
+
 {% macro caseCard(study, index, initialCount) %}
   {% set classes = "case-card" %}
   {% if study.data.featured %}{% set classes = classes + " case-card-featured" %}{% endif %}
@@ -13,7 +23,11 @@
       {{ study.data.number | pad2 }}{% if study.data.featured %} · featured{% endif %}{% if study.data.cardLabel %} · {{ study.data.cardLabel }}{% endif %}
     </span>
     <span class="case-card-title">{{ study.data.title }}</span>
-    <span class="case-card-summary">{{ study.data.summary }}</span>
+    {% if study.data.role and study.data.evidence %}
+      {{ caseProof(study.data.summary, study.data.role, study.data.evidence, "case-card-proof") }}
+    {% else %}
+      <span class="case-card-summary">{{ study.data.summary }}</span>
+    {% endif %}
     <span class="case-card-topics">{{ study.data.topics | join(' · ') }}</span>
     <span class="case-card-action">{% if study.data.spotlight %}full story ↑{% else %}read →{% endif %}</span>
   </a>
