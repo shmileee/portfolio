@@ -27,7 +27,7 @@ The generated static site is written to `_site/`.
 npm run verify:build
 ```
 
-Builds the site, then runs `scripts/verify-build.mjs` against `_site/`: it checks the 22 canonical study routes, internal link targets, sitemap/robots/404 contracts, media outputs, the homepage payload budget, and the reader manifest.
+Checks the case-study catalog contract, builds the site, then runs `scripts/verify-build.mjs` against `_site/`: it checks the catalog-derived canonical study routes, compatibility redirects, internal link targets, sitemap/robots/404 contracts, media outputs, the homepage payload budget, and the reader manifest.
 
 Browser tests use [Playwright](https://playwright.dev/) with Chromium. Install the browser once, then run the suite:
 
@@ -47,10 +47,22 @@ npm run test:e2e -- tests/responsive-accessibility.spec.js --project=chromium
 
 ## Add a case study
 
-Create a folder under `src/content/case-studies/` containing an `index.md` file:
+Add one ordered entry to `src/_data/caseStudyCatalog.js`. Its stable `id` is used by references, while `folder` names the number-free content directory and canonical route:
+
+```js
+{
+  id: "example-study",
+  folder: "example-study",
+  legacyFolder: "24-example-study",
+}
+```
+
+`legacyFolder` is only needed when a previously published numbered route must keep redirecting. New studies can omit it. Display numbers are derived from array position, so adding, removing, or reordering a study never requires editing numbers elsewhere.
+
+Create the matching folder under `src/content/case-studies/` containing an `index.md` file:
 
 ```text
-src/content/case-studies/24-example-study/
+src/content/case-studies/example-study/
 ├── index.md
 └── architecture.svg
 ```
@@ -59,8 +71,6 @@ Start the Markdown file with this front matter:
 
 ```yaml
 ---
-number: 24
-slug: example-study
 title: Example study
 summary: A short sentence used on the case-study card.
 topics:
@@ -85,6 +95,13 @@ What needed to change.
 ![Architecture overview](./architecture.svg)
 ```
 
+Reference another study by stable id so its number, title changes, and canonical folder are resolved at build time:
+
+```njk
+{% caseStudyLink "example-study" %}
+{% caseStudyLink "example-study", "an optional descriptive label" %}
+```
+
 Use the media exhibit shortcode for framed screenshots and recordings. Intrinsic dimensions prevent layout shift, while `maxWidth` controls the frame without adding one-off CSS. A screenshot renders as a lazy-loaded image (`loading="lazy" decoding="async"`):
 
 ```njk
@@ -106,14 +123,16 @@ ffmpeg -i recording.gif -an -c:v libx264 -crf 23 -preset slow -pix_fmt yuv420p -
 ffmpeg -i demo.mp4 -frames:v 1 demo-poster.png
 ```
 
-The build creates a standalone page at `/case-studies/<folder-name>/` — the canonical route, named after the study folder. Each standalone page has canonical previous and next study links in numeric order, wrapping between the first and last numbered studies, followed by separate links back to the portfolio index and contact footer.
+The build creates a standalone page at `/case-studies/<folder-name>/` — the canonical route, named after the study folder. Each standalone page has canonical previous and next study links in catalog order, wrapping between the first and last studies, followed by separate links back to the portfolio index and contact footer. Previously published numbered routes redirect to these number-free canonical URLs.
 
 Homepage cards, arc labels, and the spotlight link all use those canonical study URLs. An ordinary primary same-tab click is progressively enhanced into the reader, which fetches the canonical page on demand; modified clicks, middle clicks, Copy Link Address, and JavaScript-disabled navigation continue to use the standalone URL. Media can use its authored wider breakout on the standalone page, while media fetched into the reader is contained to the reader prose width. The sitemap lists the homepage plus every study route.
 
 The build validates that:
 
-- `number` is a unique positive integer.
-- `slug`, `title`, and `summary` are present.
+- Every catalog `id` and `folder` is unique and resolves to exactly one content directory.
+- Content directories contain no numeric prefix and case-study frontmatter does not define `number` or `slug`.
+- Derived display numbers are contiguous in catalog order.
+- `title` and `summary` are present.
 - `featured` and `spotlight` are booleans.
 - Exactly one case study has `spotlight: true`, and that study defines a non-empty `spotlightProof`.
 - `cardLabel`, when present, is a non-empty string.
@@ -125,6 +144,7 @@ MP4, PNG, and SVG files colocated with a case study are copied beside its genera
 ## Structure
 
 - `src/content/case-studies/` — Markdown studies and their media.
+- `src/_data/caseStudyCatalog.js` — the single ordered source of case-study identity, folders, legacy aliases, and display numbers.
 - `src/content/home/` — homepage narrative sections.
 - `src/_includes/` — shared Nunjucks layouts and partials.
 - `src/assets/` — shared CSS and browser behavior.
