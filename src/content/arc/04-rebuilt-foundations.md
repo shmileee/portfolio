@@ -1,9 +1,9 @@
 ---
 number: 4
 links:
-  - number: 13
+  - study: network-rebuild
     label: the network
-  - number: 14
+  - study: ephemeral-environments
     label: environments
 ---
 
