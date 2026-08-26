@@ -1,13 +1,18 @@
 ---
 layout: layouts/base.njk
 ---
+{% from "partials/case-card.njk" import caseProof %}
 {% set adjacentStudies = collections.caseStudies | studyNeighbors(number) %}
 <main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study {{ number | pad2 }}{% if featured %} · featured{% endif %}</p>
     <h1>{{ title }}</h1>
-    <p class="case-detail-summary">{{ summary }}</p>
+    {% if role and evidence %}
+      {{ caseProof(summary, role, evidence, "case-detail-proof") }}
+    {% else %}
+      <p class="case-detail-summary">{{ summary }}</p>
+    {% endif %}
     <div class="topic-list" aria-label="Topics">
       {% for topic in topics %}<span>{{ topic }}</span>{% endfor %}
     </div>
