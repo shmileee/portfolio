@@ -28,7 +28,7 @@ test("all standalone studies expose canonical wraparound adjacency", async ({ pa
   // Given the complete, number-ordered canonical study manifest
   test.setTimeout(120_000);
   const studies = await getStudyManifest(page);
-  expect(studies).toHaveLength(23);
+  expect(studies).toHaveLength(22);
 
   for (const viewport of VIEWPORTS) {
     await page.setViewportSize(viewport);
@@ -157,7 +157,7 @@ test("all standalone studies expose canonical, semantic, and navigation contract
   // Given the complete canonical work index
   test.setTimeout(120_000);
   const paths = await getStandalonePaths(page);
-  expect(paths).toHaveLength(23);
+  expect(paths).toHaveLength(22);
 
   for (const viewport of VIEWPORTS) {
     await page.setViewportSize(viewport);
@@ -359,11 +359,11 @@ test("sitemap and robots expose the canonical route inventory", async ({ page })
   const robots = await robotsResponse.text();
   const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 
-  // Then exactly home plus 23 canonical studies are discoverable and 404 stays excluded
+  // Then exactly home plus 22 canonical studies are discoverable and 404 stays excluded
   expect(sitemapResponse.ok()).toBe(true);
   expect(robotsResponse.ok()).toBe(true);
   expect(locations).toEqual(expectedLocations);
-  expect(new Set(locations).size).toBe(24);
+  expect(new Set(locations).size).toBe(23);
   expect(sitemap).not.toContain("/404.html");
   expect(sitemap).not.toContain("#study-");
   expect(robots).toContain(`Sitemap: ${PUBLIC_ORIGIN}/sitemap.xml`);
