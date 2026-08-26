@@ -3,6 +3,8 @@ number: 12
 slug: the-fleet-that-patches-itself
 title: The fleet that patches itself (while engineers are watching)
 summary: A vendor announces a fix; the fleet is rotating onto it within hours.
+role: "Wrote the architecture and rotation policy; co-built the event-driven image pipeline with two teammates."
+evidence: "07:00–20:00 weekday coverage, an 18:00 rotation cutoff, and pool-specific disruption budgets."
 topics:
   - security
   - reliability
