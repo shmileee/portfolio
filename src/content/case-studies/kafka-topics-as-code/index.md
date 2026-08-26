@@ -1,6 +1,4 @@
 ---
-number: 11
-slug: kafka-topics-as-code
 title: "Kafka topics as code: adopting 550 live topics"
 summary: Topic changes became pull requests with named owners, review, and history.
 topics:
@@ -46,7 +44,7 @@ It also cleaned as it went — stripping settings that merely repeated broker de
 ## The interesting part
 Adopting roughly 550 live topics without touching production data. The generated definitions matched live state, so the topic operator's first pass was adoption rather than recreation.
 
-Auto-deployment was turned on in its most conservative form: apply changes, never delete anything. And the door I closed behind me: admission policies ([case study 10](/case-studies/10-kyverno-at-the-cluster-door/)) now reject replica changes outright, allow partition counts only to grow (Kafka cannot shrink them safely), and nobody can shell into a broker pod anymore — the manual workflow isn't just deprecated, it's impossible.
+Auto-deployment was turned on in its most conservative form: apply changes, never delete anything. And the door I closed behind me: admission policies ({% caseStudyLink "policy-engine" %}) now reject replica changes outright, allow partition counts only to grow (Kafka cannot shrink them safely), and nobody can shell into a broker pod anymore — the manual workflow isn't just deprecated, it's impossible.
 
 ## What it changed
 Topic changes became pull requests with named owners, review, and history. The runbook retired, and the generated files became the queryable inventory.
