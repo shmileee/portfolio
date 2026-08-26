@@ -1,6 +1,4 @@
 ---
-number: 13
-slug: the-network-nobody-dared-touch
 title: The network nobody dared touch
 summary: A list-indexed route mesh became stable resources and one reviewable network policy.
 role: Rebuilt the route model and led the no-change migration and Cloud WAN architecture.
