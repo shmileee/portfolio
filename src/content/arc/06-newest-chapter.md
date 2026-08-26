@@ -1,13 +1,13 @@
 ---
 number: 6
 links:
-  - number: 19
+  - study: container-supply-chain
     label: container images
-  - number: 21
+  - study: cloud-functions
     label: cloud functions
-  - number: 22
+  - study: ai-tooling
     label: ai tooling
-  - number: 23
+  - study: agent-ready-codebase
     label: ai agents
 ---
 

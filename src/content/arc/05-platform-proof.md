@@ -1,9 +1,9 @@
 ---
 number: 5
 links:
-  - number: 16
+  - study: acquisition-migration
     label: acquisition
-  - number: 17
+  - study: registry-migration
     label: docker hub
 ---
 
