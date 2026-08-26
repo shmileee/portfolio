@@ -45,7 +45,7 @@ The same file drives CI: I rebuilt our centralized pre-commit workflow — one r
 ## THE INTERESTING PART
 
 The caching. Fast CI dies on cache mistakes, and each one taught a lesson that's now written into the workflow itself.
-Restoring the big tool archive can cost more than a fresh install — so tool caching is a per-repository toggle with that exact warning in its description. Cache uploads were dominating pull-request runs — so pull requests only restore the cache and only the main branch saves it. On our in-cluster runners the cache moved to the node's local disk — but the tool manager keeps one global directory, and a shared one leaks tools between repositories, so each repository gets its own isolated subdirectory. And pull requests from forks are excluded from writing entirely: untrusted code must never poison a shared cache.
+Restoring the big tool archive can cost more than a fresh install — so tool caching is a per-repository toggle with that exact warning in its description. Cache uploads were dominating pull request runs — so pull requests only restore the cache and only the main branch saves it. On our in-cluster runners the cache moved to the node's local disk — but the tool manager keeps one global directory, and a shared one leaks tools between repositories, so each repository gets its own isolated subdirectory. And pull requests from forks are excluded from writing entirely: untrusted code must never poison a shared cache.
 
 ## WHAT IT CHANGED
 
