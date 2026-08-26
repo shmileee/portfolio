@@ -3,21 +3,13 @@ import { readFileSync } from "node:fs";
 import { basename, dirname, extname, relative, resolve } from "node:path";
 import syntaxHighlight from "@11ty/eleventy-plugin-syntaxhighlight";
 
-const TOPICS = new Set([
-  "reliability",
-  "networking",
-  "developer experience",
-  "security",
-  "ai",
-  "cost",
-  "delivery",
-]);
+import { registerCaseStudyFeatures } from "./src/lib/eleventy-case-studies.js";
 
 const byNumber = (left, right) => left.data.number - right.data.number;
-const sortCaseStudiesByNumber = (items) => [...items].sort(byNumber);
 const BROWSER_ASSET_PATHS = [
   "src/assets/css/site.css",
   "src/assets/js/reader-focus.js",
+  "src/assets/js/reader-model.js",
   "src/assets/js/reader.js",
   "src/assets/js/site.js",
 ];
@@ -26,18 +18,6 @@ function createAssetVersion() {
   const hash = createHash("sha256");
   for (const path of BROWSER_ASSET_PATHS) hash.update(readFileSync(resolve(path)));
   return hash.digest("hex").slice(0, 12);
-}
-
-function findCaseStudyByNumber(items, number) {
-  const requestedNumber = Number(number);
-  const sortedItems = sortCaseStudiesByNumber(items);
-  const index = sortedItems.findIndex((item) => item.data.number === requestedNumber);
-
-  if (index === -1) {
-    throw new RangeError(`Case study number ${String(number)} was not found`);
-  }
-
-  return { index, requestedNumber, sortedItems };
 }
 
 function parseCodeFenceInfo(info) {
@@ -126,48 +106,6 @@ function readColocatedSvg(inputPath, source, label) {
   );
 }
 
-function validateCaseStudies(studies) {
-  const numbers = new Set();
-
-  for (const study of studies) {
-    const { cardLabel, featured, number, slug, spotlight, spotlightProof, summary, title, topics } =
-      study.data;
-    const location = study.inputPath;
-
-    if (!Number.isInteger(number) || number < 1) {
-      throw new TypeError(`${location}: number must be a positive integer`);
-    }
-    if (numbers.has(number)) {
-      throw new TypeError(`${location}: duplicate case-study number ${number}`);
-    }
-    numbers.add(number);
-
-    for (const [name, value] of Object.entries({ slug, summary, title })) {
-      if (typeof value !== "string" || value.trim() === "") {
-        throw new TypeError(`${location}: ${name} must be a non-empty string`);
-      }
-    }
-    if (!Array.isArray(topics) || topics.length === 0 || topics.some((topic) => !TOPICS.has(topic))) {
-      throw new TypeError(`${location}: topics must contain only known portfolio topics`);
-    }
-    if (typeof featured !== "boolean" || typeof spotlight !== "boolean") {
-      throw new TypeError(`${location}: featured and spotlight must be booleans`);
-    }
-    if (cardLabel !== undefined && (typeof cardLabel !== "string" || cardLabel.trim() === "")) {
-      throw new TypeError(`${location}: cardLabel must be a non-empty string when defined`);
-    }
-    if (spotlight && (typeof spotlightProof !== "string" || spotlightProof.trim() === "")) {
-      throw new TypeError(
-        `${location}: the spotlight case study must define a non-empty spotlightProof`,
-      );
-    }
-  }
-
-  if (studies.filter((study) => study.data.spotlight).length !== 1) {
-    throw new TypeError("Case studies must define exactly one spotlight entry");
-  }
-}
-
 export default function (eleventyConfig) {
   eleventyConfig.addPlugin(syntaxHighlight, {
     errorOnInvalidLanguage: false,
@@ -205,26 +143,8 @@ export default function (eleventyConfig) {
 
   eleventyConfig.addGlobalData("assetVersion", createAssetVersion);
   eleventyConfig.addFilter("pad2", (value) => String(value).padStart(2, "0"));
-  eleventyConfig.addFilter("sortByNumber", (items) => [...items].sort(byNumber));
-  eleventyConfig.addFilter("findByNumber", (items, number) => {
-    const { index, sortedItems } = findCaseStudyByNumber(items, number);
-
-    return sortedItems[index];
-  });
-  eleventyConfig.addFilter("studyNeighbors", (items, number) => {
-    const { index, sortedItems } = findCaseStudyByNumber(items, number);
-
-    return {
-      previous: sortedItems[(index - 1 + sortedItems.length) % sortedItems.length],
-      next: sortedItems[(index + 1) % sortedItems.length],
-    };
-  });
   eleventyConfig.addFilter("findByKey", (items, key) => items.find((item) => item.data.key === key));
-  eleventyConfig.addFilter("findSpotlight", (items) => items.find((item) => item.data.spotlight));
-  eleventyConfig.addFilter("indexOrder", (items) => {
-    const sorted = sortCaseStudiesByNumber(items);
-    return [...sorted.filter((item) => item.data.featured), ...sorted.filter((item) => !item.data.featured)];
-  });
+  registerCaseStudyFeatures(eleventyConfig, escapeHtml);
 
   eleventyConfig.addShortcode("diagram", function (source, title, label) {
     const svg = readColocatedSvg(this.page.inputPath, source, label);
@@ -251,11 +171,6 @@ export default function (eleventyConfig) {
     },
   );
 
-  eleventyConfig.addCollection("caseStudies", (collectionApi) => {
-    const studies = sortCaseStudiesByNumber(collectionApi.getFilteredByTag("caseStudy"));
-    validateCaseStudies(studies);
-    return studies;
-  });
   eleventyConfig.addCollection("arcBeats", (collectionApi) =>
     collectionApi.getFilteredByTag("arcBeat").sort(byNumber),
   );
