@@ -1,6 +1,4 @@
 ---
-number: 22
-slug: safe-ai-tooling-for-every-developer
 title: Safe AI tooling for every developer
 summary: Existing AWS identity and restricted backends provide one governed path from AI clients to operational tools.
 topics:
