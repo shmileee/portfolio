@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import { caseStudy } from "./case-studies.js";
+
 test("case index initializes before the optional reader dependency resolves", async ({ page }) => {
   // Given the reader focus module has been requested but is still loading
   let releaseFocus = () => {};
@@ -17,7 +19,9 @@ test("case index initializes before the optional reader dependency resolves", as
   });
   await page.goto("/", { waitUntil: "commit" });
   await focusRequested;
-  const target = page.locator('[data-case-grid] [data-open-study="6"]');
+  const target = page.locator(
+    `[data-case-grid] [data-open-study="${caseStudy("self-service-teams").id}"]`,
+  );
 
   // When a visitor expands the independently initialized case index
   try {

@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-const STANDALONE_STUDY_PATH =
-  "/case-studies/14-environments-you-can-create-and-destroy-with-one-command/";
+import { caseStudy } from "./case-studies.js";
+
+const STANDALONE_STUDY_PATH = caseStudy("ephemeral-environments").url;
 
 function trackRuntimeErrors(page) {
   const errors = [];
