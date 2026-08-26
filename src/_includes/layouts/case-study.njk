@@ -2,7 +2,7 @@
 layout: layouts/base.njk
 ---
 {% from "partials/case-card.njk" import caseProof %}
-{% set adjacentStudies = collections.caseStudies | studyNeighbors(number) %}
+{% set adjacentStudies = collections.caseStudies | studyNeighbors(caseStudyId) %}
 <main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
