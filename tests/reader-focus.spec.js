@@ -1,13 +1,15 @@
 import { expect, test } from "@playwright/test";
 
+import { caseStudy } from "./case-studies.js";
+
 const reader = (page) => page.locator("dialog[data-reader]");
-const card = (page, number) => page.locator(`[data-open-study="${number}"]`).first();
-const arcLink = (page, number) => page.locator(`#arc [data-arc-study="${number}"]`).first();
-const STUDY_03_URL = "/case-studies/03-buttons-instead-of-incantations/";
+const card = (page, id) => page.locator(`[data-open-study="${id}"]`).first();
+const arcLink = (page, id) => page.locator(`#arc [data-arc-study="${id}"]`).first();
+const BUTTONS_STUDY = caseStudy("self-service-buttons");
 const NEW_TAB_MODIFIER = process.platform === "darwin" ? "Meta" : "Control";
 
-async function openCard(page, number) {
-  const opener = card(page, number);
+async function openCard(page, id) {
+  const opener = card(page, id);
   if (!(await opener.isVisible())) await page.locator("[data-grid-toggle]").click();
   await opener.click();
   await expect(reader(page)).toBeVisible();
@@ -16,12 +18,12 @@ async function openCard(page, number) {
 test("ordinary canonical arc activation replaces a stale card restoration target", async ({ page }) => {
   // Given a completed card-reader interaction followed by a focused arc link
   await page.goto("/");
-  const staleCard = card(page, 3);
-  await openCard(page, 3);
+  const staleCard = card(page, BUTTONS_STUDY.id);
+  await openCard(page, BUTTONS_STUDY.id);
   await page.keyboard.press("Escape");
   await expect(reader(page)).toBeHidden();
   await expect(staleCard).toBeFocused();
-  const invoker = arcLink(page, 3);
+  const invoker = arcLink(page, BUTTONS_STUDY.id);
   await invoker.focus();
 
   // When progressive enhancement opens and then closes the reader
@@ -37,13 +39,13 @@ test("ordinary canonical arc activation replaces a stale card restoration target
 test("direct hash navigation does not reuse a stale restoration target", async ({ page }) => {
   // Given a completed card-reader interaction with stale focus available
   await page.goto("/");
-  const staleCard = card(page, 3);
-  await openCard(page, 3);
+  const staleCard = card(page, BUTTONS_STUDY.id);
+  await openCard(page, BUTTONS_STUDY.id);
   await page.keyboard.press("Escape");
   await expect(staleCard).toBeFocused();
 
   // When a hash change without an invoker opens and closes the reader
-  await page.evaluate(() => { location.hash = "study-3"; });
+  await page.evaluate((id) => { location.hash = `study-${id}`; }, BUTTONS_STUDY.id);
   await expect(reader(page)).toBeVisible();
   await page.keyboard.press("Escape");
 
@@ -53,10 +55,10 @@ test("direct hash navigation does not reuse a stale restoration target", async (
 });
 
 test("modified and middle arc clicks remain native", async ({ context, page }) => {
-  // Given the canonical Study 03 arc anchor
+  // Given the canonical buttons-study arc anchor
   await page.goto("/");
   const homepageUrl = page.url();
-  const invoker = arcLink(page, 3);
+  const invoker = arcLink(page, BUTTONS_STUDY.id);
 
   // When the visitor uses the platform new-tab modifier and then the middle button
   const [modifiedPage] = await Promise.all([
@@ -67,7 +69,7 @@ test("modified and middle arc clicks remain native", async ({ context, page }) =
 
   // Then the homepage remains unchanged and the canonical standalone route opens natively
   expect(page.url()).toBe(homepageUrl);
-  expect(new URL(modifiedPage.url()).pathname).toBe(STUDY_03_URL);
+  expect(new URL(modifiedPage.url()).pathname).toBe(BUTTONS_STUDY.url);
   await expect(reader(page)).toBeHidden();
   await modifiedPage.close();
 
@@ -78,7 +80,7 @@ test("modified and middle arc clicks remain native", async ({ context, page }) =
   await middlePage.waitForLoadState("domcontentloaded");
 
   expect(page.url()).toBe(homepageUrl);
-  expect(new URL(middlePage.url()).pathname).toBe(STUDY_03_URL);
+  expect(new URL(middlePage.url()).pathname).toBe(BUTTONS_STUDY.url);
   await expect(reader(page)).toBeHidden();
   await middlePage.close();
 });
