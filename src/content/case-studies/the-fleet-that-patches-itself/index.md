@@ -1,6 +1,4 @@
 ---
-number: 12
-slug: the-fleet-that-patches-itself
 title: The fleet that patches itself (while engineers are watching)
 summary: A vendor announces a fix; the fleet is rotating onto it within hours.
 role: "Wrote the architecture and rotation policy; co-built the event-driven image pipeline with two teammates."
@@ -26,7 +24,7 @@ The consumption side uses Karpenter's drift mechanism: a node whose image no lon
 
 - Development and staging track new images instantly (name-pattern match — nodes start rotating minutes after a build).
 
-- Production pins exact image IDs — and the dependency bot ([case study 8](/case-studies/08-dependency-updates-from-quarterly-panic-to-background-noise/)) proposes the bump as a pull request. The merge button *is* the deployment gate: human review, full audit trail, no custom tooling.
+- Production pins exact image IDs — and the dependency bot ({% caseStudyLink "dependency-updates" %}) proposes the bump as a pull request. The merge button *is* the deployment gate: human review, full audit trail, no custom tooling.
 
 - Rotation happens when engineers are watching. The core principle from the design doc: *drift is a controlled, planned operation triggered by a known image change — it should happen during coverage hours.* Our two on-call regions cover 07:00–20:00 weekdays; rotation windows close at 18:00 — two hours before coverage ends, so a bad image is caught on-shift, never discovered by the night. Weekends are blocked ("no one gets paged on weekends for node rotation")… with one deliberate inversion: the development Kafka brokers rotate *on* weekends, because a rebalance hurts developers more on a Tuesday than it hurts a Saturday.
 
