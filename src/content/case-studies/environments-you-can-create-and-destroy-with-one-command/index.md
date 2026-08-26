@@ -1,6 +1,4 @@
 ---
-number: 14
-slug: environments-you-can-create-and-destroy-with-one-command
 title: Environments you can create and destroy with one command
 summary: Entering a new region became an infrastructure change, not an infrastructure project.
 role: Led the architecture and implementation of the cell platform and its fail-closed teardown provider.
@@ -24,13 +22,13 @@ This is the work I consider my biggest win. I led the design and build of our ta
 
 Our main driver was speed into new markets: the ability to stand up a complete environment in a new region, quickly. But the same primitive serves more: developers can spin up an ephemeral cell to test something and throw it away, and a cell can be dedicated to a single customer where data residency demands it.
 
-A cell is one Terraform stack that provisions everything — the VPC, the EKS cluster with its networking, IAM, DNS, and identity integration — and it joins the Cloud WAN network from [case study 13](/case-studies/13-the-network-nobody-dared-touch/) with one flag. Three design pieces I'm particularly proud of:
+A cell is one Terraform stack that provisions everything — the VPC, the EKS cluster with its networking, IAM, DNS, and identity integration — and it joins the Cloud WAN network from {% caseStudyLink "network-rebuild" %} with one flag. Three design pieces I'm particularly proud of:
 
 - **The GitOps bridge.** Terraform stops where it should. It builds the foundation, installs the Flux operator into the fresh cluster, declares the Flux runtime — and hands over: Flux finishes the bootstrap the GitOps way, pulling the remaining twenty-plus platform add-ons from the git repository. This solves the classic chicken-and-egg of cluster bootstrapping (you need a cluster to run the deployment system that deploys everything else), following the community "GitOps Bridge" pattern; cluster-specific values flow across the bridge through a metadata file Terraform writes and Flux substitutes.
 
 - **A data-only brain.** I wrote a companion module that creates no cloud resources at all: it validates every cell input at plan time (unsupported region? wrong size? rejected before anything runs), normalizes names, resolves network sizing from t-shirt sizes (small/medium/large map to precise subnet layouts), and auto-discovers which SSO roles should get cluster access. All the judgment in one testable place, all the resources elsewhere.
 
-- **Togglable add-ons.** Every piece of the platform a cell can carry — NAT optimization ([case study 15](/case-studies/15-the-nat-bill-and-the-open-source-fix-i-helped-ship/)), the network attachment, each add-on — sits behind an explicit toggle, so a cell's consumer opts in or out per environment instead of inheriting one-size-fits-all.
+- **Togglable add-ons.** Every piece of the platform a cell can carry — NAT optimization ({% caseStudyLink "nat-cost" %}), the network attachment, each add-on — sits behind an explicit toggle, so a cell's consumer opts in or out per environment instead of inheriting one-size-fits-all.
 
 Every cell also registers itself in a central cell registry (a DynamoDB table) — the shared source of truth for what cells exist and how they're attached, consumed today by the secrets and network reconcilers, and designed to later feed a cell router that steers tenants and traffic to the right cell.
 
