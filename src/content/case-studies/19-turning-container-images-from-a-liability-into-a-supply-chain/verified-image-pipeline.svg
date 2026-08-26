@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 500" role="img">
+  <defs>
+    <marker id="imageArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="var(--w5, #aab4c3)"/>
+    </marker>
+    <marker id="imageArrowAccent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="var(--ab4, #60a5fa)"/>
+    </marker>
+  </defs>
+  <text x="360" y="27" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.15em" fill="var(--w45, #aab4c3)">DECLARATION → TESTED ARTIFACT → VERIFIED RELEASE</text>
+  <rect x="28" y="76" width="180" height="100" rx="7" fill="var(--bg, #0b1220)" stroke="var(--ab4, #60a5fa)"/>
+  <text x="48" y="101" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">01 · DECLARE</text>
+  <text x="48" y="128" font-family="IBM Plex Mono, monospace" font-size="14" fill="var(--w88, #fff)">Image manifest</text>
+  <text x="48" y="151" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--w45, #aab4c3)">owner · upstream · tests</text>
+  <path d="M208 126 H262" stroke="var(--w42, #aab4c3)" marker-end="url(#imageArrow)"/>
+  <rect x="270" y="62" width="180" height="128" rx="7" fill="var(--bg, #0b1220)" stroke="var(--ab4, #60a5fa)"/>
+  <text x="290" y="87" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">02 · BUILD</text>
+  <text x="290" y="114" font-family="IBM Plex Mono, monospace" font-size="14" fill="var(--w88, #fff)">Parallel targets</text>
+  <rect x="290" y="132" width="140" height="21" rx="3" fill="var(--bg, #0b1220)" stroke="var(--w42, #aab4c3)"/>
+  <text x="360" y="147" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--w45, #aab4c3)">linux / amd64</text>
+  <rect x="290" y="159" width="140" height="21" rx="3" fill="var(--bg, #0b1220)" stroke="var(--w42, #aab4c3)"/>
+  <text x="360" y="174" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--w45, #aab4c3)">linux / arm64</text>
+  <path d="M450 126 H504" stroke="var(--w42, #aab4c3)" marker-end="url(#imageArrow)"/>
+  <rect x="512" y="76" width="180" height="100" rx="7" fill="var(--bg, #0b1220)" stroke="var(--ab4, #60a5fa)"/>
+  <text x="532" y="101" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">03 · TEST</text>
+  <text x="532" y="128" font-family="IBM Plex Mono, monospace" font-size="14" fill="var(--w88, #fff)">Build + package</text>
+  <text x="532" y="151" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--w45, #aab4c3)">both platforms must pass</text>
+  <path d="M602 176 V252" stroke="var(--w42, #aab4c3)" marker-end="url(#imageArrow)"/>
+  <rect x="512" y="260" width="180" height="100" rx="7" fill="var(--bg, #0b1220)" stroke="var(--ab4, #60a5fa)"/>
+  <text x="532" y="285" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">04 · PUBLISH</text>
+  <text x="532" y="312" font-family="IBM Plex Mono, monospace" font-size="14" fill="var(--w88, #fff)">Immutable version</text>
+  <text x="532" y="335" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--w45, #aab4c3)">write once to registry</text>
+  <path d="M512 310 H458" stroke="var(--w42, #aab4c3)" marker-end="url(#imageArrow)"/>
+  <rect x="270" y="260" width="180" height="100" rx="7" fill="var(--bg, #0b1220)" stroke="var(--ab4, #60a5fa)"/>
+  <text x="290" y="285" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">05 · VERIFY</text>
+  <text x="290" y="312" font-family="IBM Plex Mono, monospace" font-size="14" fill="var(--w88, #fff)">Registry read-back</text>
+  <text x="290" y="335" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--w45, #aab4c3)">published = tested digest</text>
+  <path d="M270 310 H216" stroke="var(--ab4, #60a5fa)" marker-end="url(#imageArrowAccent)"/>
+  <rect x="28" y="260" width="180" height="100" rx="7" fill="var(--bg, #0b1220)" stroke="var(--ab4, #60a5fa)" stroke-width="2"/>
+  <text x="48" y="285" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">ACCEPTED</text>
+  <text x="48" y="312" font-family="IBM Plex Mono, monospace" font-size="14" fill="var(--w88, #fff)">Verified release</text>
+  <text x="48" y="335" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--w45, #aab4c3)">trusted name · known bytes</text>
+  <rect x="270" y="404" width="180" height="72" rx="7" fill="var(--bg, #0b1220)" stroke="var(--w42, #aab4c3)"/>
+  <text x="290" y="429" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">UPSTREAM UPDATE</text>
+  <text x="290" y="454" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--w45, #aab4c3)">bot changes the manifest</text>
+  <path d="M270 440 H12 V126 H20" stroke="var(--ab4, #60a5fa)" fill="none" marker-end="url(#imageArrowAccent)"/>
+  <rect x="492" y="404" width="200" height="72" rx="7" fill="var(--bg, #0b1220)" stroke="var(--w42, #aab4c3)" stroke-dasharray="4 4"/>
+  <text x="512" y="427" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.08em" fill="var(--w45, #aab4c3)">RESTART SEMANTICS</text>
+  <text x="512" y="448" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--w45, #aab4c3)">build failure → new run</text>
+  <text x="512" y="466" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--w45, #aab4c3)">publish retry → reuse digests</text>
+</svg>
