@@ -2,7 +2,7 @@
 number: 7
 slug: turning-a-terraform-repository-into-a-product
 title: Turning a Terraform repository into a product
-summary: Terraform stopped being a specialist skill.
+summary: Release automation, reusable stacks, documentation, and teaching made the central Terraform repository usable across teams.
 topics:
   - developer experience
   - delivery
@@ -31,4 +31,4 @@ The teaching mattered as much as the tooling. Standards that arrive as documenta
 
 ## WHAT IT CHANGED
 
-Terraform stopped being a specialist skill. Engineers across teams now propose infrastructure changes routinely, modules are versioned and reusable, and the repository scaled from dozens of stacks to hundreds without becoming unmanageable.
+Engineers across teams now propose infrastructure changes through the shared workflow, modules are versioned and reusable, and the repository scaled from dozens of stacks to hundreds with consistent navigation and release controls.

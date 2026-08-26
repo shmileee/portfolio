@@ -2,7 +2,7 @@
 number: 21
 slug: customer-code-running-safely-self-service-cloud-functions
 title: "Customer code, running safely: self-service cloud functions"
-summary: From upload to a running, isolated, observable function with zero human involvement.
+summary: Uploaded customer code becomes an isolated, observable function without per-function platform intervention.
 topics:
   - security
   - delivery
@@ -44,4 +44,4 @@ The self-service needed a fence: the only identity allowed to create function ob
 
 ## WHAT IT CHANGED
 
-Customer extension code goes from upload to a running, isolated, observable function with zero human involvement — a genuine product capability, built as a platform.
+Customer extension code goes from upload to a running, isolated, observable function without a platform engineer provisioning each function by hand.

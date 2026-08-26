@@ -2,7 +2,7 @@
 number: 6
 slug: teams-that-create-themselves
 title: Teams that create themselves
-summary: "Because teams are code, nothing drifts: the directory is the org chart."
+summary: One self-service pull request provisions the team, communication, on-call, catalog, and alerting resources together.
 topics:
   - developer experience
   - delivery
@@ -48,8 +48,8 @@ I made "team" a piece of infrastructure. A developer creates one folder with one
 
 ## THE INTERESTING PART
 
-The proof it worked: engineers outside our team now add their own teams without asking us. The request queue for "can you set up..." simply disappeared.
+Engineers outside the platform team now add their own teams through the same pull request workflow, without waiting for an administrator to assemble the resources by hand.
 
 ## WHAT IT CHANGED
 
-Team setup went from a multi-ticket, multi-day chore to a self-service pull request — and because teams are code, nothing drifts: the directory is the org chart.
+Team setup went from a multi-ticket, multi-day chore to a self-service pull request, with one directory acting as the reviewed definition for every connected system.
