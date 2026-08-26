@@ -25,7 +25,6 @@ const EXPECTED_ACTIONS = [
 const EXPECTED_CONTACT_LINKS = [
   "https://github.com/shmileee",
   "https://www.linkedin.com/in/aleksandr-ponomarov",
-  "mailto:ponomarov.aleksandr@gmail.com",
 ];
 const EXPECTED_ARC_COPY = [
   "For four years, I owned the platform foundation of an industrial IoT company. I joined when infrastructure changes were still applied by hand; by the end, a few hundred engineers were shipping through systems designed to make changes visible, reviewable, and reversible.",
@@ -47,15 +46,12 @@ const EXPECTED_ARC_LABELS = [
   "16 · acquisition",
   "17 · docker hub",
   "19 · container images",
-  "20 · source code",
   "21 · cloud functions",
   "22 · ai tooling",
   "23 · ai agents",
 ];
-const SPOTLIGHT_SUMMARY =
-  "Entering a new region became an infrastructure change, not an infrastructure project.";
 const SPOTLIGHT_PROOF =
-  "Environments became genuinely independent — a problem in one cannot spread to the others — their costs actually end when they are deleted, and entering a new region became an infrastructure change, not an infrastructure project.";
+  "Each cell contains its own failure domain, joins the network by policy, and verifies teardown before infrastructure state can disappear.";
 
 for (const viewport of VIEWPORTS) {
   test.describe(`homepage at ${viewport.width}x${viewport.height}`, () => {
@@ -118,7 +114,7 @@ for (const viewport of VIEWPORTS) {
       );
     });
 
-    test("renders the exact four-year narrative with six ordered beats and 18 labels", async ({ page }) => {
+    test("renders the exact four-year narrative with six ordered beats and 17 labels", async ({ page }) => {
       // Given the homepage narrative arc
       await page.goto("/");
       const arc = page.locator("#arc");
@@ -133,7 +129,7 @@ for (const viewport of VIEWPORTS) {
       expect(paragraphs.map((paragraph) => paragraph.trim())).toEqual(EXPECTED_ARC_COPY);
       expect(beatNumbers.map((number) => number.trim())).toEqual(["01", "02", "03", "04", "05", "06"]);
       expect(labels.map((label) => label.trim())).toEqual(EXPECTED_ARC_LABELS);
-      expect(new Set(labels.map((label) => label.trim())).size).toBe(18);
+      expect(new Set(labels.map((label) => label.trim())).size).toBe(17);
     });
 
     test("renders the metadata spotlight without an extra label or full article", async ({ page }) => {
@@ -147,8 +143,9 @@ for (const viewport of VIEWPORTS) {
       const spotlightHref = await spotlightLink.getAttribute("href");
       const topics = await featured.locator(".topic-list span").allTextContents();
 
-      // Then it contains only title, summary, proof, topics, and the enhanced canonical link
-      await expect(featured).toContainText(SPOTLIGHT_SUMMARY);
+      // Then it contains only structured proof, topics, and the enhanced canonical link
+      await expect(featured.locator("[data-case-proof] dt")).toHaveText(["Impact", "My role", "Evidence"]);
+      await expect(featured.locator("[data-case-proof] dd")).toHaveCount(3);
       await expect(featured).toContainText(SPOTLIGHT_PROOF);
       expect(topics).toEqual(["reliability", "cost", "delivery"]);
       await expect(featured.locator(".topic-featured")).toHaveCount(0);

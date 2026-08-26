@@ -24,7 +24,6 @@
   ],
   "contactLinks": [
     { "label": "github.com/shmileee", "href": "https://github.com/shmileee", "external": true },
-    { "label": "linkedin.com/in/aleksandr-ponomarov", "href": "https://www.linkedin.com/in/aleksandr-ponomarov", "external": true },
-    { "label": "ponomarov.aleksandr@gmail.com", "href": "mailto:ponomarov.aleksandr@gmail.com", "external": false }
+    { "label": "linkedin.com/in/aleksandr-ponomarov", "href": "https://www.linkedin.com/in/aleksandr-ponomarov", "external": true }
   ]
 }

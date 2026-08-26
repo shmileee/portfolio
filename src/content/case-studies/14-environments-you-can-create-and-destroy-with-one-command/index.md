@@ -3,13 +3,15 @@ number: 14
 slug: environments-you-can-create-and-destroy-with-one-command
 title: Environments you can create and destroy with one command
 summary: Entering a new region became an infrastructure change, not an infrastructure project.
+role: Led the architecture and implementation of the cell platform and its fail-closed teardown provider.
+evidence: "One stack provisions the VPC, EKS, GitOps bridge, and network attachment; teardown verifies six ordered phases."
 topics:
   - reliability
   - cost
   - delivery
 featured: true
 spotlight: true
-spotlightProof: Environments became genuinely independent — a problem in one cannot spread to the others — their costs actually end when they are deleted, and entering a new region became an infrastructure change, not an infrastructure project.
+spotlightProof: Each cell contains its own failure domain, joins the network by policy, and verifies teardown before infrastructure state can disappear.
 ---
 
 ## The situation
@@ -33,18 +35,19 @@ A cell is one Terraform stack that provisions everything — the VPC, the EKS cl
 Every cell also registers itself in a central cell registry (a DynamoDB table) — the shared source of truth for what cells exist and how they're attached, consumed today by the secrets and network reconcilers, and designed to later feed a cell router that steers tenants and traffic to the right cell.
 
 ## The interesting part
-The teardown problem had no off-the-shelf solution, so I wrote a custom Terraform provider to close the gap. It walks an environment down in ordered phases — freeze the deployment system, evacuate workloads, decommission autoscaled capacity, sweep, verify — and it never pretends: if anything survived, it stops, reports failure, and names exactly what is still alive rather than letting leftover resources hide. It can even rehearse a destroy during planning and tell you what would be left behind.
+The teardown problem had no off-the-shelf solution, so I wrote a custom Terraform provider to close the gap. It walks an environment down in six ordered phases — preflight, freeze the deployment system, evacuate workloads, decommission autoscaled capacity, reconcile, verify — and it never pretends: if anything survived, it stops, reports failure, and names exactly what is still alive rather than letting leftover resources hide. It can even rehearse a destroy during planning and tell you what would be left behind.
 
-<div class="teardown-exhibit" role="img" aria-label="Teardown ordered phases: freeze, evacuate, decommission, sweep, verify">
+<div class="teardown-exhibit" role="img" aria-label="Teardown ordered phases: preflight, freeze, evacuate, decommission, reconcile, verify">
   <p>TEARDOWN — ORDERED PHASES</p>
   <div>
+    <span>preflight</span><i aria-hidden="true">→</i>
     <span>freeze</span><i aria-hidden="true">→</i>
     <span>evacuate</span><i aria-hidden="true">→</i>
     <span>decommission</span><i aria-hidden="true">→</i>
-    <span>sweep</span><i aria-hidden="true">→</i>
+    <span>reconcile</span><i aria-hidden="true">→</i>
     <span>verify</span>
   </div>
 </div>
 
 ## What it changed
-Environments became genuinely independent — a problem in one cannot spread to the others — their costs actually end when they are deleted, and entering a new region became an infrastructure change, not an infrastructure project.
+Each cell contains its own failure domain, teardown verifies that cloud resources are gone before state can disappear, and entering a new region is handled as a reviewed infrastructure change.

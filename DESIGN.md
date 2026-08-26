@@ -6,7 +6,7 @@ A calm, technical field report: dark by default, editorial rather than dashboard
 
 Primary visitors are engineering leaders, hiring managers, and senior platform engineers scanning for evidence before reading deeply. The secondary user is the author, who needs new Markdown content to inherit the same hierarchy without making visual decisions.
 
-The homepage is ordered for that scan: a hero pairing the name with a short hiring snapshot (role, scope of ownership, and AWS/Kubernetes/delivery/reliability focus), then the six-beat four-year platform arc (section 01), a concise metadata-driven spotlight proof (02), the full case-study index (03), and working principles (04). The hero actions link to the case-study index and contact footer. GitHub, LinkedIn, and email live in that footer rather than the hero. The spotlight section shows the study's title, summary, `spotlightProof` sentence, and topics with a single link to the case study — never the full inline story. Primary navigation is Work, The arc, How I work, and Contact.
+The homepage is ordered for that scan: a hero pairing the name with a short hiring snapshot (role, scope of ownership, and AWS/Kubernetes/delivery/reliability focus), then the six-beat four-year platform arc (section 01), a concise metadata-driven spotlight proof (02), the full case-study index (03), and working principles (04). The hero actions link to the case-study index and contact footer. GitHub and LinkedIn live in that footer rather than the hero. The spotlight section shows the study's title, summary, `spotlightProof` sentence, and topics with a single link to the case study — never the full inline story. Primary navigation is Work, The arc, How I work, and Contact.
 
 ## 2. Color
 
@@ -129,6 +129,12 @@ Spacing follows a 4px base with these intent tokens:
 - **States**: hover/focus strengthens the border; active returns to rest.
 - **Accessibility**: real anchor, never a clickable `div` or a button.
 
+### Evidence Summary
+- **Structure**: one compact description list using the existing `summary` as Impact plus optional `role` and `evidence` metadata as My role and Evidence. The three values are one authored unit; partial summaries do not render.
+- **Placement**: used selectively on the five strongest studies in featured cards, the spotlight, and canonical study headers. It extends the existing metadata system rather than introducing a second summary source.
+- **Layout**: labels stay mono and quiet; values remain readable body copy. Card summaries use a compact stacked treatment, while spotlight and standalone variants may use a three-column grid that collapses to one column at narrow widths.
+- **Accessibility**: semantic `dl`, `dt`, and `dd` elements preserve label/value relationships without adding redundant headings.
+
 ### Case Study Reader
 - **Structure**: one reusable native dialog shell — a sticky toolbar containing an icon-only Close button with the accessible name “Close case study,” metadata line, a single `h2` title with `tabindex="-1"`, an `aria-live` status target, one prose container, and previous/next controls — plus an embedded JSON manifest listing each study's number, canonical URL, title, and topics. Each adjacent control has separate direction kicker, case number, and title nodes. No study body is pre-rendered into the page.
 - **Loading**: opening a study fetches its canonical standalone page on demand, extracts `.case-detail-prose`, rewrites relative `src`/`poster`/`href` values against the response URL, demotes fetched `h2` headings to `h3`, and caches the result so each study is requested at most once per page session. While loading, the shell is `aria-busy` and the status region announces progress.
@@ -156,6 +162,7 @@ Spacing follows a 4px base with these intent tokens:
 
 ### Architecture Diagram
 - **Structure**: authored SVG is inserted inline inside an exhibit wrapper so the original CSS custom properties, marker IDs, and geometry remain active.
+- **Conceptual variant**: public conceptual redraws use the same frame plus a visible caption and `data-concept-diagram`; the SVG keeps a descriptive accessible name and neutral labels.
 - **Theme**: the wrapper surface and shared SVG custom properties resolve separately for light and dark themes, preserving readable node fills, labels, emphasis, connectors, and markers on both standalone and reader surfaces.
 - **Layout**: diagram SVGs are width 100%, height auto, max-width 720px, and centered; the wrapper does not redraw or approximate the source. At narrow widths, the wrapper owns horizontal overflow so the diagram remains locally scrollable rather than widening the page.
 
