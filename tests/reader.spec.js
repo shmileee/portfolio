@@ -1,19 +1,30 @@
 import { expect, test } from "@playwright/test";
 
+import { caseStudies, caseStudy, caseStudyHash } from "./case-studies.js";
+
 const reader = (page) => page.locator("dialog[data-reader]");
-const card = (page, number) => page.locator(`[data-open-study="${number}"]`).first();
+const card = (page, id) => page.locator(`[data-open-study="${id}"]`).first();
+const INFRA_STUDY = caseStudy("infrastructure-changes");
+const APPROVE_STUDY = caseStudy("audited-approve");
+const BUTTONS_STUDY = caseStudy("self-service-buttons");
+const FEEDBACK_STUDY = caseStudy("fast-feedback");
+const TOOL_VERSIONS_STUDY = caseStudy("tool-versions");
+const TEAMS_STUDY = caseStudy("self-service-teams");
+const TERRAFORM_STUDY = caseStudy("terraform-product");
+const FLEET_STUDY = caseStudy("fleet-patching");
+const LAST_STUDY = caseStudies.at(-1);
 
-async function studyPath(page, number) {
-  return card(page, number).getAttribute("href");
+async function studyPath(page, id) {
+  return card(page, id).getAttribute("href");
 }
 
-async function revealStudy(page, number) {
-  if (!(await card(page, number).isVisible())) await page.locator("[data-grid-toggle]").click();
+async function revealStudy(page, id) {
+  if (!(await card(page, id).isVisible())) await page.locator("[data-grid-toggle]").click();
 }
 
-async function openStudy(page, number) {
-  await revealStudy(page, number);
-  await card(page, number).click();
+async function openStudy(page, id) {
+  await revealStudy(page, id);
+  await card(page, id).click();
   await expect(reader(page)).toBeVisible();
 }
 
@@ -129,7 +140,7 @@ async function manifestEntries(page) {
 
 const fixture = (body) => `<!doctype html><article class="case-detail-prose">${body}</article>`;
 
-async function observeNativeClick(page, number, attributes, eventInit = {}) {
+async function observeNativeClick(page, id, attributes, eventInit = {}) {
   return page.evaluate(
     ({ selector, attributes: nextAttributes, eventInit: nextEventInit }) => {
       const anchor = document.querySelector(selector);
@@ -146,14 +157,14 @@ async function observeNativeClick(page, number, attributes, eventInit = {}) {
         anchor.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, button: 0, ...nextEventInit }));
       });
     },
-    { selector: `[data-open-study="${number}"]`, attributes, eventInit },
+    { selector: `[data-open-study="${id}"]`, attributes, eventInit },
   );
 }
 
 test("normalizes canonical HTML and shares one pending request with the success cache", async ({ page }) => {
   // Given a canonical study response whose prose contains relative URLs and an attributed H2
   await page.goto("/");
-  const path = await studyPath(page, 3);
+  const path = await studyPath(page, BUTTONS_STUDY.id);
   let requests = 0;
   let release;
   const pending = new Promise((resolve) => { release = resolve; });
@@ -162,14 +173,14 @@ test("normalizes canonical HTML and shares one pending request with the success 
     await pending;
     await route.fulfill({
       contentType: "text/html",
-      body: fixture('<h2 id="phase"><em>Phase</em></h2><img src="media.png"><video poster="./poster.jpg"></video><a href="../04-a-feedback-loop-measured-in-milliseconds/">next</a><a href="">empty</a>'),
+      body: fixture('<h2 id="phase"><em>Phase</em></h2><img src="media.png"><video poster="./poster.jpg"></video><a href="../a-feedback-loop-measured-in-milliseconds/">next</a><a href="">empty</a>'),
     });
   });
 
   // When two opens race before the response settles and the cached study is reopened
-  await revealStudy(page, 3);
-  await card(page, 3).click({ noWaitAfter: true });
-  await card(page, 3).click({ noWaitAfter: true });
+  await revealStudy(page, BUTTONS_STUDY.id);
+  await card(page, BUTTONS_STUDY.id).click({ noWaitAfter: true });
+  await card(page, BUTTONS_STUDY.id).click({ noWaitAfter: true });
   release();
   await expect(reader(page)).toBeVisible();
   const prose = reader(page).locator("[data-reader-prose]");
@@ -180,20 +191,20 @@ test("normalizes canonical HTML and shares one pending request with the success 
   await expect(prose.locator('h3#phase > em')).toHaveText("Phase");
   expect(await prose.locator("img").getAttribute("src")).toBe(new URL("media.png", `http://127.0.0.1:8080${path}`).href);
   expect(await prose.locator("video").getAttribute("poster")).toBe(new URL("poster.jpg", `http://127.0.0.1:8080${path}`).href);
-  expect(await prose.locator('a:has-text("next")').getAttribute("href")).toBe(new URL("../04-a-feedback-loop-measured-in-milliseconds/", `http://127.0.0.1:8080${path}`).href);
+  expect(await prose.locator('a:has-text("next")').getAttribute("href")).toBe(new URL("../a-feedback-loop-measured-in-milliseconds/", `http://127.0.0.1:8080${path}`).href);
   await expect(prose.locator('a:has-text("empty")')).toHaveAttribute("href", "");
   await reader(page).locator("[data-reader-close]").click();
-  await openStudy(page, 3);
+  await openStudy(page, BUTTONS_STUDY.id);
   expect(requests).toBe(1);
 });
 
 test("latest intent wins over stale success and stale failure", async ({ page }) => {
   // Given two delayed canonical responses and a later immediately successful study
   await page.goto("/");
-  const third = await studyPath(page, 3);
-  const fourth = await studyPath(page, 4);
-  const fifth = await studyPath(page, 5);
-  const sixth = await studyPath(page, 6);
+  const third = await studyPath(page, BUTTONS_STUDY.id);
+  const fourth = await studyPath(page, FEEDBACK_STUDY.id);
+  const fifth = await studyPath(page, TOOL_VERSIONS_STUDY.id);
+  const sixth = await studyPath(page, TEAMS_STUDY.id);
   let releaseSuccess;
   let releaseFailure;
   const successGate = new Promise((resolve) => { releaseSuccess = resolve; });
@@ -202,9 +213,9 @@ test("latest intent wins over stale success and stale failure", async ({ page })
   await page.route(fourth, (route) => route.fulfill({ contentType: "text/html", body: fixture("<h2>current</h2>") }));
 
   // When Study 04 supersedes Study 03 before Study 03 succeeds
-  await revealStudy(page, 3);
-  await card(page, 3).click({ noWaitAfter: true });
-  await openStudy(page, 4);
+  await revealStudy(page, BUTTONS_STUDY.id);
+  await card(page, BUTTONS_STUDY.id).click({ noWaitAfter: true });
+  await openStudy(page, FEEDBACK_STUDY.id);
   releaseSuccess();
   await expect(reader(page).locator("[data-reader-title]")).toContainText("feedback loop");
   await expect(reader(page).locator("[data-reader-prose]")).toContainText("current");
@@ -214,9 +225,9 @@ test("latest intent wins over stale success and stale failure", async ({ page })
   await page.route(sixth, (route) => route.fulfill({ contentType: "text/html", body: fixture("<h2>still current</h2>") }));
 
   // When the same sequence ends in a stale failure
-  await revealStudy(page, 5);
-  await card(page, 5).click({ noWaitAfter: true });
-  await openStudy(page, 6);
+  await revealStudy(page, TOOL_VERSIONS_STUDY.id);
+  await card(page, TOOL_VERSIONS_STUDY.id).click({ noWaitAfter: true });
+  await openStudy(page, TEAMS_STUDY.id);
   const failed = page.waitForEvent("requestfailed");
   releaseFailure();
   await failed;
@@ -229,10 +240,10 @@ test("latest intent wins over stale success and stale failure", async ({ page })
 test("marked Back and Forward close and reopen while restoring focus", async ({ page }) => {
   // Given an opener that owns a successful marked reader entry
   await page.goto("/");
-  const opener = card(page, 3);
+  const opener = card(page, BUTTONS_STUDY.id);
   await opener.focus();
-  await openStudy(page, 3);
-  expect(await page.evaluate(() => history.state)).toEqual({ portfolioReader: true, number: 3 });
+  await openStudy(page, BUTTONS_STUDY.id);
+  expect(await page.evaluate(() => history.state)).toEqual({ portfolioReader: true, id: BUTTONS_STUDY.id });
 
   // When browser history moves backward and forward
   await page.goBack();
@@ -254,7 +265,7 @@ test("explicit marked close consumes exactly one entry and Back does not reopen 
   });
   await page.goto("/");
   await page.evaluate(() => history.pushState({ seed: true }, "", "#seed"));
-  await openStudy(page, 3);
+  await openStudy(page, BUTTONS_STUDY.id);
 
   // When the close control consumes the marked reader entry and Back moves again
   await reader(page).locator("[data-reader-close]").click();
@@ -274,14 +285,19 @@ test("unmarked initial and hashchange readers strip hashes without consuming his
     window.__readerBackCalls = 0;
     history.back = () => { window.__readerBackCalls += 1; nativeBack(); };
   });
-  await page.goto("/#study-3");
+  await page.goto(`/#study-${BUTTONS_STUDY.legacyNumber}`);
   await expect(reader(page)).toBeVisible();
+  const manifest = await manifestEntries(page);
+  const buttonsEntry = manifest.find(({ id }) => id === BUTTONS_STUDY.id);
+  const feedbackEntry = manifest.find(({ id }) => id === FEEDBACK_STUDY.id);
+  await expect(reader(page).locator("[data-reader-title]")).toHaveText(buttonsEntry.title);
 
   // When it closes and another legacy hash is assigned then escaped
   await reader(page).locator("[data-reader-close]").click();
   expect(new URL(page.url()).hash).toBe("");
-  await page.evaluate(() => { location.hash = "study-4"; });
+  await page.evaluate((legacyNumber) => { location.hash = `study-${legacyNumber}`; }, FEEDBACK_STUDY.legacyNumber);
   await expect(reader(page)).toBeVisible();
+  await expect(reader(page).locator("[data-reader-title]")).toHaveText(feedbackEntry.title);
   await page.keyboard.press("Escape");
 
   // Then both unmarked entries close by replacement rather than history.back
@@ -293,24 +309,24 @@ test("unmarked initial and hashchange readers strip hashes without consuming his
 test("canonical prose navigation replaces history and previous-next controls wrap", async ({ page }) => {
   // Given Study 01 with a canonical prose link to Study 02
   await page.goto("/");
-  const first = await studyPath(page, 1);
-  const second = await studyPath(page, 2);
+  const first = await studyPath(page, INFRA_STUDY.id);
+  const second = await studyPath(page, APPROVE_STUDY.id);
   await page.route(first, (route) => route.fulfill({ contentType: "text/html", body: fixture(`<a href="${second}">Study 02</a>`) }));
-  await openStudy(page, 1);
+  await openStudy(page, INFRA_STUDY.id);
   const markedLength = await page.evaluate(() => history.length);
 
   // When the prose link, previous, and next controls navigate within the reader
   await reader(page).getByRole("link", { name: "Study 02" }).click();
   expect(await page.evaluate(() => history.length)).toBe(markedLength);
-  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(2);
+  await expect.poll(() => page.evaluate(() => history.state.id)).toBe(APPROVE_STUDY.id);
   await reader(page).locator('[data-reader-direction="previous"]').click();
-  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(1);
+  await expect.poll(() => page.evaluate(() => history.state.id)).toBe(INFRA_STUDY.id);
   await reader(page).locator('[data-reader-direction="previous"]').click();
-  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(23);
+  await expect.poll(() => page.evaluate(() => history.state.id)).toBe(LAST_STUDY.id);
   await reader(page).locator('[data-reader-direction="next"]').click();
 
   // Then navigation wraps back to the first manifest entry without pushing entries
-  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(1);
+  await expect.poll(() => page.evaluate(() => history.state.id)).toBe(INFRA_STUDY.id);
   expect(await page.evaluate(() => history.length)).toBe(markedLength);
 });
 
@@ -319,10 +335,10 @@ test("close and adjacent controls expose structured descriptive semantics", asyn
   await page.goto("/");
   const entries = await manifestEntries(page);
   const longest = entries.reduce((candidate, entry) => entry.title.length > candidate.title.length ? entry : candidate);
-  const longestIndex = entries.findIndex(({ number }) => number === longest.number);
+  const longestIndex = entries.findIndex(({ id }) => id === longest.id);
   const current = entries[(longestIndex - 1 + entries.length) % entries.length];
   const previous = entries[(longestIndex - 2 + entries.length) % entries.length];
-  await openStudy(page, current.number);
+  await openStudy(page, current.id);
 
   // Then Close is icon-only and each adjacent control exposes stable structured nodes
   const close = reader(page).locator("[data-reader-close]");
@@ -346,7 +362,7 @@ test("Task 6 sticky Close and adjacent cards keep exact responsive geometry", as
 
   for (const width of widths) {
     await page.setViewportSize({ width, height: 900 });
-    await page.goto("/#study-12", { waitUntil: "networkidle" });
+    await page.goto(`/${caseStudyHash(FLEET_STUDY.id)}`, { waitUntil: "networkidle" });
     await expect(reader(page)).toBeVisible();
     const close = reader(page).locator("[data-reader-close]");
     const navigation = reader(page).locator(".reader-navigation");
@@ -431,14 +447,14 @@ test("Task 6 sticky Close and adjacent cards keep exact responsive geometry", as
     await close.click();
     await expect(reader(page)).toBeHidden();
 
-    await page.goto("/#study-3", { waitUntil: "networkidle" });
+    await page.goto(`/${caseStudyHash(BUTTONS_STUDY.id)}`, { waitUntil: "networkidle" });
     await expect(reader(page)).toBeVisible();
     const media = reader(page).locator(".media-exhibit").first();
     await media.scrollIntoViewIfNeeded();
     await reader(page).locator("video").focus();
     expect(await closeContentOverlaps(page)).toEqual([]);
 
-    await page.goto("/#study-4", { waitUntil: "networkidle" });
+    await page.goto(`/${caseStudyHash(FEEDBACK_STUDY.id)}`, { waitUntil: "networkidle" });
     await expect(reader(page)).toBeVisible();
     await reader(page).locator(".reader-navigation").scrollIntoViewIfNeeded();
     expect(await closeContentOverlaps(page)).toEqual([]);
@@ -451,11 +467,11 @@ test("Task 6 sticky toolbar never paints over reader prose or section rules", as
   for (const width of [320, 375, 768, 1280, 1440]) {
     await page.setViewportSize({ width, height: 900 });
 
-    for (const { heading, number } of [
-      { heading: "WHAT IT CHANGED", number: 3 },
-      { heading: "What I did", number: 12 },
+    for (const { heading, study } of [
+      { heading: "WHAT IT CHANGED", study: BUTTONS_STUDY },
+      { heading: "What I did", study: FLEET_STUDY },
     ]) {
-      await page.goto(`/#study-${number}`, { waitUntil: "networkidle" });
+      await page.goto(`/${caseStudyHash(study.id)}`, { waitUntil: "networkidle" });
       await expect(reader(page)).toBeVisible();
       const sectionHeading = reader(page).locator(".reader-prose h3").filter({ hasText: heading });
       const paragraph = sectionHeading.locator("xpath=following-sibling::p[1]");
@@ -464,12 +480,12 @@ test("Task 6 sticky toolbar never paints over reader prose or section rules", as
         const facts = await stickyOcclusionFacts(target);
         expect(
           facts.targetIntersectsToolbar,
-          `${width}px Study ${number} target must exercise sticky region: ${JSON.stringify(facts)}`,
+          `${width}px ${study.id} target must exercise sticky region: ${JSON.stringify(facts)}`,
         ).toBe(true);
-        expect(facts.backgroundAlpha, `${width}px Study ${number} toolbar background ${facts.background}`).toBe(0);
-        expect(facts.opaqueLineIntersectionAreas, `${width}px Study ${number} text hidden by toolbar`).toEqual([]);
-        expect(facts.opaqueRuleIntersectionArea, `${width}px Study ${number} left rule hidden by toolbar`).toBe(0);
-        expect(facts.closeIntersectionAreas, `${width}px Study ${number} Close overlaps content`).toEqual([]);
+        expect(facts.backgroundAlpha, `${width}px ${study.id} toolbar background ${facts.background}`).toBe(0);
+        expect(facts.opaqueLineIntersectionAreas, `${width}px ${study.id} text hidden by toolbar`).toEqual([]);
+        expect(facts.opaqueRuleIntersectionArea, `${width}px ${study.id} left rule hidden by toolbar`).toBe(0);
+        expect(facts.closeIntersectionAreas, `${width}px ${study.id} Close overlaps content`).toEqual([]);
         expect(facts.close).toEqual({ height: 44, hitTarget: true, pointerEvents: "auto", width: 44 });
         expect(facts.pointerEvents).toBe("none");
         expect(facts.toolbar.height).toBeGreaterThanOrEqual(44);
@@ -481,32 +497,32 @@ test("Task 6 sticky toolbar never paints over reader prose or section rules", as
 test("unmodified arrows navigate with wrapping and replace reader history", async ({ page }) => {
   // Given an open reader with one marked history entry
   await page.goto("/");
-  await openStudy(page, 6);
+  await openStudy(page, TEAMS_STUDY.id);
   const markedLength = await page.evaluate(() => history.length);
 
   // When unmodified arrows move forward and backward
   await page.keyboard.press("ArrowRight");
-  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(7);
+  await expect.poll(() => page.evaluate(() => history.state.id)).toBe(TERRAFORM_STUDY.id);
   expect(await page.evaluate(() => history.length)).toBe(markedLength);
   await page.keyboard.press("ArrowLeft");
-  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(6);
+  await expect.poll(() => page.evaluate(() => history.state.id)).toBe(TEAMS_STUDY.id);
   expect(await page.evaluate(() => history.length)).toBe(markedLength);
 
   // And the first and last entries wrap in both directions
   await reader(page).locator("[data-reader-close]").click();
   await expect(reader(page)).toBeHidden();
-  await openStudy(page, 1);
+  await openStudy(page, INFRA_STUDY.id);
   const wrappedLength = await page.evaluate(() => history.length);
   await page.keyboard.press("ArrowLeft");
-  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(23);
+  await expect.poll(() => page.evaluate(() => history.state.id)).toBe(LAST_STUDY.id);
   await page.keyboard.press("ArrowRight");
-  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(1);
+  await expect.poll(() => page.evaluate(() => history.state.id)).toBe(INFRA_STUDY.id);
   expect(await page.evaluate(() => history.length)).toBe(wrappedLength);
 
   // Then every modified arrow remains native and does not navigate
   for (const key of ["Alt+ArrowRight", "Control+ArrowRight", "Meta+ArrowRight", "Shift+ArrowRight"]) {
     await page.keyboard.press(key);
-    expect(await page.evaluate(() => history.state.number)).toBe(1);
+    expect(await page.evaluate(() => history.state.id)).toBe(INFRA_STUDY.id);
     expect(await page.evaluate(() => history.length)).toBe(wrappedLength);
   }
 });
@@ -515,7 +531,7 @@ test("focused diagrams retain native real-key arrows in standalone and reader", 
   // Given the real Study 12 diagram at a mobile viewport
   await page.setViewportSize({ width: 375, height: 900 });
   await page.goto("/");
-  const path = await studyPath(page, 12);
+  const path = await studyPath(page, FLEET_STUDY.id);
   await page.goto(path);
   const standaloneDiagram = page.locator(".diagram-exhibit").first();
   await standaloneDiagram.focus();
@@ -543,7 +559,7 @@ test("focused diagrams retain native real-key arrows in standalone and reader", 
 
   // Given the same real diagram loaded into a marked reader entry
   await page.goto("/");
-  await openStudy(page, 12);
+  await openStudy(page, FLEET_STUDY.id);
   const readerDiagram = reader(page).locator(".diagram-exhibit").first();
   await readerDiagram.focus();
   await page.evaluate(() => {
@@ -594,7 +610,9 @@ test("focused diagrams retain native real-key arrows in standalone and reader", 
     historyLength: history.length,
     historyState: history.state,
   }))).toEqual(readerState);
-  await expect(reader(page).locator("[data-reader-meta-number]")).toHaveText("Case study 12");
+  await expect(reader(page).locator("[data-reader-meta-number]")).toHaveText(
+    `Case study ${String(FLEET_STUDY.number).padStart(2, "0")}`,
+  );
 });
 
 test("nested contenteditable Text node arrows remain native", async ({ page }) => {
@@ -607,9 +625,9 @@ test("nested contenteditable Text node arrows remain native", async ({ page }) =
 
   for (const key of ["ArrowLeft", "ArrowRight"]) {
     await page.goto("/");
-    await openStudy(page, 6);
+    await openStudy(page, TEAMS_STUDY.id);
     const before = await page.evaluate(() => ({
-      number: history.state.number,
+      id: history.state.id,
       hash: location.hash,
       historyLength: history.length,
     }));
@@ -627,7 +645,7 @@ test("nested contenteditable Text node arrows remain native", async ({ page }) =
     // Then native handling remains available without changing reader navigation state
     expect(defaultPrevented).toBe(false);
     expect(await page.evaluate(() => ({
-      number: history.state.number,
+      id: history.state.id,
       hash: location.hash,
       historyLength: history.length,
     }))).toEqual(before);
@@ -637,10 +655,10 @@ test("nested contenteditable Text node arrows remain native", async ({ page }) =
 test("native link variants and every guarded arrow target pass through", async ({ page }) => {
   // Given same-tab card enhancement and fetched prose with every guarded target kind
   await page.goto("/");
-  expect(await observeNativeClick(page, 3, { target: "_blank" })).toBe(false);
-  expect(await observeNativeClick(page, 4, { download: "study.html" })).toBe(false);
-  expect(await observeNativeClick(page, 5, {}, { metaKey: true })).toBe(false);
-  const path = await studyPath(page, 6);
+  expect(await observeNativeClick(page, BUTTONS_STUDY.id, { target: "_blank" })).toBe(false);
+  expect(await observeNativeClick(page, FEEDBACK_STUDY.id, { download: "study.html" })).toBe(false);
+  expect(await observeNativeClick(page, TOOL_VERSIONS_STUDY.id, {}, { metaKey: true })).toBe(false);
+  const path = await studyPath(page, TEAMS_STUDY.id);
   await page.route(path, (route) => route.fulfill({
     contentType: "text/html",
     body: fixture(`
@@ -657,7 +675,7 @@ test("native link variants and every guarded arrow target pass through", async (
       <h2>guarded targets</h2>
     `),
   }));
-  await openStudy(page, 6);
+  await openStudy(page, TEAMS_STUDY.id);
   const input = reader(page).getByRole("textbox", { name: "reader input" });
   await input.focus();
   await input.evaluate((element) => element.setSelectionRange(1, 1));
@@ -715,15 +733,15 @@ test("native link variants and every guarded arrow target pass through", async (
   }
 
   // Then guarded interactions retain the current study and fixed history entry
-  expect(await page.evaluate(() => history.state.number)).toBe(6);
+  expect(await page.evaluate(() => history.state.id)).toBe(TEAMS_STUDY.id);
 });
 
 test("focus starts at H2, wraps visible controls, and restores after Escape and backdrop", async ({ page }) => {
   // Given a keyboard-focused card opening the modal reader
   await page.goto("/");
-  const opener = card(page, 3);
+  const opener = card(page, BUTTONS_STUDY.id);
   await opener.focus();
-  await openStudy(page, 3);
+  await openStudy(page, BUTTONS_STUDY.id);
   const title = reader(page).locator("[data-reader-title]");
   await expect(title).toBeFocused();
 
@@ -734,7 +752,7 @@ test("focus starts at H2, wraps visible controls, and restores after Escape and 
   await expect(reader(page).locator("[data-reader-close]")).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(opener).toBeFocused();
-  await openStudy(page, 3);
+  await openStudy(page, BUTTONS_STUDY.id);
   await reader(page).evaluate((dialog) => dialog.dispatchEvent(new MouseEvent("click", { bubbles: true })));
 
   // Then both modal close paths restore the original invoker
@@ -742,17 +760,17 @@ test("focus starts at H2, wraps visible controls, and restores after Escape and 
   await expect(opener).toBeFocused();
 });
 
-test("real Study 03 media and reader controls complete the headed journey", async ({ page }) => {
-  // Given the canonical Study 03 reader with request tracking and a focused invoker
+test("real buttons-study media and reader controls complete the headed journey", async ({ page }) => {
+  // Given the canonical buttons-study reader with request tracking and a focused invoker
   const evidenceDirectory = process.env.TASK14_EVIDENCE_DIR;
   let studyRequests = 0;
   page.on("request", (request) => {
-    if (request.resourceType() === "fetch" && new URL(request.url()).pathname.includes("/case-studies/03-")) studyRequests += 1;
+    if (request.resourceType() === "fetch" && new URL(request.url()).pathname === BUTTONS_STUDY.url) studyRequests += 1;
   });
   await page.goto("/");
-  const opener = card(page, 3);
+  const opener = card(page, BUTTONS_STUDY.id);
   await opener.focus();
-  await openStudy(page, 3);
+  await openStudy(page, BUTTONS_STUDY.id);
   const video = reader(page).locator("video");
   await video.scrollIntoViewIfNeeded();
 
@@ -762,12 +780,14 @@ test("real Study 03 media and reader controls complete the headed journey", asyn
   await video.evaluate((element) => element.pause());
   await expect.poll(() => video.evaluate((element) => element.paused)).toBe(true);
   await reader(page).locator('[data-reader-direction="next"]').click();
-  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(4);
+  await expect.poll(() => page.evaluate(() => history.state.id)).toBe(FEEDBACK_STUDY.id);
   await reader(page).locator('[data-reader-direction="previous"]').click();
-  await expect.poll(() => page.evaluate(() => history.state.number)).toBe(3);
+  await expect.poll(() => page.evaluate(() => history.state.id)).toBe(BUTTONS_STUDY.id);
 
-  // Then media URLs are canonical, cache reuse avoids another Study 03 request, and close restores focus
-  expect(await video.getAttribute("poster")).toMatch(/^http:\/\/127\.0\.0\.1:8080\/case-studies\/03-/);
+  // Then media URLs are canonical, cache reuse avoids another buttons-study request, and close restores focus
+  expect(await video.getAttribute("poster")).toMatch(
+    new RegExp(`^http://127\\.0\\.0\\.1:8080${BUTTONS_STUDY.url}`),
+  );
   expect(studyRequests).toBe(1);
   if (evidenceDirectory) {
     for (const width of [375, 768, 1280]) {
@@ -783,7 +803,7 @@ for (const failure of ["abort", "500", "malformed"]) {
   test(`${failure} canonical response falls back to the current standalone URL`, async ({ page }) => {
     // Given a first reader request that cannot produce canonical prose
     await page.goto("/");
-    const path = await studyPath(page, 3);
+    const path = await studyPath(page, BUTTONS_STUDY.id);
     let firstRequest = true;
     await page.route(path, async (route) => {
       if (!firstRequest) return route.continue();
@@ -794,8 +814,8 @@ for (const failure of ["abort", "500", "malformed"]) {
     });
 
     // When the enhanced card is activated
-    await revealStudy(page, 3);
-    await card(page, 3).click({ noWaitAfter: true });
+    await revealStudy(page, BUTTONS_STUDY.id);
+    await card(page, BUTTONS_STUDY.id).click({ noWaitAfter: true });
 
     // Then the current intent assigns the canonical URL and its standalone page renders
     await page.waitForURL((url) => url.pathname === path);
