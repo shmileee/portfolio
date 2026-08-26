@@ -2,7 +2,7 @@
 number: 16
 slug: absorbing-an-acquisition-one-engineer-one-summer-an-entire-product-moved
 title: Absorbing an acquisition
-summary: One engineer, one summer, an entire product moved.
+summary: Six services moved from Heroku to AWS and onto the shared platform in about two months.
 topics:
   - delivery
   - reliability
@@ -15,7 +15,7 @@ spotlight: false
 The company made an acquisition, and the acquired product ran on Heroku — a different cloud, a different deployment model, different everything. Running two parallel stacks means double the tooling, double the on-call knowledge, and an "integration" that exists on slides but not in production.
 
 ## What I did
-I migrated their entire product onto our platform, single-handedly, in about two months.
+I led and implemented the Heroku-to-AWS platform migration in about two months.
 
 I wrote the deployment charts for their services — the backend API, background workers, the web frontend, and a handful of supporting jobs — and wired them into our GitOps pipeline like any other internal app. I recreated everything their old hosting had quietly been providing: the databases with the extensions their code depended on, a cache, object storage, certificates for their public domain, secrets management.
 
