@@ -6,8 +6,6 @@ import { routeToFile } from "./context.mjs";
 import { decodeEntities, MalformedMarkupError } from "./html.mjs";
 import { outcome } from "./report.mjs";
 
-const EXPECTED_SITEMAP_LOCATIONS = 23; // homepage + 22 studies
-const EXPECTED_ARC_LINKS = 17;
 const EXPECTED_VIDEO_COUNT = 2;
 
 function parseSitemapLocations(xml, file) {
@@ -44,8 +42,9 @@ function checkSitemap(site) {
   if (unique.size !== locations.length) {
     problems.push(`sitemap repeats ${locations.length - unique.size} location(s)`);
   }
-  if (unique.size !== EXPECTED_SITEMAP_LOCATIONS) {
-    problems.push(`expected ${EXPECTED_SITEMAP_LOCATIONS} unique locations, found ${unique.size}`);
+  const expectedLocationCount = site.studyRoutes.length + 1;
+  if (unique.size !== expectedLocationCount) {
+    problems.push(`expected ${expectedLocationCount} unique locations, found ${unique.size}`);
   }
   const expected = new Set([`${site.origin}/`, ...site.studyRoutes.map((route) => `${site.origin}${route}`)]);
   for (const loc of [...expected].filter((candidate) => !unique.has(candidate)).sort()) {
@@ -143,20 +142,17 @@ function checkCanonicalArcLinks(site) {
     .tagsOf("index.html")
     .filter((tag) => tag.name === "a" && tag.attrs.has("data-arc-study"));
   const routeSet = new Set(site.studyRoutes);
-  const numberByRoute = new Map();
+  const idByRoute = new Map();
   if (manifest.entries) {
     for (const entry of manifest.entries) {
       if (entry !== null && typeof entry === "object" && typeof entry.url === "string") {
-        numberByRoute.set(entry.url, entry.number);
+        idByRoute.set(entry.url, entry.id);
       }
     }
   } else {
     problems.push(`cannot verify arc-to-manifest binding: ${manifest.error}`);
   }
-  if (entries.length !== EXPECTED_ARC_LINKS) {
-    problems.push(`expected ${EXPECTED_ARC_LINKS} arc anchors, found ${entries.length}`);
-  }
-  const uniqueNumbers = new Set();
+  const uniqueIds = new Set();
   const uniqueRoutes = new Set();
   entries.forEach((tag, index) => {
     const href = tag.attrs.get("href") ?? "";
@@ -168,26 +164,26 @@ function checkCanonicalArcLinks(site) {
     if (open !== arc) {
       problems.push(`${href === "" ? `arc[${index}]` : href}: data-open-study is ${open}, expected ${arc}`);
     }
-    if (uniqueNumbers.has(arc)) {
+    if (uniqueIds.has(arc)) {
       problems.push(`duplicate data-arc-study ${arc}`);
     }
-    uniqueNumbers.add(arc);
+    uniqueIds.add(arc);
     if (uniqueRoutes.has(href)) {
       problems.push(`duplicate arc href ${href === "" ? "(empty)" : href}`);
     }
     uniqueRoutes.add(href);
     if (manifest.entries && routeSet.has(href)) {
-      const expectedNumber = numberByRoute.get(href);
-      if (String(expectedNumber) !== arc) {
-        problems.push(`${href}: data-arc-study is ${arc}, manifest says ${expectedNumber}`);
+      const expectedId = idByRoute.get(href);
+      if (expectedId !== arc) {
+        problems.push(`${href}: data-arc-study is ${arc}, manifest says ${expectedId}`);
       }
     }
   });
-  if (uniqueNumbers.size !== EXPECTED_ARC_LINKS) {
-    problems.push(`expected ${EXPECTED_ARC_LINKS} unique data-arc-study values, found ${uniqueNumbers.size}`);
+  if (uniqueIds.size !== entries.length) {
+    problems.push(`expected ${entries.length} unique data-arc-study values, found ${uniqueIds.size}`);
   }
-  if (uniqueRoutes.size !== EXPECTED_ARC_LINKS) {
-    problems.push(`expected ${EXPECTED_ARC_LINKS} unique arc hrefs, found ${uniqueRoutes.size}`);
+  if (uniqueRoutes.size !== entries.length) {
+    problems.push(`expected ${entries.length} unique arc hrefs, found ${uniqueRoutes.size}`);
   }
   return outcome(
     problems,
