@@ -17,6 +17,7 @@ const byNumber = (left, right) => left.data.number - right.data.number;
 const sortCaseStudiesByNumber = (items) => [...items].sort(byNumber);
 const BROWSER_ASSET_PATHS = [
   "src/assets/css/site.css",
+  "src/assets/js/reader-focus.js",
   "src/assets/js/reader.js",
   "src/assets/js/site.js",
 ];

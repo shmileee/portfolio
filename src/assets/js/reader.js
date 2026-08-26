@@ -1,26 +1,9 @@
+const focusUrl = new URL("./reader-focus.js", import.meta.url);
+const assetVersion = new URL(import.meta.url).searchParams.get("v");
+if (assetVersion) focusUrl.searchParams.set("v", assetVersion);
+const { isGuardedArrowTarget, visibleFocusables } = await import(focusUrl);
+
 const STUDY_HASH = /^#study-(\d+)$/;
-const FOCUSABLE_SELECTOR = [
-  "a[href]",
-  "button:not([disabled])",
-  "input:not([disabled])",
-  "select:not([disabled])",
-  "textarea:not([disabled])",
-  "[tabindex]:not([tabindex='-1'])",
-].join(",");
-const ARROW_GUARD_SELECTOR = [
-  "input",
-  "textarea",
-  "select",
-  "option",
-  "[contenteditable]",
-  "audio",
-  "video",
-  ".diagram-exhibit",
-  '[role="textbox"]',
-  '[role="searchbox"]',
-  '[role="spinbutton"]',
-  '[role="slider"]',
-].join(",");
 
 function createManifestIndex(manifestNode) {
   const entries = JSON.parse(manifestNode.textContent || "[]");
@@ -81,21 +64,8 @@ function isPrimarySameTab(event, anchor) {
   );
 }
 
-function visibleFocusables(dialog) {
-  return [...dialog.querySelectorAll(FOCUSABLE_SELECTOR)].filter((element) => {
-    const style = getComputedStyle(element);
-    const bounds = element.getBoundingClientRect();
-    return !element.hidden && style.display !== "none" && style.visibility !== "hidden" && bounds.width > 0 && bounds.height > 0;
-  });
-}
-
 function isReaderState(state) {
   return state?.portfolioReader === true && Number.isInteger(state.number);
-}
-
-function isGuardedArrowTarget(target) {
-  const element = target instanceof Element ? target : target instanceof Node ? target.parentElement : null;
-  return Boolean(element?.closest(ARROW_GUARD_SELECTOR));
 }
 
 export function setupReader() {
