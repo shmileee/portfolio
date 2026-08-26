@@ -1,6 +1,4 @@
 ---
-number: 5
-slug: one-tool-version-everywhere
 title: "One tool version, everywhere: from decision record to a centrally cached CI"
 summary: Version drift — between two laptops, or between a laptop and CI — stopped being a category of bug.
 topics:
@@ -51,4 +49,4 @@ Restoring the big tool archive can cost more than a fresh install — so tool ca
 
 Setup went from a wiki page to one command. Version drift — between two laptops, or between a laptop and CI — stopped being a category of bug. And because the workflow is centralized, the whole company's checks get faster every time one person improves one file. It also set a precedent I'm fond of: standards have lifecycles — the person who introduces one should be willing to replace it, in writing, when something better exists.
 
-PREQUEL ← [case study 4 — a feedback loop measured in milliseconds](/case-studies/04-a-feedback-loop-measured-in-milliseconds/)
+PREQUEL ← {% caseStudyLink "fast-feedback", "a feedback loop measured in milliseconds" %}

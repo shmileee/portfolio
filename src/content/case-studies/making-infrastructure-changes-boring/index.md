@@ -1,6 +1,4 @@
 ---
-number: 1
-slug: making-infrastructure-changes-boring
 title: Making infrastructure changes boring
 summary: Pull-request plans and Kubernetes diffs made infrastructure changes visible before automated deployment.
 topics:

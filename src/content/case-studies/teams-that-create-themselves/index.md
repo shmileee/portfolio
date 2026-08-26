@@ -1,6 +1,4 @@
 ---
-number: 6
-slug: teams-that-create-themselves
 title: Teams that create themselves
 summary: One self-service pull request provisions the team, communication, on-call, catalog, and alerting resources together.
 topics:
