@@ -1,6 +1,4 @@
 ---
-number: 19
-slug: turning-container-images-from-a-liability-into-a-supply-chain
 title: Turning container images from a liability into a supply chain
 summary: A missing image is an inconvenience; a wrong image is a disaster.
 role: Designed and built the image factory, then turned the migration into a playbook teammates could run.
