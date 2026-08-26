@@ -1,6 +1,4 @@
 ---
-number: 4
-slug: a-feedback-loop-measured-in-milliseconds
 title: A feedback loop measured in milliseconds
 summary: The old formatting hook took about seven seconds; the rewritten one runs a fifty-file commit in 59 milliseconds.
 topics:
@@ -28,4 +26,4 @@ I benchmarked instead of guessing. The old formatting hook took about seven seco
 
 Mistakes get fixed before they're even committed, review comments moved from formatting to substance, and the checks are self-contained enough that they spread to every repository without an installation guide.
 
-SEQUEL → [case study 5 — one tool version, everywhere](/case-studies/05-one-tool-version-everywhere/)
+SEQUEL → {% caseStudyLink "tool-versions", "one tool version, everywhere" %}
