@@ -18,7 +18,7 @@
     <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/14-environments-you-can-create-and-destroy-with-one-command/">
     <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/assets/css/site.css?v=ebf54ac20f81">
+    <link rel="stylesheet" href="/assets/css/site.css?v=ed34e0622789">
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -42,12 +42,23 @@
 </header>
 
     
+
 <main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 14 · featured</p>
     <h1>Environments you can create and destroy with one command</h1>
-    <p class="case-detail-summary">Entering a new region became an infrastructure change, not an infrastructure project.</p>
+    
+      
+  
+    <dl class="case-proof case-detail-proof" data-case-proof="">
+      <div><dt>Impact</dt><dd>Entering a new region became an infrastructure change, not an infrastructure project.</dd></div>
+      <div><dt>My role</dt><dd>Led the architecture and implementation of the cell platform and its fail-closed teardown provider.</dd></div>
+      <div><dt>Evidence</dt><dd>One stack provisions the VPC, EKS, GitOps bridge, and network attachment; teardown verifies six ordered phases.</dd></div>
+    </dl>
+  
+
+    
     <div class="topic-list" aria-label="Topics">
       <span>reliability</span><span>cost</span><span>delivery</span>
     </div>
@@ -72,19 +83,20 @@
 </ul>
 <p>Every cell also registers itself in a central cell registry (a DynamoDB table) — the shared source of truth for what cells exist and how they're attached, consumed today by the secrets and network reconcilers, and designed to later feed a cell router that steers tenants and traffic to the right cell.</p>
 <h2>The interesting part</h2>
-<p>The teardown problem had no off-the-shelf solution, so I wrote a custom Terraform provider to close the gap. It walks an environment down in ordered phases — freeze the deployment system, evacuate workloads, decommission autoscaled capacity, sweep, verify — and it never pretends: if anything survived, it stops, reports failure, and names exactly what is still alive rather than letting leftover resources hide. It can even rehearse a destroy during planning and tell you what would be left behind.</p>
-<div class="teardown-exhibit" role="img" aria-label="Teardown ordered phases: freeze, evacuate, decommission, sweep, verify">
+<p>The teardown problem had no off-the-shelf solution, so I wrote a custom Terraform provider to close the gap. It walks an environment down in six ordered phases — preflight, freeze the deployment system, evacuate workloads, decommission autoscaled capacity, reconcile, verify — and it never pretends: if anything survived, it stops, reports failure, and names exactly what is still alive rather than letting leftover resources hide. It can even rehearse a destroy during planning and tell you what would be left behind.</p>
+<div class="teardown-exhibit" role="img" aria-label="Teardown ordered phases: preflight, freeze, evacuate, decommission, reconcile, verify">
   <p>TEARDOWN — ORDERED PHASES</p>
   <div>
+    <span>preflight</span><i aria-hidden="true">→</i>
     <span>freeze</span><i aria-hidden="true">→</i>
     <span>evacuate</span><i aria-hidden="true">→</i>
     <span>decommission</span><i aria-hidden="true">→</i>
-    <span>sweep</span><i aria-hidden="true">→</i>
+    <span>reconcile</span><i aria-hidden="true">→</i>
     <span>verify</span>
   </div>
 </div>
 <h2>What it changed</h2>
-<p>Environments became genuinely independent — a problem in one cannot spread to the others — their costs actually end when they are deleted, and entering a new region became an infrastructure change, not an infrastructure project.</p>
+<p>Each cell contains its own failure domain, teardown verifies that cloud resources are gone before state can disappear, and entering a new region is handled as a reviewed infrastructure change.</p>
 </article>
   <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
     <a href="/case-studies/13-the-network-nobody-dared-touch/" data-study-direction="previous">
@@ -121,14 +133,10 @@
           linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
         </a>
       
-        <a href="mailto:ponomarov.aleksandr@gmail.com">
-          ponomarov.aleksandr@gmail.com
-        </a>
-      
     </div>
   </div>
 </footer>
 
-    <script type="module" src="/assets/js/site.js?v=ebf54ac20f81"></script>
+    <script type="module" src="/assets/js/site.js?v=ed34e0622789"></script>
   </body>
 </html>

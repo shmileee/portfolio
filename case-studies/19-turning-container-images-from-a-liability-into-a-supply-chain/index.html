@@ -18,7 +18,7 @@
     <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/19-turning-container-images-from-a-liability-into-a-supply-chain/">
     <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/assets/css/site.css?v=ebf54ac20f81">
+    <link rel="stylesheet" href="/assets/css/site.css?v=ed34e0622789">
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -42,12 +42,23 @@
 </header>
 
     
+
 <main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 19 · featured</p>
     <h1>Turning container images from a liability into a supply chain</h1>
-    <p class="case-detail-summary">A missing image is an inconvenience; a wrong image is a disaster.</p>
+    
+      
+  
+    <dl class="case-proof case-detail-proof" data-case-proof="">
+      <div><dt>Impact</dt><dd>A missing image is an inconvenience; a wrong image is a disaster.</dd></div>
+      <div><dt>My role</dt><dd>Designed and built the image factory, then turned the migration into a playbook teammates could run.</dd></div>
+      <div><dt>Evidence</dt><dd>48 images migrated in four days; 35 releases in 20 days; 864 tests protected the publishing contract.</dd></div>
+    </dl>
+  
+
+    
     <div class="topic-list" aria-label="Topics">
       <span>security</span><span>cost</span><span>delivery</span>
     </div>
@@ -92,14 +103,71 @@
     <span class="token key atrule">version</span><span class="token punctuation">:</span> <span class="token string">"v0.18.0"</span></code></pre>
 
 </div><p>Because each image is a self-contained folder with a manifest, the factory discovers them independently: only changed images rebuild, builds run in parallel per architecture, and adding a new image means adding a folder — not editing a script. The upstream block closes the security loop: the dependency bot watches it and opens the version bump; the factory rebuilds and republishes. I migrated the entire fleet of internal images onto this using a playbook repeatable enough that teammates ran migrations without me.</p>
+<figure class="concept-diagram" data-concept-diagram="">
+<div class="diagram-exhibit" data-exhibit="">
+  <div class="diagram-exhibit-label">EXHIBIT — IMAGE PROVENANCE · MANIFEST TO VERIFIED PUBLISH</div>
+  <svg aria-label="Container image pipeline from a declarative manifest through parallel architecture builds, tests, immutable publishing and digest verification" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 500" role="img">
+  <defs>
+    <marker id="imageArrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="var(--w5, #aab4c3)"></path>
+    </marker>
+    <marker id="imageArrowAccent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="var(--ab4, #60a5fa)"></path>
+    </marker>
+  </defs>
+  <text x="360" y="27" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.15em" fill="var(--w45, #aab4c3)">DECLARATION → TESTED ARTIFACT → VERIFIED RELEASE</text>
+  <rect x="28" y="76" width="180" height="100" rx="7" fill="var(--bg, #0b1220)" stroke="var(--ab4, #60a5fa)"></rect>
+  <text x="48" y="101" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">01 · DECLARE</text>
+  <text x="48" y="128" font-family="IBM Plex Mono, monospace" font-size="14" fill="var(--w88, #fff)">Image manifest</text>
+  <text x="48" y="151" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--w45, #aab4c3)">owner · upstream · tests</text>
+  <path d="M208 126 H262" stroke="var(--w42, #aab4c3)" marker-end="url(#imageArrow)"></path>
+  <rect x="270" y="62" width="180" height="128" rx="7" fill="var(--bg, #0b1220)" stroke="var(--ab4, #60a5fa)"></rect>
+  <text x="290" y="87" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">02 · BUILD</text>
+  <text x="290" y="114" font-family="IBM Plex Mono, monospace" font-size="14" fill="var(--w88, #fff)">Parallel targets</text>
+  <rect x="290" y="132" width="140" height="21" rx="3" fill="var(--bg, #0b1220)" stroke="var(--w42, #aab4c3)"></rect>
+  <text x="360" y="147" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--w45, #aab4c3)">linux / amd64</text>
+  <rect x="290" y="159" width="140" height="21" rx="3" fill="var(--bg, #0b1220)" stroke="var(--w42, #aab4c3)"></rect>
+  <text x="360" y="174" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="var(--w45, #aab4c3)">linux / arm64</text>
+  <path d="M450 126 H504" stroke="var(--w42, #aab4c3)" marker-end="url(#imageArrow)"></path>
+  <rect x="512" y="76" width="180" height="100" rx="7" fill="var(--bg, #0b1220)" stroke="var(--ab4, #60a5fa)"></rect>
+  <text x="532" y="101" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">03 · TEST</text>
+  <text x="532" y="128" font-family="IBM Plex Mono, monospace" font-size="14" fill="var(--w88, #fff)">Build + package</text>
+  <text x="532" y="151" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--w45, #aab4c3)">both platforms must pass</text>
+  <path d="M602 176 V252" stroke="var(--w42, #aab4c3)" marker-end="url(#imageArrow)"></path>
+  <rect x="512" y="260" width="180" height="100" rx="7" fill="var(--bg, #0b1220)" stroke="var(--ab4, #60a5fa)"></rect>
+  <text x="532" y="285" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">04 · PUBLISH</text>
+  <text x="532" y="312" font-family="IBM Plex Mono, monospace" font-size="14" fill="var(--w88, #fff)">Immutable version</text>
+  <text x="532" y="335" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--w45, #aab4c3)">write once to registry</text>
+  <path d="M512 310 H458" stroke="var(--w42, #aab4c3)" marker-end="url(#imageArrow)"></path>
+  <rect x="270" y="260" width="180" height="100" rx="7" fill="var(--bg, #0b1220)" stroke="var(--ab4, #60a5fa)"></rect>
+  <text x="290" y="285" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">05 · VERIFY</text>
+  <text x="290" y="312" font-family="IBM Plex Mono, monospace" font-size="14" fill="var(--w88, #fff)">Registry read-back</text>
+  <text x="290" y="335" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--w45, #aab4c3)">published = tested digest</text>
+  <path d="M270 310 H216" stroke="var(--ab4, #60a5fa)" marker-end="url(#imageArrowAccent)"></path>
+  <rect x="28" y="260" width="180" height="100" rx="7" fill="var(--bg, #0b1220)" stroke="var(--ab4, #60a5fa)" stroke-width="2"></rect>
+  <text x="48" y="285" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">ACCEPTED</text>
+  <text x="48" y="312" font-family="IBM Plex Mono, monospace" font-size="14" fill="var(--w88, #fff)">Verified release</text>
+  <text x="48" y="335" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="var(--w45, #aab4c3)">trusted name · known bytes</text>
+  <rect x="270" y="404" width="180" height="72" rx="7" fill="var(--bg, #0b1220)" stroke="var(--w42, #aab4c3)"></rect>
+  <text x="290" y="429" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.1em" fill="var(--ab4, #60a5fa)">UPSTREAM UPDATE</text>
+  <text x="290" y="454" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--w45, #aab4c3)">bot changes the manifest</text>
+  <path d="M270 440 H12 V126 H20" stroke="var(--ab4, #60a5fa)" fill="none" marker-end="url(#imageArrowAccent)"></path>
+  <rect x="492" y="404" width="200" height="72" rx="7" fill="var(--bg, #0b1220)" stroke="var(--w42, #aab4c3)" stroke-dasharray="4 4"></rect>
+  <text x="512" y="427" font-family="IBM Plex Mono, monospace" font-size="11" letter-spacing="0.08em" fill="var(--w45, #aab4c3)">RESTART SEMANTICS</text>
+  <text x="512" y="448" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--w45, #aab4c3)">build failure → new run</text>
+  <text x="512" y="466" font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--w45, #aab4c3)">publish retry → reuse digests</text>
+</svg>
+</div>
+<figcaption class="exhibit-caption"><span>EXHIBIT</span> — The release is accepted only when the registry digest matches the artifact that passed both architecture builds and their tests.</figcaption>
+</figure>
 <blockquote>
 <p>The scariest failure in image publishing isn't a build that breaks — it's a wrong image quietly landing under a trusted name.</p>
 </blockquote>
-<p>So the publisher is deliberately paranoid: published versions can never be overwritten, every upload is read back and compared against what was actually built, and a failed pipeline retries without rebuilding anything, so a retry can never produce a different artifact than the one that was tested. The principle: a missing image is an inconvenience; a wrong image is a disaster — every design choice guards against the disaster.</p>
+<p>So the publisher is deliberately paranoid: published versions can never be overwritten, and every upload is read back and compared against what was actually built. A transient failure during publishing can restart from the planned state and reuse existing digest artifacts without rebuilding; a failed platform build requires a new workflow run. The principle: a missing image is an inconvenience; a wrong image is a disaster — every design choice guards against the disaster.</p>
 <h2>THE INTERESTING PART</h2>
 <p>The factory got boring in the best way: images became data, not scripts; ARM became a default instead of a special project; and the update bot became the front door to the whole supply chain.</p>
 <h2>WHAT IT CHANGED</h2>
-<p>Security patching became a routine automated flow. &quot;Where did this image come from?&quot; stopped being a research project. ARM support by default opened the door to meaningfully cheaper compute. Built from zero to production in under a month — possible only because pull-request automation, releases, runners, and hooks already existed.</p>
+<p>Security patching became a routine automated flow. &quot;Where did this image come from?&quot; stopped being a research project. ARM support by default opened the door to meaningfully cheaper compute. Built from zero to production in under a month — possible only because pull request automation, releases, runners, and hooks already existed.</p>
 </article>
   <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
     <a href="/case-studies/18-the-fork-that-needed-a-home/" data-study-direction="previous">
@@ -107,10 +175,10 @@
       <span class="case-detail-adjacent-number">Case 18</span>
       <span class="case-detail-adjacent-title">The fork that needed a home</span>
     </a>
-    <a href="/case-studies/20-making-the-companys-source-code-survivable/" data-study-direction="next">
+    <a href="/case-studies/21-customer-code-running-safely-self-service-cloud-functions/" data-study-direction="next">
       <span class="case-detail-adjacent-kicker">Next</span>
-      <span class="case-detail-adjacent-number">Case 20</span>
-      <span class="case-detail-adjacent-title">Making the company&#39;s source code survivable</span>
+      <span class="case-detail-adjacent-number">Case 21</span>
+      <span class="case-detail-adjacent-title">Customer code, running safely: self-service cloud functions</span>
     </a>
   </nav>
   <nav class="case-detail-footer" aria-label="Portfolio navigation">
@@ -136,14 +204,10 @@
           linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
         </a>
       
-        <a href="mailto:ponomarov.aleksandr@gmail.com">
-          ponomarov.aleksandr@gmail.com
-        </a>
-      
     </div>
   </div>
 </footer>
 
-    <script type="module" src="/assets/js/site.js?v=ebf54ac20f81"></script>
+    <script type="module" src="/assets/js/site.js?v=ed34e0622789"></script>
   </body>
 </html>

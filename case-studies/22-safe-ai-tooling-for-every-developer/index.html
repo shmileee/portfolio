@@ -9,16 +9,16 @@
     
     
     <title>Safe AI tooling for every developer — Oleksandr Ponomarov</title>
-    <meta name="description" content="Nothing new to leak, nothing to rotate, one governed door instead of a hundred hand-made ones.">
+    <meta name="description" content="Existing AWS identity and restricted backends provide one governed path from AI clients to operational tools.">
     <link rel="canonical" href="https://portfolio.oponomarov.com/case-studies/22-safe-ai-tooling-for-every-developer/">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230B1220'/><text x='6' y='44' font-family='monospace' font-size='24' fill='%2393c5fd'>~/op</text></svg>">
     <meta property="og:title" content="Safe AI tooling for every developer — Oleksandr Ponomarov">
-    <meta property="og:description" content="Nothing new to leak, nothing to rotate, one governed door instead of a hundred hand-made ones.">
+    <meta property="og:description" content="Existing AWS identity and restricted backends provide one governed path from AI clients to operational tools.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/22-safe-ai-tooling-for-every-developer/">
     <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/assets/css/site.css?v=ebf54ac20f81">
+    <link rel="stylesheet" href="/assets/css/site.css?v=ed34e0622789">
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -42,12 +42,15 @@
 </header>
 
     
+
 <main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 22 · featured</p>
     <h1>Safe AI tooling for every developer</h1>
-    <p class="case-detail-summary">Nothing new to leak, nothing to rotate, one governed door instead of a hundred hand-made ones.</p>
+    
+      <p class="case-detail-summary">Existing AWS identity and restricted backends provide one governed path from AI clients to operational tools.</p>
+    
     <div class="topic-list" aria-label="Topics">
       <span>ai</span><span>security</span><span>developer experience</span>
     </div>
@@ -70,18 +73,18 @@
   </div>
   <pre class="language-jsonc"><code class="language-jsonc">{
   "mcp": {
-    "sre-mcp-dev": {
+    "platform-tools-dev": {
       "type": "local",
       "command": [
         "uvx", "mcp-proxy-for-aws",
-        "https://sre.mcp.dev.<internal-domain>/mcp",
+        "https://gateway.dev.example.com/mcp",
         "--service", "execute-api",
         "--region", "eu-west-1",
-        "--profile", "dev"
+        "--profile", "development"
       ]
     }
   }
-}</internal-domain></code></pre>
+}</code></pre>
 
 </div><p>Same pattern for staging, operations, and production — only the URL and profile change. Rolled out to all four environments; our repositories now instruct AI agents to prefer the gateway over raw command-line access.</p>
 <blockquote>
@@ -91,7 +94,7 @@
 <h2>THE INTERESTING PART</h2>
 <p>The whole design is one stable door, many safe backends. The hard part wasn't just making the proxy work; it was making the security model obvious enough that the repository itself can tell developers how to use it.</p>
 <h2>WHAT IT CHANGED</h2>
-<p>The company got AI-assistant access to production tooling that is safe by default: nothing new to leak, nothing to rotate, one governed door instead of a hundred hand-made ones. Every developer has it; the security team can sleep.</p>
+<p>Developers gained one governed path from AI assistants to operational tooling, using existing identity and backend restrictions instead of per-tool credentials on each laptop.</p>
 </article>
   <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
     <a href="/case-studies/21-customer-code-running-safely-self-service-cloud-functions/" data-study-direction="previous">
@@ -128,14 +131,10 @@
           linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
         </a>
       
-        <a href="mailto:ponomarov.aleksandr@gmail.com">
-          ponomarov.aleksandr@gmail.com
-        </a>
-      
     </div>
   </div>
 </footer>
 
-    <script type="module" src="/assets/js/site.js?v=ebf54ac20f81"></script>
+    <script type="module" src="/assets/js/site.js?v=ed34e0622789"></script>
   </body>
 </html>

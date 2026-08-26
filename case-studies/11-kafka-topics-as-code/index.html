@@ -8,17 +8,17 @@
     </script>
     
     
-    <title>Kafka topics as code: 550 topics, zero surprises — Oleksandr Ponomarov</title>
+    <title>Kafka topics as code: adopting 550 live topics — Oleksandr Ponomarov</title>
     <meta name="description" content="Topic changes became pull requests with named owners, review, and history.">
     <link rel="canonical" href="https://portfolio.oponomarov.com/case-studies/11-kafka-topics-as-code/">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230B1220'/><text x='6' y='44' font-family='monospace' font-size='24' fill='%2393c5fd'>~/op</text></svg>">
-    <meta property="og:title" content="Kafka topics as code: 550 topics, zero surprises — Oleksandr Ponomarov">
+    <meta property="og:title" content="Kafka topics as code: adopting 550 live topics — Oleksandr Ponomarov">
     <meta property="og:description" content="Topic changes became pull requests with named owners, review, and history.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/11-kafka-topics-as-code/">
     <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/assets/css/site.css?v=ebf54ac20f81">
+    <link rel="stylesheet" href="/assets/css/site.css?v=ed34e0622789">
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -42,19 +42,22 @@
 </header>
 
     
+
 <main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 11</p>
-    <h1>Kafka topics as code: 550 topics, zero surprises</h1>
-    <p class="case-detail-summary">Topic changes became pull requests with named owners, review, and history.</p>
+    <h1>Kafka topics as code: adopting 550 live topics</h1>
+    
+      <p class="case-detail-summary">Topic changes became pull requests with named owners, review, and history.</p>
+    
     <div class="topic-list" aria-label="Topics">
       <span>reliability</span><span>delivery</span>
     </div>
   </header>
   <article class="prose case-detail-prose"><h2>The situation</h2>
 <p>Our Kafka topics — hundreds of them, across clusters and environments — were managed the way most companies manage them: someone shells into a broker pod and runs the topic tool by hand, and a markdown runbook full of copy-paste commands pretends to be the source of truth.</p>
-<p>Nobody could say with confidence what existed, who owned what, or whether the doc matched reality.</p>
+<p>The runbook could not establish what existed, who owned each topic, or where documentation and live state had diverged.</p>
 <h2>What I did</h2>
 <p>I moved every topic into git as a Kubernetes resource (Strimzi's KafkaTopic), managed by the same GitOps pipeline as everything else. Each topic is now one small reviewable file:</p>
 <div class="code-exhibit" data-exhibit="">
@@ -84,10 +87,10 @@
 <p>Production became the baseline: topics that exist everywhere became shared definitions; per-environment extras got their own folders; and where the same topic differed between environments, the generator emitted a minimal override patch containing only the differing fields.</p>
 <p>It also cleaned as it went — stripping settings that merely repeated broker defaults, resolving each topic's owning team from our service catalog — and, my favorite part, it wrote a discrepancy report: a folder of everything the documentation claimed that reality disagreed with, and vice versa. The audit of doc-vs-truth fell out of the migration for free.</p>
 <h2>The interesting part</h2>
-<p>Adopting ~550 live topics without touching production data. The generated definitions matched live state exactly, so the topic operator's first pass had nothing to change — adoption, not recreation.</p>
+<p>Adopting roughly 550 live topics without touching production data. The generated definitions matched live state, so the topic operator's first pass was adoption rather than recreation.</p>
 <p>Auto-deployment was turned on in its most conservative form: apply changes, never delete anything. And the door I closed behind me: admission policies (<a href="/case-studies/10-kyverno-at-the-cluster-door/">case study 10</a>) now reject replica changes outright, allow partition counts only to grow (Kafka cannot shrink them safely), and nobody can shell into a broker pod anymore — the manual workflow isn't just deprecated, it's impossible.</p>
 <h2>What it changed</h2>
-<p>Topic changes became pull requests with named owners, review, and history. The runbook retired. And &quot;what topics do we have?&quot; went from an investigation to <code>ls</code>.</p>
+<p>Topic changes became pull requests with named owners, review, and history. The runbook retired, and the generated files became the queryable inventory.</p>
 </article>
   <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
     <a href="/case-studies/10-kyverno-at-the-cluster-door/" data-study-direction="previous">
@@ -124,14 +127,10 @@
           linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
         </a>
       
-        <a href="mailto:ponomarov.aleksandr@gmail.com">
-          ponomarov.aleksandr@gmail.com
-        </a>
-      
     </div>
   </div>
 </footer>
 
-    <script type="module" src="/assets/js/site.js?v=ebf54ac20f81"></script>
+    <script type="module" src="/assets/js/site.js?v=ed34e0622789"></script>
   </body>
 </html>

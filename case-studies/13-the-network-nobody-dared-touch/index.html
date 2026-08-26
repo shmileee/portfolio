@@ -9,16 +9,16 @@
     
     
     <title>The network nobody dared touch — Oleksandr Ponomarov</title>
-    <meta name="description" content="The scariest stack in the company became just another stack.">
+    <meta name="description" content="A list-indexed route mesh became stable resources and one reviewable network policy.">
     <link rel="canonical" href="https://portfolio.oponomarov.com/case-studies/13-the-network-nobody-dared-touch/">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230B1220'/><text x='6' y='44' font-family='monospace' font-size='24' fill='%2393c5fd'>~/op</text></svg>">
     <meta property="og:title" content="The network nobody dared touch — Oleksandr Ponomarov">
-    <meta property="og:description" content="The scariest stack in the company became just another stack.">
+    <meta property="og:description" content="A list-indexed route mesh became stable resources and one reviewable network policy.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/13-the-network-nobody-dared-touch/">
     <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/assets/css/site.css?v=ebf54ac20f81">
+    <link rel="stylesheet" href="/assets/css/site.css?v=ed34e0622789">
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -42,23 +42,34 @@
 </header>
 
     
+
 <main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 13 · featured</p>
     <h1>The network nobody dared touch</h1>
-    <p class="case-detail-summary">The scariest stack in the company became just another stack.</p>
+    
+      
+  
+    <dl class="case-proof case-detail-proof" data-case-proof="">
+      <div><dt>Impact</dt><dd>A list-indexed route mesh became stable resources and one reviewable network policy.</dd></div>
+      <div><dt>My role</dt><dd>Rebuilt the route model and led the no-change migration and Cloud WAN architecture.</dd></div>
+      <div><dt>Evidence</dt><dd>Stable route identities, a quarantine segment, and one policy document replaced about fifteen module copies.</dd></div>
+    </dl>
+  
+
+    
     <div class="topic-list" aria-label="Topics">
       <span>networking</span><span>reliability</span>
     </div>
   </header>
   <article class="prose case-detail-prose"><h2>The situation</h2>
-<p>All our AWS networks were interconnected through a transit-gateway setup built from about fifteen copies of a community module. It had a landmine inside: routes were tracked by position in a list, so adding a single network range made the plan want to destroy and recreate production routes en masse. Everyone was afraid to touch it, so nobody did — for years.</p>
+<p>All our AWS networks were interconnected through a transit-gateway setup built from about fifteen copies of a community module. Routes were tracked by position in a list, so adding one network range made the plan propose destroying and recreating production routes. The resulting blast radius kept the stack effectively frozen for years.</p>
 <p>And the fear was structural, not personal: with a transit gateway, all the wiring is yours — a route table per attachment, hand-managed propagation, and no concept of &quot;environment&quot; beyond the discipline of whoever edits the routes.</p>
 <h2>What I did</h2>
 <p>Two moves — first make it safe, then make it better.</p>
 <p>Make it safe: I replaced the module maze with plain, explicit resources where every route has a stable identity — changing one range now touches exactly one route.</p>
-<p>The migration itself was the delicate part: live production routing had to move to new code with zero changes applied. I generated a thirteen-hundred-line state-migration file mapping every old resource to its new address, opened a deliberately-unmergeable demo pull request to prove the plan was a no-op, wrote a rollback runbook, landed it, and deleted the scaffolding.</p>
+<p>The migration itself was the delicate part: live production routing had to move to new code with no infrastructure changes applied. I generated an explicit state map from every old resource to its new address, opened a deliberately unmergeable demonstration pull request to prove the plan was a no-op, wrote a rollback runbook, landed it, and deleted the scaffolding.</p>
 <p>Make it better: I designed and drove our move to AWS Cloud WAN — effectively the managed evolution of the transit gateway, and better in exactly the ways that had hurt us:</p>
 <ul>
 <li>
@@ -75,9 +86,9 @@
 </li>
 </ul>
 <h2>The interesting part</h2>
-<p>Two days after the refactor landed, the bot proposed a major version bump on that very stack — and it merged the same day. The scariest stack in the company became just another stack. And a colleague who had never dared touch the network shipped his own changes to it the following week.</p>
+<p>After the refactor, dependency updates and colleague-authored network changes could use the same plan-and-review path as the rest of the infrastructure estate.</p>
 <h2>What it changed</h2>
-<p>Network changes stopped being feared, prod and non-prod gained real separation, and — the part that mattered most for what came next — new environments can now join the network programmatically.</p>
+<p>Network changes became reviewable at resource and policy level, production and non-production gained explicit separation, and new environments can join the network programmatically.</p>
 </article>
   <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
     <a href="/case-studies/12-the-fleet-that-patches-itself/" data-study-direction="previous">
@@ -114,14 +125,10 @@
           linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
         </a>
       
-        <a href="mailto:ponomarov.aleksandr@gmail.com">
-          ponomarov.aleksandr@gmail.com
-        </a>
-      
     </div>
   </div>
 </footer>
 
-    <script type="module" src="/assets/js/site.js?v=ebf54ac20f81"></script>
+    <script type="module" src="/assets/js/site.js?v=ed34e0622789"></script>
   </body>
 </html>

@@ -9,16 +9,16 @@
     
     
     <title>Customer code, running safely: self-service cloud functions — Oleksandr Ponomarov</title>
-    <meta name="description" content="From upload to a running, isolated, observable function with zero human involvement.">
+    <meta name="description" content="Uploaded customer code becomes an isolated, observable function without per-function platform intervention.">
     <link rel="canonical" href="https://portfolio.oponomarov.com/case-studies/21-customer-code-running-safely-self-service-cloud-functions/">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%230B1220'/><text x='6' y='44' font-family='monospace' font-size='24' fill='%2393c5fd'>~/op</text></svg>">
     <meta property="og:title" content="Customer code, running safely: self-service cloud functions — Oleksandr Ponomarov">
-    <meta property="og:description" content="From upload to a running, isolated, observable function with zero human involvement.">
+    <meta property="og:description" content="Uploaded customer code becomes an isolated, observable function without per-function platform intervention.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/21-customer-code-running-safely-self-service-cloud-functions/">
     <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/assets/css/site.css?v=ebf54ac20f81">
+    <link rel="stylesheet" href="/assets/css/site.css?v=ed34e0622789">
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -42,12 +42,15 @@
 </header>
 
     
+
 <main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 21</p>
     <h1>Customer code, running safely: self-service cloud functions</h1>
-    <p class="case-detail-summary">From upload to a running, isolated, observable function with zero human involvement.</p>
+    
+      <p class="case-detail-summary">Uploaded customer code becomes an isolated, observable function without per-function platform intervention.</p>
+    
     <div class="topic-list" aria-label="Topics">
       <span>security</span><span>delivery</span>
     </div>
@@ -83,13 +86,13 @@
 </div>
 <p>The self-service needed a fence: the only identity allowed to create function objects is the SDK service itself. And the unglamorous correctness work mattered too — cleaning up cloud resources when a function object is deleted half-way, and making Crossplane's dynamically-spawned machinery carry proper team-ownership labels so it shows up in our monitoring like everything else. (Accepted trade-offs, documented in the decision record: Lambda's 15-minute execution cap, and cold starts mitigated — not eliminated — by container packaging.)</p>
 <h2>WHAT IT CHANGED</h2>
-<p>Customer extension code goes from upload to a running, isolated, observable function with zero human involvement — a genuine product capability, built as a platform.</p>
+<p>Customer extension code goes from upload to a running, isolated, observable function without a platform engineer provisioning each function by hand.</p>
 </article>
   <nav class="case-detail-adjacent" aria-label="Adjacent case studies">
-    <a href="/case-studies/20-making-the-companys-source-code-survivable/" data-study-direction="previous">
+    <a href="/case-studies/19-turning-container-images-from-a-liability-into-a-supply-chain/" data-study-direction="previous">
       <span class="case-detail-adjacent-kicker">Previous</span>
-      <span class="case-detail-adjacent-number">Case 20</span>
-      <span class="case-detail-adjacent-title">Making the company&#39;s source code survivable</span>
+      <span class="case-detail-adjacent-number">Case 19</span>
+      <span class="case-detail-adjacent-title">Turning container images from a liability into a supply chain</span>
     </a>
     <a href="/case-studies/22-safe-ai-tooling-for-every-developer/" data-study-direction="next">
       <span class="case-detail-adjacent-kicker">Next</span>
@@ -120,14 +123,10 @@
           linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
         </a>
       
-        <a href="mailto:ponomarov.aleksandr@gmail.com">
-          ponomarov.aleksandr@gmail.com
-        </a>
-      
     </div>
   </div>
 </footer>
 
-    <script type="module" src="/assets/js/site.js?v=ebf54ac20f81"></script>
+    <script type="module" src="/assets/js/site.js?v=ed34e0622789"></script>
   </body>
 </html>

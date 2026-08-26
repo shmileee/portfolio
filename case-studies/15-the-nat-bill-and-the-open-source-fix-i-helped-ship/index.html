@@ -18,7 +18,7 @@
     <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/15-the-nat-bill-and-the-open-source-fix-i-helped-ship/">
     <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/assets/css/site.css?v=ebf54ac20f81">
+    <link rel="stylesheet" href="/assets/css/site.css?v=ed34e0622789">
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -42,12 +42,15 @@
 </header>
 
     
+
 <main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 15</p>
     <h1>The NAT bill, and the open-source fix I helped ship</h1>
-    <p class="case-detail-summary">The per-gigabyte NAT tax is gone from the default path.</p>
+    
+      <p class="case-detail-summary">The per-gigabyte NAT tax is gone from the default path.</p>
+    
     <div class="topic-list" aria-label="Topics">
       <span>cost</span><span>networking</span>
     </div>
@@ -58,7 +61,7 @@
 <p>I adopted AlterNAT — an open-source project that replaces managed NAT gateways with auto-scaled EC2 NAT instances, while keeping a standby managed gateway as a safety net: a small function checks connectivity every minute and flips the route tables to the managed gateway if an instance ever fails, then back when it recovers. Cheap path by default, expensive path as insurance.</p>
 <p>I ran it first in our main VPCs, then designed it into the cell architecture (<a href="/case-studies/14-environments-you-can-create-and-destroy-with-one-command/">case study 14</a>) as a per-environment toggle — on ARM instances, naturally (<a href="/case-studies/19-turning-container-images-from-a-liability-into-a-supply-chain/">case study 19</a> made that free). A later overhaul pre-allocates all the public IPs with the VPC — the NAT instances' and the standby gateways' — so flipping the toggle never changes the addresses the outside world has allowlisted.</p>
 <h2>The interesting part</h2>
-<p>I didn't just consume the project — I contributed the deployment model we needed upstream. Early AlterNAT required building and hosting a container image for its failover function; in shared automation (CI, pull-request-driven Terraform) that's a build dependency nobody wants.</p>
+<p>I didn't just consume the project — I contributed the deployment model we needed upstream. Early AlterNAT required building and hosting a container image for its failover function; in shared automation (CI, pull request driven Terraform) that's a build dependency nobody wants.</p>
 <p>My merged upstream pull requests added the native Zip deployment path (<a href="https://github.com/chime/terraform-aws-alternat/pull/44">chime/terraform-aws-alternat#44 ↗</a>) — package the function for the standard runtime, no image registry involved — and then removed the last third-party dependency from the function so it runs on the standard library alone (<a href="https://github.com/chime/terraform-aws-alternat/pull/52">#52 ↗</a>). Production at our company runs on exactly the code path I upstreamed; four more filed issues fed the maintainers' roadmap.</p>
 <h2>What it changed</h2>
 <p>The per-gigabyte NAT tax is gone from the default path, failover to the managed gateway is automatic and tested every minute, and — the part I value most — the fix lives upstream where everyone gets it, instead of in a private fork only we maintain.</p>
@@ -98,14 +101,10 @@
           linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
         </a>
       
-        <a href="mailto:ponomarov.aleksandr@gmail.com">
-          ponomarov.aleksandr@gmail.com
-        </a>
-      
     </div>
   </div>
 </footer>
 
-    <script type="module" src="/assets/js/site.js?v=ebf54ac20f81"></script>
+    <script type="module" src="/assets/js/site.js?v=ed34e0622789"></script>
   </body>
 </html>

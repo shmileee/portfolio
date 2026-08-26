@@ -18,7 +18,7 @@
     <meta property="og:url" content="https://portfolio.oponomarov.com/case-studies/05-one-tool-version-everywhere/">
     <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/assets/css/site.css?v=ebf54ac20f81">
+    <link rel="stylesheet" href="/assets/css/site.css?v=ed34e0622789">
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -42,12 +42,15 @@
 </header>
 
     
+
 <main class="case-detail" id="main-content" tabindex="-1">
   <header class="case-detail-header">
     <a class="back-link" href="/#index">← all case studies</a>
     <p class="section-eyebrow">Case study 05</p>
     <h1>One tool version, everywhere: from decision record to a centrally cached CI</h1>
-    <p class="case-detail-summary">Version drift — between two laptops, or between a laptop and CI — stopped being a category of bug.</p>
+    
+      <p class="case-detail-summary">Version drift — between two laptops, or between a laptop and CI — stopped being a category of bug.</p>
+    
     <div class="topic-list" aria-label="Topics">
       <span>developer experience</span><span>delivery</span>
     </div>
@@ -84,7 +87,7 @@ It solved the consistency problem, but over two years the cracks showed: every c
 The same file drives CI: I rebuilt our centralized pre-commit workflow — one reusable GitHub Actions workflow that every repository calls instead of maintaining its own — to run inside a maintained <code>mise</code> container image and install from the very same pins. Local and CI can no longer disagree, and a fix to the workflow lands in every repository at once.</p>
 <h2>THE INTERESTING PART</h2>
 <p>The caching. Fast CI dies on cache mistakes, and each one taught a lesson that's now written into the workflow itself.
-Restoring the big tool archive can cost more than a fresh install — so tool caching is a per-repository toggle with that exact warning in its description. Cache uploads were dominating pull-request runs — so pull requests only restore the cache and only the main branch saves it. On our in-cluster runners the cache moved to the node's local disk — but the tool manager keeps one global directory, and a shared one leaks tools between repositories, so each repository gets its own isolated subdirectory. And pull requests from forks are excluded from writing entirely: untrusted code must never poison a shared cache.</p>
+Restoring the big tool archive can cost more than a fresh install — so tool caching is a per-repository toggle with that exact warning in its description. Cache uploads were dominating pull request runs — so pull requests only restore the cache and only the main branch saves it. On our in-cluster runners the cache moved to the node's local disk — but the tool manager keeps one global directory, and a shared one leaks tools between repositories, so each repository gets its own isolated subdirectory. And pull requests from forks are excluded from writing entirely: untrusted code must never poison a shared cache.</p>
 <h2>WHAT IT CHANGED</h2>
 <p>Setup went from a wiki page to one command. Version drift — between two laptops, or between a laptop and CI — stopped being a category of bug. And because the workflow is centralized, the whole company's checks get faster every time one person improves one file. It also set a precedent I'm fond of: standards have lifecycles — the person who introduces one should be willing to replace it, in writing, when something better exists.</p>
 <p>PREQUEL ← <a href="/case-studies/04-a-feedback-loop-measured-in-milliseconds/">case study 4 — a feedback loop measured in milliseconds</a></p>
@@ -124,14 +127,10 @@ Restoring the big tool archive can cost more than a fresh install — so tool ca
           linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
         </a>
       
-        <a href="mailto:ponomarov.aleksandr@gmail.com">
-          ponomarov.aleksandr@gmail.com
-        </a>
-      
     </div>
   </div>
 </footer>
 
-    <script type="module" src="/assets/js/site.js?v=ebf54ac20f81"></script>
+    <script type="module" src="/assets/js/site.js?v=ed34e0622789"></script>
   </body>
 </html>

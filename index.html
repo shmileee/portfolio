@@ -18,7 +18,7 @@
     <meta property="og:url" content="https://portfolio.oponomarov.com/">
     <meta property="og:image" content="https://portfolio.oponomarov.com/assets/og-image.png">
     <meta name="twitter:card" content="summary_large_image">
-    <link rel="stylesheet" href="/assets/css/site.css?v=ebf54ac20f81">
+    <link rel="stylesheet" href="/assets/css/site.css?v=ed34e0622789">
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -181,9 +181,6 @@
                   <a href="/case-studies/19-turning-container-images-from-a-liability-into-a-supply-chain/" data-open-study="19" data-arc-study="19">19 · container images</a>
                 
                   
-                  <a href="/case-studies/20-making-the-companys-source-code-survivable/" data-open-study="20" data-arc-study="20">20 · source code</a>
-                
-                  
                   <a href="/case-studies/21-customer-code-running-safely-self-service-cloud-functions/" data-open-study="21" data-arc-study="21">21 · cloud functions</a>
                 
                   
@@ -209,9 +206,17 @@
         <header class="spotlight-header">
           <p class="reader-meta">Case study 14 · spotlight</p>
           <h3>Environments you can create and destroy with one command</h3>
+          
+  
+    <dl class="case-proof spotlight-proof" data-case-proof="">
+      <div><dt>Impact</dt><dd>Entering a new region became an infrastructure change, not an infrastructure project.</dd></div>
+      <div><dt>My role</dt><dd>Led the architecture and implementation of the cell platform and its fail-closed teardown provider.</dd></div>
+      <div><dt>Evidence</dt><dd>One stack provisions the VPC, EKS, GitOps bridge, and network attachment; teardown verifies six ordered phases.</dd></div>
+    </dl>
+  
+
           <div class="section-intro">
-            <p>Entering a new region became an infrastructure change, not an infrastructure project.</p>
-            <p>Environments became genuinely independent — a problem in one cannot spread to the others — their costs actually end when they are deleted, and entering a new region became an infrastructure change, not an infrastructure project.</p>
+            <p>Each cell contains its own failure domain, joins the network by policy, and verifies teardown before infrastructure state can disappear.</p>
           </div>
           <div class="topic-list" aria-label="Topics">
             <span>reliability</span><span>cost</span><span>delivery</span>
@@ -257,7 +262,17 @@
       12 · featured
     </span>
     <span class="case-card-title">The fleet that patches itself (while engineers are watching)</span>
-    <span class="case-card-summary">A vendor announces a fix; the fleet is rotating onto it within hours.</span>
+    
+      
+  
+    <dl class="case-proof case-card-proof" data-case-proof="">
+      <div><dt>Impact</dt><dd>A vendor announces a fix; the fleet is rotating onto it within hours.</dd></div>
+      <div><dt>My role</dt><dd>Wrote the architecture and rotation policy; co-built the event-driven image pipeline with two teammates.</dd></div>
+      <div><dt>Evidence</dt><dd>07:00–20:00 weekday coverage, an 18:00 rotation cutoff, and pool-specific disruption budgets.</dd></div>
+    </dl>
+  
+
+    
     <span class="case-card-topics">security · reliability</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -271,7 +286,17 @@
       13 · featured
     </span>
     <span class="case-card-title">The network nobody dared touch</span>
-    <span class="case-card-summary">The scariest stack in the company became just another stack.</span>
+    
+      
+  
+    <dl class="case-proof case-card-proof" data-case-proof="">
+      <div><dt>Impact</dt><dd>A list-indexed route mesh became stable resources and one reviewable network policy.</dd></div>
+      <div><dt>My role</dt><dd>Rebuilt the route model and led the no-change migration and Cloud WAN architecture.</dd></div>
+      <div><dt>Evidence</dt><dd>Stable route identities, a quarantine segment, and one policy document replaced about fifteen module copies.</dd></div>
+    </dl>
+  
+
+    
     <span class="case-card-topics">networking · reliability</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -285,7 +310,17 @@
       14 · featured
     </span>
     <span class="case-card-title">Environments you can create and destroy with one command</span>
-    <span class="case-card-summary">Entering a new region became an infrastructure change, not an infrastructure project.</span>
+    
+      
+  
+    <dl class="case-proof case-card-proof" data-case-proof="">
+      <div><dt>Impact</dt><dd>Entering a new region became an infrastructure change, not an infrastructure project.</dd></div>
+      <div><dt>My role</dt><dd>Led the architecture and implementation of the cell platform and its fail-closed teardown provider.</dd></div>
+      <div><dt>Evidence</dt><dd>One stack provisions the VPC, EKS, GitOps bridge, and network attachment; teardown verifies six ordered phases.</dd></div>
+    </dl>
+  
+
+    
     <span class="case-card-topics">reliability · cost · delivery</span>
     <span class="case-card-action">full story ↑</span>
   </a>
@@ -299,22 +334,18 @@
       19 · featured
     </span>
     <span class="case-card-title">Turning container images from a liability into a supply chain</span>
-    <span class="case-card-summary">A missing image is an inconvenience; a wrong image is a disaster.</span>
-    <span class="case-card-topics">security · cost · delivery</span>
-    <span class="case-card-action">read →</span>
-  </a>
+    
+      
+  
+    <dl class="case-proof case-card-proof" data-case-proof="">
+      <div><dt>Impact</dt><dd>A missing image is an inconvenience; a wrong image is a disaster.</dd></div>
+      <div><dt>My role</dt><dd>Designed and built the image factory, then turned the migration into a playbook teammates could run.</dd></div>
+      <div><dt>Evidence</dt><dd>48 images migrated in four days; 35 releases in 20 days; 864 tests protected the publishing contract.</dd></div>
+    </dl>
+  
 
-        
-          
-  
-  
-  <a class="case-card case-card-featured" href="/case-studies/20-making-the-companys-source-code-survivable/" data-case-card="" data-open-study="20" data-topics="security|reliability" data-initially-hidden="false">
-    <span class="case-card-number">
-      20 · featured
-    </span>
-    <span class="case-card-title">Making the company&#39;s source code survivable</span>
-    <span class="case-card-summary">Destroying the company’s code and its backups would now require compromising two unrelated systems at once.</span>
-    <span class="case-card-topics">security · reliability</span>
+    
+    <span class="case-card-topics">security · cost · delivery</span>
     <span class="case-card-action">read →</span>
   </a>
 
@@ -327,7 +358,9 @@
       22 · featured
     </span>
     <span class="case-card-title">Safe AI tooling for every developer</span>
-    <span class="case-card-summary">Nothing new to leak, nothing to rotate, one governed door instead of a hundred hand-made ones.</span>
+    
+      <span class="case-card-summary">Existing AWS identity and restricted backends provide one governed path from AI clients to operational tools.</span>
+    
     <span class="case-card-topics">ai · security · developer experience</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -341,7 +374,17 @@
       23 · featured
     </span>
     <span class="case-card-title">A codebase whose newest users are AI agents</span>
-    <span class="case-card-summary">Every merge still crosses the same gates as human work.</span>
+    
+      
+  
+    <dl class="case-proof case-card-proof" data-case-proof="">
+      <div><dt>Impact</dt><dd>Every merge still crosses the same gates as human work.</dd></div>
+      <div><dt>My role</dt><dd>Defined repository guidance, safe-tool defaults, supervised skills, and merge controls for agent-assisted work.</dd></div>
+      <div><dt>Evidence</dt><dd>Repository-local maps and playbooks route every change through the same plans, diffs, CI, and human merge gate.</dd></div>
+    </dl>
+  
+
+    
     <span class="case-card-topics">ai · developer experience · security</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -355,7 +398,9 @@
       01
     </span>
     <span class="case-card-title">Making infrastructure changes boring</span>
-    <span class="case-card-summary">Infrastructure went from tribal knowledge to a reviewable, reversible, self-documenting system.</span>
+    
+      <span class="case-card-summary">Pull-request plans and Kubernetes diffs made infrastructure changes visible before automated deployment.</span>
+    
     <span class="case-card-topics">delivery · developer experience · reliability</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -369,7 +414,9 @@
       02
     </span>
     <span class="case-card-title">/approve: the audited escape hatch</span>
-    <span class="case-card-summary">Speed and control stopped being a trade-off.</span>
+    
+      <span class="case-card-summary">An authorized reviewer can unblock an urgent `terraform apply` in Atlantis without weakening branch protection or losing the audit trail.</span>
+    
     <span class="case-card-topics">security · developer experience</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -378,12 +425,14 @@
           
   
   
-  <a class="case-card" href="/case-studies/03-buttons-instead-of-incantations/" data-case-card="" data-open-study="3" data-topics="developer experience" data-initially-hidden="true">
+  <a class="case-card" href="/case-studies/03-buttons-instead-of-incantations/" data-case-card="" data-open-study="3" data-topics="developer experience" data-initially-hidden="false">
     <span class="case-card-number">
       03
     </span>
     <span class="case-card-title">Buttons instead of incantations</span>
-    <span class="case-card-summary">The kind of small tool that costs a week and pays for itself every single day.</span>
+    
+      <span class="case-card-summary">Pull-request commands became one-click actions without adding tokens, a server, or a new identity.</span>
+    
     <span class="case-card-topics">developer experience</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -397,7 +446,9 @@
       04
     </span>
     <span class="case-card-title">A feedback loop measured in milliseconds</span>
-    <span class="case-card-summary">The old formatting hook took about seven seconds; the rewritten one runs a fifty-file commit in 59 milliseconds.</span>
+    
+      <span class="case-card-summary">The old formatting hook took about seven seconds; the rewritten one runs a fifty-file commit in 59 milliseconds.</span>
+    
     <span class="case-card-topics">developer experience · delivery</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -411,7 +462,9 @@
       05 · sequel
     </span>
     <span class="case-card-title">One tool version, everywhere: from decision record to a centrally cached CI</span>
-    <span class="case-card-summary">Version drift — between two laptops, or between a laptop and CI — stopped being a category of bug.</span>
+    
+      <span class="case-card-summary">Version drift — between two laptops, or between a laptop and CI — stopped being a category of bug.</span>
+    
     <span class="case-card-topics">developer experience · delivery</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -425,7 +478,9 @@
       06
     </span>
     <span class="case-card-title">Teams that create themselves</span>
-    <span class="case-card-summary">Because teams are code, nothing drifts: the directory is the org chart.</span>
+    
+      <span class="case-card-summary">One self-service pull request provisions the team, communication, on-call, catalog, and alerting resources together.</span>
+    
     <span class="case-card-topics">developer experience · delivery</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -439,7 +494,9 @@
       07
     </span>
     <span class="case-card-title">Turning a Terraform repository into a product</span>
-    <span class="case-card-summary">Terraform stopped being a specialist skill.</span>
+    
+      <span class="case-card-summary">Release automation, reusable stacks, documentation, and teaching made the central Terraform repository usable across teams.</span>
+    
     <span class="case-card-topics">developer experience · delivery</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -453,7 +510,9 @@
       08
     </span>
     <span class="case-card-title">Dependency updates: from quarterly panic to background noise</span>
-    <span class="case-card-summary">Staying current became the default state.</span>
+    
+      <span class="case-card-summary">Staying current became the default state.</span>
+    
     <span class="case-card-topics">security · reliability · ai</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -467,7 +526,9 @@
       09
     </span>
     <span class="case-card-title">Kubernetes upgrades became a checklist</span>
-    <span class="case-card-summary">What used to be a dreaded annual project became routine maintenance.</span>
+    
+      <span class="case-card-summary">Deprecated-API signals and a staged four-cluster sequence made upgrade risk visible before production.</span>
+    
     <span class="case-card-topics">reliability</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -481,7 +542,9 @@
       10
     </span>
     <span class="case-card-title">One policy engine, many jobs: Kyverno at the cluster door</span>
-    <span class="case-card-summary">The clusters now say &quot;no&quot; politely, consistently, and in version control.</span>
+    
+      <span class="case-card-summary">The clusters now say &quot;no&quot; politely, consistently, and in version control.</span>
+    
     <span class="case-card-topics">security · reliability</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -494,8 +557,10 @@
     <span class="case-card-number">
       11
     </span>
-    <span class="case-card-title">Kafka topics as code: 550 topics, zero surprises</span>
-    <span class="case-card-summary">Topic changes became pull requests with named owners, review, and history.</span>
+    <span class="case-card-title">Kafka topics as code: adopting 550 live topics</span>
+    
+      <span class="case-card-summary">Topic changes became pull requests with named owners, review, and history.</span>
+    
     <span class="case-card-topics">reliability · delivery</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -509,7 +574,9 @@
       15
     </span>
     <span class="case-card-title">The NAT bill, and the open-source fix I helped ship</span>
-    <span class="case-card-summary">The per-gigabyte NAT tax is gone from the default path.</span>
+    
+      <span class="case-card-summary">The per-gigabyte NAT tax is gone from the default path.</span>
+    
     <span class="case-card-topics">cost · networking</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -523,7 +590,9 @@
       16
     </span>
     <span class="case-card-title">Absorbing an acquisition</span>
-    <span class="case-card-summary">One engineer, one summer, an entire product moved.</span>
+    
+      <span class="case-card-summary">Six services moved from Heroku to AWS and onto the shared platform in about two months.</span>
+    
     <span class="case-card-topics">delivery · reliability · cost</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -536,8 +605,10 @@
     <span class="case-card-number">
       17
     </span>
-    <span class="case-card-title">Leaving Docker Hub without anyone noticing</span>
-    <span class="case-card-summary">The organization learned it can leave a vendor smoothly.</span>
+    <span class="case-card-title">Leaving Docker Hub without a flag day</span>
+    
+      <span class="case-card-summary">A registry mirror and Kyverno admission policies moved image pulls before teams had to edit every manifest.</span>
+    
     <span class="case-card-topics">cost · reliability · security</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -551,7 +622,9 @@
       18
     </span>
     <span class="case-card-title">The fork that needed a home</span>
-    <span class="case-card-summary">A vendor’s bug stopped being our outage.</span>
+    
+      <span class="case-card-summary">A vendor’s bug stopped being our outage.</span>
+    
     <span class="case-card-topics">reliability · delivery</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -565,7 +638,9 @@
       21
     </span>
     <span class="case-card-title">Customer code, running safely: self-service cloud functions</span>
-    <span class="case-card-summary">From upload to a running, isolated, observable function with zero human involvement.</span>
+    
+      <span class="case-card-summary">Uploaded customer code becomes an isolated, observable function without per-function platform intervention.</span>
+    
     <span class="case-card-topics">security · delivery</span>
     <span class="case-card-action">read →</span>
   </a>
@@ -736,7 +811,7 @@
         {
           "number": 11,
           "url": "/case-studies/11-kafka-topics-as-code/",
-          "title": "Kafka topics as code: 550 topics, zero surprises",
+          "title": "Kafka topics as code: adopting 550 live topics",
           "topics": ["reliability","delivery"]
         },
       
@@ -778,7 +853,7 @@
         {
           "number": 17,
           "url": "/case-studies/17-leaving-docker-hub-without-anyone-noticing/",
-          "title": "Leaving Docker Hub without anyone noticing",
+          "title": "Leaving Docker Hub without a flag day",
           "topics": ["cost","reliability","security"]
         },
       
@@ -794,13 +869,6 @@
           "url": "/case-studies/19-turning-container-images-from-a-liability-into-a-supply-chain/",
           "title": "Turning container images from a liability into a supply chain",
           "topics": ["security","cost","delivery"]
-        },
-      
-        {
-          "number": 20,
-          "url": "/case-studies/20-making-the-companys-source-code-survivable/",
-          "title": "Making the company's source code survivable",
-          "topics": ["security","reliability"]
         },
       
         {
@@ -846,14 +914,10 @@
           linkedin.com/in/aleksandr-ponomarov<span aria-hidden="true"> ↗</span>
         </a>
       
-        <a href="mailto:ponomarov.aleksandr@gmail.com">
-          ponomarov.aleksandr@gmail.com
-        </a>
-      
     </div>
   </div>
 </footer>
 
-    <script type="module" src="/assets/js/site.js?v=ebf54ac20f81"></script>
+    <script type="module" src="/assets/js/site.js?v=ed34e0622789"></script>
   </body>
 </html>
