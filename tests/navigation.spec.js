@@ -2,8 +2,9 @@ import { expect, test } from "@playwright/test";
 
 const CARD_SELECTOR = 'a.case-card[href^="/case-studies/"]';
 const ARC_SELECTOR = "#arc a[data-arc-study]";
-const EXPECTED_STUDY_COUNT = 23;
-const EXPECTED_ARC_STUDY_COUNT = 18;
+const EXPECTED_STUDY_COUNT = 22;
+const EXPECTED_ARC_STUDY_COUNT = 17;
+const EXPECTED_STUDY_NUMBERS = [...Array.from({ length: 19 }, (_, index) => index + 1), 21, 22, 23];
 const STUDY_03_URL = "/case-studies/03-buttons-instead-of-incantations/";
 const NEW_TAB_MODIFIER = process.platform === "darwin" ? "Meta" : "Control";
 
@@ -37,8 +38,8 @@ test("homepage exposes canonical case cards and one lightweight reader contract"
   expect(targetResponses.every((response) => response.ok())).toBe(true);
 
   expect(manifest).toHaveLength(EXPECTED_STUDY_COUNT);
-  for (const [index, entry] of manifest.entries()) {
-    expect(entry.number).toBe(index + 1);
+  expect(manifest.map(({ number }) => number)).toEqual(EXPECTED_STUDY_NUMBERS);
+  for (const entry of manifest) {
     expect(entry.url).toMatch(/^\/case-studies\/.+\/$/);
     expect(entry.title.length).toBeGreaterThan(0);
     expect(entry.topics.length).toBeGreaterThan(0);
@@ -59,7 +60,7 @@ test("homepage exposes canonical case cards and one lightweight reader contract"
   await expect(page.locator('[data-open-study="5"] .case-card-number')).toContainText("05 · sequel");
 });
 
-test("homepage arc exposes 18 unique canonical anchors aligned with the reader manifest", async ({ page }) => {
+test("homepage arc exposes 17 unique canonical anchors aligned with the reader manifest", async ({ page }) => {
   // Given the built homepage and its reader manifest
   await page.goto("/");
   const manifest = await page.locator("[data-reader-manifest]").evaluate((element) =>
