@@ -6,7 +6,8 @@
   "scripts": {
     "build": "eleventy",
     "dev": "eleventy --serve --port=8080",
-    "verify:build": "eleventy && node scripts/verify-build.mjs",
+    "verify:build": "node --test tests/case-study-catalog.test.js && eleventy && node scripts/verify-build.mjs",
+    "test:catalog": "node --test tests/case-study-catalog.test.js",
     "test:e2e": "playwright test",
     "test:e2e:headed": "playwright test --headed"
   },
