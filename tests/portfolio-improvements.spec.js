@@ -1,9 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-const PROOF_STUDIES = [12, 13, 14, 19, 23];
-const CONCEPT_STUDIES = [
-  { number: 19, path: "/case-studies/19-turning-container-images-from-a-liability-into-a-supply-chain/" },
-];
+import { caseStudy, caseStudyHash } from "./case-studies.js";
+
+const PROOF_STUDIES = [
+  "fleet-patching",
+  "network-rebuild",
+  "ephemeral-environments",
+  "container-supply-chain",
+  "agent-ready-codebase",
+].map(caseStudy);
+const CONCEPT_STUDIES = [caseStudy("container-supply-chain")];
 
 async function expectContainedConcept(page, selector, theme) {
   const exhibit = page.locator(selector);
@@ -31,8 +37,8 @@ test("surfaces evidence-backed progressive summaries in cards and canonical stud
 
   // Then five cards expose impact, role, and evidence without replacing canonical links
   await expect(proofCards).toHaveCount(PROOF_STUDIES.length);
-  for (const number of PROOF_STUDIES) {
-    const card = page.locator(`[data-case-card][data-open-study="${number}"]`);
+  for (const study of PROOF_STUDIES) {
+    const card = page.locator(`[data-case-card][data-open-study="${study.id}"]`);
     await expect(card.locator("[data-case-proof] dt")).toHaveText(["Impact", "My role", "Evidence"]);
     await expect(card.locator("[data-case-proof] dd")).toHaveCount(3);
     await expect(card).toHaveAttribute("href", /^\/case-studies\/[a-z0-9-]+\/$/);
@@ -62,7 +68,7 @@ test("renders revised conceptual exhibits responsively in both themes", async ({
       await page.setViewportSize({ width, height: 900 });
       for (const study of CONCEPT_STUDIES) {
         // Given a revised study at the acceptance width and theme
-        await page.goto(study.path);
+        await page.goto(study.url);
 
         // When its conceptual exhibit is inspected
         // Then the exhibit is named, captioned, locally contained, and never widens the page
@@ -70,7 +76,7 @@ test("renders revised conceptual exhibits responsively in both themes", async ({
 
         if (width !== 768) {
           // And the progressively enhanced reader preserves the same contained exhibit
-          await page.goto(`/#study-${study.number}`);
+          await page.goto(`/${caseStudyHash(study.id)}`);
           await expect(page.locator("dialog[data-reader]")).toBeVisible();
           await expectContainedConcept(page, "[data-reader] [data-concept-diagram]", theme);
         }
