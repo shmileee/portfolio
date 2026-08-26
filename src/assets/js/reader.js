@@ -1,72 +1,15 @@
-const focusUrl = new URL("./reader-focus.js", import.meta.url);
 const assetVersion = new URL(import.meta.url).searchParams.get("v");
-if (assetVersion) focusUrl.searchParams.set("v", assetVersion);
-const { isGuardedArrowTarget, visibleFocusables } = await import(focusUrl);
-
-const STUDY_HASH = /^#study-(\d+)$/;
-
-function createManifestIndex(manifestNode) {
-  const entries = JSON.parse(manifestNode.textContent || "[]");
-  return {
-    entries,
-    numbers: entries.map(({ number }) => number),
-    byNumber: new Map(entries.map((entry) => [entry.number, entry])),
-    byPath: new Map(entries.map((entry) => [new URL(entry.url, window.location.origin).pathname, entry])),
-  };
-}
-
-function normalizeProse(prose, responseUrl) {
-  for (const element of prose.querySelectorAll("[src], [poster], [href]")) {
-    for (const attribute of ["src", "poster", "href"]) {
-      const value = element.getAttribute(attribute);
-      if (value?.trim()) element.setAttribute(attribute, new URL(value, responseUrl).href);
-    }
-  }
-  for (const heading of prose.querySelectorAll("h2")) {
-    const replacement = prose.ownerDocument.createElement("h3");
-    for (const attribute of heading.attributes) replacement.setAttribute(attribute.name, attribute.value);
-    replacement.append(...heading.childNodes);
-    heading.replaceWith(replacement);
-  }
-  return prose.innerHTML;
-}
-
-function createContentLoader() {
-  const cache = new Map();
-  return (entry) => {
-    const cached = cache.get(entry.number);
-    if (cached) return cached;
-
-    const pending = fetch(entry.url).then(async (response) => {
-      if (!response.ok) throw new Error(`Study request failed with ${response.status}`);
-      const source = new DOMParser().parseFromString(await response.text(), "text/html");
-      const prose = source.querySelector(".case-detail-prose");
-      if (!prose) throw new Error("Study response has no canonical prose");
-      return normalizeProse(prose, response.url);
-    });
-    cache.set(entry.number, pending);
-    pending.catch(() => {
-      if (cache.get(entry.number) === pending) cache.delete(entry.number);
-    });
-    return pending;
-  };
-}
-
-function isPrimarySameTab(event, anchor) {
-  return (
-    event.button === 0 &&
-    !event.altKey &&
-    !event.ctrlKey &&
-    !event.metaKey &&
-    !event.shiftKey &&
-    !anchor.hasAttribute("target") &&
-    !anchor.hasAttribute("download")
-  );
-}
-
-function isReaderState(state) {
-  return state?.portfolioReader === true && Number.isInteger(state.number);
-}
+const dependencyUrl = (file) => {
+  const url = new URL(file, import.meta.url);
+  if (assetVersion) url.searchParams.set("v", assetVersion);
+  return url;
+};
+const [{ isGuardedArrowTarget, visibleFocusables }, readerModel] = await Promise.all([
+  import(dependencyUrl("./reader-focus.js")),
+  import(dependencyUrl("./reader-model.js")),
+]);
+const { createContentLoader, createManifestIndex, isPrimarySameTab, isReaderState, STUDY_HASH } =
+  readerModel;
 
 export function setupReader() {
   const dialog = document.querySelector("[data-reader]");
@@ -96,15 +39,17 @@ export function setupReader() {
 
   const manifest = createManifestIndex(manifestNode);
   const loadContent = createContentLoader();
-  let activeNumber = 0;
+  let activeId = "";
   let intentGeneration = 0;
   let returnFocus = null;
   let closingMarkedEntry = false;
 
-  const entryFromHash = () => {
-    const match = window.location.hash.match(STUDY_HASH);
-    return match ? manifest.byNumber.get(Number(match[1])) : undefined;
+  const entryForHash = (hash) => {
+    const match = hash.match(STUDY_HASH);
+    if (!match) return undefined;
+    return manifest.byId.get(match[1]) ?? manifest.byLegacyNumber.get(Number(match[1]));
   };
+  const entryFromHash = () => entryForHash(window.location.hash);
 
   const hideReader = () => {
     const focusTarget = returnFocus;
@@ -133,22 +78,22 @@ export function setupReader() {
   };
 
   const updateHistory = (entry, mode) => {
-    const hash = `#study-${entry.number}`;
+    const hash = `#study-${entry.id}`;
     if (mode === "push") {
-      history.pushState({ portfolioReader: true, number: entry.number }, "", hash);
+      history.pushState({ portfolioReader: true, id: entry.id }, "", hash);
     } else if (mode === "replace") {
       const state = isReaderState(history.state)
-        ? { portfolioReader: true, number: entry.number }
+        ? { portfolioReader: true, id: entry.id }
         : history.state;
       history.replaceState(state, "", hash);
     }
   };
 
   const renderStudy = (entry, content) => {
-    const current = manifest.numbers.indexOf(entry.number);
-    const previous = manifest.byNumber.get(manifest.numbers[(current - 1 + manifest.numbers.length) % manifest.numbers.length]);
-    const next = manifest.byNumber.get(manifest.numbers[(current + 1) % manifest.numbers.length]);
-    activeNumber = entry.number;
+    const current = manifest.ids.indexOf(entry.id);
+    const previous = manifest.byId.get(manifest.ids[(current - 1 + manifest.ids.length) % manifest.ids.length]);
+    const next = manifest.byId.get(manifest.ids[(current + 1) % manifest.ids.length]);
+    activeId = entry.id;
     metaNumber.textContent = `Case study ${String(entry.number).padStart(2, "0")}`;
     metaTopics.textContent = ` · ${entry.topics.join(" · ")}`;
     title.textContent = entry.title;
@@ -186,11 +131,11 @@ export function setupReader() {
   };
 
   const navigate = (direction) => {
-    const current = manifest.numbers.indexOf(activeNumber);
+    const current = manifest.ids.indexOf(activeId);
     if (current < 0) return false;
     const offset = direction === "next" ? 1 : -1;
-    const number = manifest.numbers[(current + offset + manifest.numbers.length) % manifest.numbers.length];
-    const entry = manifest.byNumber.get(number);
+    const id = manifest.ids[(current + offset + manifest.ids.length) % manifest.ids.length];
+    const entry = manifest.byId.get(id);
     if (!entry) return false;
     showStudy(entry, "replace");
     return true;
@@ -208,16 +153,16 @@ export function setupReader() {
     if (!anchor || !isPrimarySameTab(event, anchor)) return;
 
     const url = new URL(anchor.href);
-    const hashMatch = url.hash.match(STUDY_HASH);
+    const hashEntry = entryForHash(url.hash);
     const sameDocument = url.origin === window.location.origin && url.pathname === window.location.pathname && url.search === window.location.search;
-    if (!dialog.open && sameDocument && hashMatch && manifest.byNumber.has(Number(hashMatch[1]))) {
+    if (!dialog.open && sameDocument && hashEntry) {
       returnFocus = anchor;
       return;
     }
 
     let entry;
     if (anchor.matches("[data-open-study]")) {
-      entry = manifest.byNumber.get(Number(anchor.dataset.openStudy));
+      entry = manifest.byId.get(anchor.dataset.openStudy);
     } else if (dialog.open && prose.contains(anchor)) {
       if (url.origin === window.location.origin) entry = manifest.byPath.get(url.pathname);
     }

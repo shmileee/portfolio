@@ -28,6 +28,8 @@
     [
       {% for study in collections.caseStudies %}
         {
+          "id": {{ study.data.caseStudyId | dump | safe }},
+          "legacyNumber": {{ study.data.legacyNumber | dump | safe }},
           "number": {{ study.data.number }},
           "url": {{ study.url | dump | safe }},
           "title": {{ study.data.title | dump | safe }},
