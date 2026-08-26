@@ -5,7 +5,7 @@ import { STUDY_PAGE_PATTERN } from "./context.mjs";
 import { MalformedMarkupError, normalizeText, scanTags } from "./html.mjs";
 import { outcome } from "./report.mjs";
 
-export const EXPECTED_STUDY_COUNT = 23;
+export const EXPECTED_STUDY_COUNT = 22;
 const TITLE_SUFFIX = " — Oleksandr Ponomarov"; // base.njk appends this to every page <title>
 const HOMEPAGE_BYTE_BUDGET = 75 * 1024;
 const EMBEDDED_BODY_SIGNATURES = ["case-detail-prose", "media-exhibit", "code-exhibit", "diagram-exhibit"];

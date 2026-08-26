@@ -27,7 +27,7 @@ The generated static site is written to `_site/`.
 npm run verify:build
 ```
 
-Builds the site, then runs `scripts/verify-build.mjs` against `_site/`: it checks the 23 canonical study routes, internal link targets, sitemap/robots/404 contracts, media outputs, the homepage payload budget, and the reader manifest.
+Builds the site, then runs `scripts/verify-build.mjs` against `_site/`: it checks the 22 canonical study routes, internal link targets, sitemap/robots/404 contracts, media outputs, the homepage payload budget, and the reader manifest.
 
 Browser tests use [Playwright](https://playwright.dev/) with Chromium. Install the browser once, then run the suite:
 
@@ -106,7 +106,7 @@ ffmpeg -i recording.gif -an -c:v libx264 -crf 23 -preset slow -pix_fmt yuv420p -
 ffmpeg -i demo.mp4 -frames:v 1 demo-poster.png
 ```
 
-The build creates a standalone page at `/case-studies/<folder-name>/` — the canonical route, named after the study folder. Each standalone page has canonical previous and next study links in numeric order, wrapping between Studies 01 and 23, followed by separate links back to the portfolio index and contact footer.
+The build creates a standalone page at `/case-studies/<folder-name>/` — the canonical route, named after the study folder. Each standalone page has canonical previous and next study links in numeric order, wrapping between the first and last numbered studies, followed by separate links back to the portfolio index and contact footer.
 
 Homepage cards, arc labels, and the spotlight link all use those canonical study URLs. An ordinary primary same-tab click is progressively enhanced into the reader, which fetches the canonical page on demand; modified clicks, middle clicks, Copy Link Address, and JavaScript-disabled navigation continue to use the standalone URL. Media can use its authored wider breakout on the standalone page, while media fetched into the reader is contained to the reader prose width. The sitemap lists the homepage plus every study route.
 
