@@ -6,8 +6,8 @@ import { routeToFile } from "./context.mjs";
 import { decodeEntities, MalformedMarkupError } from "./html.mjs";
 import { outcome } from "./report.mjs";
 
-const EXPECTED_SITEMAP_LOCATIONS = 24; // homepage + 23 studies
-const EXPECTED_ARC_LINKS = 18;
+const EXPECTED_SITEMAP_LOCATIONS = 23; // homepage + 22 studies
+const EXPECTED_ARC_LINKS = 17;
 const EXPECTED_VIDEO_COUNT = 2;
 
 function parseSitemapLocations(xml, file) {
