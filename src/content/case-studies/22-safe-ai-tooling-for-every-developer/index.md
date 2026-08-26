@@ -2,7 +2,7 @@
 number: 22
 slug: safe-ai-tooling-for-every-developer
 title: Safe AI tooling for every developer
-summary: Nothing new to leak, nothing to rotate, one governed door instead of a hundred hand-made ones.
+summary: Existing AWS identity and restricted backends provide one governed path from AI clients to operational tools.
 topics:
   - ai
   - security
@@ -28,14 +28,14 @@ Connecting a client is a few lines — the committed example our developers copy
 ```jsonc filename="opencode.jsonc"
 {
   "mcp": {
-    "sre-mcp-dev": {
+    "platform-tools-dev": {
       "type": "local",
       "command": [
         "uvx", "mcp-proxy-for-aws",
-        "https://sre.mcp.dev.<internal-domain>/mcp",
+        "https://gateway.dev.example.com/mcp",
         "--service", "execute-api",
         "--region", "eu-west-1",
-        "--profile", "dev"
+        "--profile", "development"
       ]
     }
   }
@@ -54,4 +54,4 @@ The whole design is one stable door, many safe backends. The hard part wasn't ju
 
 ## WHAT IT CHANGED
 
-The company got AI-assistant access to production tooling that is safe by default: nothing new to leak, nothing to rotate, one governed door instead of a hundred hand-made ones. Every developer has it; the security team can sleep.
+Developers gained one governed path from AI assistants to operational tooling, using existing identity and backend restrictions instead of per-tool credentials on each laptop.
