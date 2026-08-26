@@ -22,8 +22,8 @@ Forked and fixed in four days: a rate-limited HTTP client with retries that back
 
 ```hcl filename="versions.tf"
 firehydrant = {
-  source  = "terraform-registry.<internal>/company/firehydrant"
-  version = "0.15.2-company.5"
+  source  = "registry.example.com/platform/incident-provider"
+  version = "0.15.2-platform.5"
 }
 ```
 
