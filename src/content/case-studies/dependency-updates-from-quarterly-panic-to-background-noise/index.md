@@ -1,6 +1,4 @@
 ---
-number: 8
-slug: dependency-updates-from-quarterly-panic-to-background-noise
 title: "Dependency updates: from quarterly panic to background noise"
 summary: Staying current became the default state.
 topics:
