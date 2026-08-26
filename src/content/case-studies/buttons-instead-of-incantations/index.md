@@ -1,6 +1,4 @@
 ---
-number: 3
-slug: buttons-instead-of-incantations
 title: Buttons instead of incantations
 summary: Pull-request commands became one-click actions without adding tokens, a server, or a new identity.
 topics:
