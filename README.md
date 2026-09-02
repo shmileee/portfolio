@@ -1,158 +1,39 @@
-# Portfolio
+# portfolio
 
-Source for [portfolio.oponomarov.com](https://portfolio.oponomarov.com), built with [Eleventy](https://www.11ty.dev/).
+Markdown content repository for the portfolio section of [oponomarov.com](https://oponomarov.com/). It contains no site code, build tooling, or templates — only content collections. The site is **rendered by [shmileee/oponomarov.com](https://github.com/shmileee/oponomarov.com)** (the Astro engine), which pulls this repository at build time and publishes the portfolio under `/`.
 
-## Local preview
+Pushes to `main` trigger `.github/workflows/notify-engine.yaml`, which dispatches a `portfolio-updated` event so the engine rebuilds with the latest content.
 
-Requires Node.js 20 or newer.
+## Layout and frontmatter contract
 
-```sh
-npm ci
-npm run dev
-```
+The engine consumes four collections from `content/`. Frontmatter is YAML and must follow the contract below.
 
-Open <http://localhost:8080>. Eleventy watches the source files and refreshes the preview after edits.
+### `content/case-studies/` — caseStudies collection
 
-Create a production build with:
+One folder per case study, matched as `**/index.md`: `content/case-studies/<slug>/index.md`, where the folder name is the slug. Images and other assets referenced by a study live alongside its `index.md` in the same folder.
 
-```sh
-npm run build
-```
+Frontmatter fields:
 
-The generated static site is written to `_site/`.
+| Field       | Type            | Notes                                  |
+| ----------- | --------------- | -------------------------------------- |
+| `title`     | string          | Case study title                       |
+| `summary`   | string          | One-line summary shown in the index    |
+| `topics`    | list of strings | Topic tags (e.g. `reliability`)        |
+| `featured`  | boolean         | Featured placement on the landing page |
+| `spotlight` | boolean         | Spotlight placement                    |
 
-## Verify and test
+### `content/home/` — home collection
 
-```sh
-npm run verify:build
-```
+Flat `*.md` files, one per home-page block (`hero.md`, `arc.md`, `hiring.md`). Every file carries a `key` identifying the block, plus block-specific display fields (e.g. `title`, `eyebrow`, `primaryCta`/`primaryHref`, `secondaryCta`/`secondaryHref`).
 
-Checks the case-study catalog contract, builds the site, then runs `scripts/verify-build.mjs` against `_site/`: it checks the catalog-derived canonical study routes, compatibility redirects, internal link targets, sitemap/robots/404 contracts, media outputs, the homepage payload budget, and the reader manifest.
+### `content/arc/` — arc collection
 
-Browser tests use [Playwright](https://playwright.dev/) with Chromium. Install the browser once, then run the suite:
+Flat, number-prefixed `*.md` files (`01-…` through `06-…`) forming the career-arc timeline. Frontmatter: `number` (integer, ordering) and `links` (list of `{study, label}` references into the case-studies collection).
 
-```sh
-npx playwright install chromium
-npm run test:e2e
-```
+### `content/principles/` — principles collection
 
-Run a single file when iterating, for example:
+Flat, number-prefixed `*.md` files. Frontmatter: `number` (integer, ordering) and `title` (string).
 
-```sh
-npm run test:e2e -- tests/reader.spec.js --project=chromium
-npm run test:e2e -- tests/responsive-accessibility.spec.js --project=chromium
-```
+## Editing
 
-`npm run test:e2e:headed` runs the same suite with a visible browser.
-
-## Add a case study
-
-Add one ordered entry to `src/_data/caseStudyCatalog.js`. Its stable `id` is used by references, while `folder` names the number-free content directory and canonical route:
-
-```js
-{
-  id: "example-study",
-  folder: "example-study",
-  legacyFolder: "24-example-study",
-}
-```
-
-`legacyFolder` is only needed when a previously published numbered route must keep redirecting. New studies can omit it. Display numbers are derived from array position, so adding, removing, or reordering a study never requires editing numbers elsewhere.
-
-Create the matching folder under `src/content/case-studies/` containing an `index.md` file:
-
-```text
-src/content/case-studies/example-study/
-├── index.md
-└── architecture.svg
-```
-
-Start the Markdown file with this front matter:
-
-```yaml
----
-title: Example study
-summary: A short sentence used on the case-study card.
-topics:
-  - reliability
-featured: false
-spotlight: false
----
-```
-
-Two optional fields refine how a study appears on the homepage:
-
-- `cardLabel` — a short non-empty string rendered on the card after the number and any `featured` marker, for example `cardLabel: sequel`.
-- `spotlightProof` — required on the one study with `spotlight: true`. One authored sentence of outcome language, shown in the homepage spotlight section next to the summary.
-
-Then write the study with ordinary Markdown. Use second-level headings for its sections and reference colocated images with relative paths:
-
-```md
-## The situation
-
-What needed to change.
-
-![Architecture overview](./architecture.svg)
-```
-
-Reference another study by stable id so its number, title changes, and canonical folder are resolved at build time:
-
-```njk
-{% caseStudyLink "example-study" %}
-{% caseStudyLink "example-study", "an optional descriptive label" %}
-```
-
-Use the media exhibit shortcode for framed screenshots and recordings. Intrinsic dimensions prevent layout shift, while `maxWidth` controls the frame without adding one-off CSS. A screenshot renders as a lazy-loaded image (`loading="lazy" decoding="async"`):
-
-```njk
-{% mediaExhibit { source: "./dashboard.png", alt: "Screenshot of the rollout dashboard", width: 1654, height: 676, maxWidth: 840, captionLabel: "EXHIBIT 01", caption: "The dashboard after rollout" } %}
-```
-
-An `.mp4` source renders as a native video with `controls`, `playsinline`, and `preload="metadata"`; it starts paused and never autoplays or loops. MP4 sources must supply a non-empty `poster` (the build fails without one):
-
-```njk
-{% mediaExhibit { source: "./demo.mp4", poster: "./demo-poster.png", alt: "Screen recording of the workflow", width: 1440, height: 820, badge: "MP4 · VIDEO", maxWidth: 840, captionLabel: "EXHIBIT 02", caption: "The workflow in action" } %}
-```
-
-`filename` defaults to the source filename and `badge` defaults to the uppercase file extension. The caption fields and `maxWidth` are optional. `source`, `alt`, and (for MP4) `poster` must be non-empty strings; `width`, `height`, and `maxWidth` must be positive integers.
-
-Convert recordings locally before committing them; the build never transcodes. Encode H.264 MP4 with even dimensions and extract a first-frame PNG poster, for example with ffmpeg:
-
-```sh
-ffmpeg -i recording.gif -an -c:v libx264 -crf 23 -preset slow -pix_fmt yuv420p -movflags +faststart -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" demo.mp4
-ffmpeg -i demo.mp4 -frames:v 1 demo-poster.png
-```
-
-The build creates a standalone page at `/case-studies/<folder-name>/` — the canonical route, named after the study folder. Each standalone page has canonical previous and next study links in catalog order, wrapping between the first and last studies, followed by separate links back to the portfolio index and contact footer. Previously published numbered routes redirect to these number-free canonical URLs.
-
-Homepage cards, arc labels, and the spotlight link all use those canonical study URLs. An ordinary primary same-tab click is progressively enhanced into the reader, which fetches the canonical page on demand; modified clicks, middle clicks, Copy Link Address, and JavaScript-disabled navigation continue to use the standalone URL. Media can use its authored wider breakout on the standalone page, while media fetched into the reader is contained to the reader prose width. The sitemap lists the homepage plus every study route.
-
-The build validates that:
-
-- Every catalog `id` and `folder` is unique and resolves to exactly one content directory.
-- Content directories contain no numeric prefix and case-study frontmatter does not define `number` or `slug`.
-- Derived display numbers are contiguous in catalog order.
-- `title` and `summary` are present.
-- `featured` and `spotlight` are booleans.
-- Exactly one case study has `spotlight: true`, and that study defines a non-empty `spotlightProof`.
-- `cardLabel`, when present, is a non-empty string.
-- Topics are selected from `reliability`, `networking`, `developer experience`, `security`, `ai`, `cost`, and `delivery`.
-- MP4 media exhibits declare a poster.
-
-MP4, PNG, and SVG files colocated with a case study are copied beside its generated page. SVG files must be valid standalone documents and include `xmlns="http://www.w3.org/2000/svg"` on the root element.
-
-## Structure
-
-- `src/content/case-studies/` — Markdown studies and their media.
-- `src/_data/caseStudyCatalog.js` — the single ordered source of case-study identity, folders, legacy aliases, and display numbers.
-- `src/content/home/` — homepage narrative sections.
-- `src/_includes/` — shared Nunjucks layouts and partials.
-- `src/assets/` — shared CSS and browser behavior.
-- `.eleventy.js` — collections, validation, filters, and asset copying.
-- `scripts/verify-build.mjs` — static checks on the generated `_site/` output.
-- `tests/` — Playwright browser suites; `playwright.config.js` configures them.
-- `DESIGN.md` — visual-system and interaction contract.
-
-## Deploy
-
-Every push to `main` runs `.github/workflows/deploy.yaml`, builds the site, and publishes `_site/` to the `gh-pages` branch with the custom domain `portfolio.oponomarov.com`.
+Change Markdown here, open a pull request into `main`, merge. The engine takes care of everything else — do not add build tooling to this repository.
