@@ -19,7 +19,7 @@ I replaced hand-made tags with a real release pipeline: structured commit messag
 I introduced Terramate to manage the growing estate of stacks, designed the repository layout and the reusable imports, then migrated every legacy stack onto it. I stood up an internal Terraform registry to host our own providers ([the fork that needed a home](/case-studies/the-fork-that-needed-a-home/)).
 And when navigation itself became the problem — hundreds of stacks across many accounts and regions — I built a terminal tool that answers "where is X deployed, and in which account?" in seconds:
 
-<figure class="media-exhibit" data-exhibit style="--media-exhibit-width: 840px">
+<figure class="media-exhibit" data-exhibit>
   <div class="media-exhibit-frame">
     <div class="exhibit-toolbar">
       <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>

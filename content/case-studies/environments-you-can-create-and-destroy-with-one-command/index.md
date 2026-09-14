@@ -35,7 +35,7 @@ Every cell also registers itself in a central cell registry (a DynamoDB table) �
 ## The interesting part
 The teardown problem had no off-the-shelf solution, so I wrote a custom Terraform provider to close the gap. It walks an environment down in six ordered phases — preflight, freeze the deployment system, evacuate workloads, decommission autoscaled capacity, reconcile, verify — and it never pretends: if anything survived, it stops, reports failure, and names exactly what is still alive rather than letting leftover resources hide. It can even rehearse a destroy during planning and tell you what would be left behind.
 
-<div class="teardown-exhibit" role="img" aria-label="Teardown ordered phases: preflight, freeze, evacuate, decommission, reconcile, verify">
+<div class="diagram-exhibit" role="img" aria-label="Teardown ordered phases: preflight, freeze, evacuate, decommission, reconcile, verify">
   <p>TEARDOWN — ORDERED PHASES</p>
   <div>
     <span>preflight</span><i aria-hidden="true">→</i>

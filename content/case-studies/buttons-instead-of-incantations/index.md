@@ -9,14 +9,14 @@ spotlight: false
 
 ## The situation
 
-Atlantis is driven by typed pull request comments: <span class="inline-code-unit"><code>atlantis plan</code>,</span> <span class="inline-code-unit"><code>atlantis apply</code>,</span> with project flags that must be exactly right. Power users type them from muscle memory; everyone else copies them from somewhere, gets a flag wrong, and waits for the bot to complain. During large migrations — dozens of pull requests a day — the typing itself became measurable friction.
+Atlantis is driven by typed pull request comments: <code>atlantis plan</code>, <code>atlantis apply</code>, with project flags that must be exactly right. Power users type them from muscle memory; everyone else copies them from somewhere, gets a flag wrong, and waits for the bot to complain. During large migrations — dozens of pull requests a day — the typing itself became measurable friction.
 The obvious fixes were all worse: a web service with GitHub tokens to manage, or yet another bot with write access.
 
 ## What I did
 
 I built a small browser extension that injects the commands as buttons directly into the GitHub pull request page.
 
-<figure class="media-exhibit" data-exhibit style="--media-exhibit-width: 840px">
+<figure class="media-exhibit" data-exhibit>
   <div class="media-exhibit-frame">
     <div class="exhibit-toolbar">
       <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -37,7 +37,7 @@ Infrastructure pull request interactions became one-click and typo-free while pr
 
 Here it is in action:
 
-<figure class="media-exhibit" data-exhibit style="--media-exhibit-width: 840px">
+<figure class="media-exhibit" data-exhibit>
   <div class="media-exhibit-frame">
     <div class="exhibit-toolbar">
       <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>
