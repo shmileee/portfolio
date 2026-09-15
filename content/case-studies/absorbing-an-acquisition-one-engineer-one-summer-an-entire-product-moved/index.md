@@ -5,6 +5,10 @@ topics:
   - delivery
   - reliability
   - cost
+order: 16
+aliases:
+  - 16-absorbing-an-acquisition-one-engineer-one-summer-an-entire-product-moved
+  - acquisition-migration
 featured: false
 spotlight: false
 ---

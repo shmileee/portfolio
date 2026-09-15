@@ -4,6 +4,10 @@ summary: An authorized reviewer can unblock an urgent `terraform apply` in Atlan
 topics:
   - security
   - developer experience
+order: 2
+aliases:
+  - 02-approve-the-audited-escape-hatch
+  - audited-approve
 featured: false
 spotlight: false
 ---

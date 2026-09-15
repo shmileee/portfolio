@@ -5,6 +5,10 @@ topics:
   - cost
   - reliability
   - security
+order: 17
+aliases:
+  - 17-leaving-docker-hub-without-anyone-noticing
+  - registry-migration
 featured: false
 spotlight: false
 ---

@@ -7,6 +7,10 @@ topics:
   - reliability
   - cost
   - delivery
+order: 14
+aliases:
+  - 14-environments-you-can-create-and-destroy-with-one-command
+  - ephemeral-environments
 featured: true
 spotlight: true
 spotlightProof: Each cell contains its own failure domain, joins the network by policy, and verifies teardown before infrastructure state can disappear.

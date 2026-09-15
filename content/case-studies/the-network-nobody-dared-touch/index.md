@@ -6,6 +6,10 @@ evidence: Stable route identities, a quarantine segment, and one policy document
 topics:
   - networking
   - reliability
+order: 13
+aliases:
+  - 13-the-network-nobody-dared-touch
+  - network-rebuild
 featured: true
 spotlight: false
 ---

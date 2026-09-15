@@ -4,6 +4,10 @@ summary: Uploaded customer code becomes an isolated, observable function without
 topics:
   - security
   - delivery
+order: 20
+aliases:
+  - 21-customer-code-running-safely-self-service-cloud-functions
+  - cloud-functions
 featured: false
 spotlight: false
 ---

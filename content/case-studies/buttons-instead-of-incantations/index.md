@@ -3,6 +3,10 @@ title: Buttons instead of incantations
 summary: Pull-request commands became one-click actions without adding tokens, a server, or a new identity.
 topics:
   - developer experience
+order: 3
+aliases:
+  - 03-buttons-instead-of-incantations
+  - self-service-buttons
 featured: false
 spotlight: false
 ---
@@ -16,7 +20,7 @@ The obvious fixes were all worse: a web service with GitHub tokens to manage, or
 
 I built a small browser extension that injects the commands as buttons directly into the GitHub pull request page.
 
-<figure class="media-exhibit" data-exhibit>
+<figure class="media-exhibit wide" data-exhibit>
   <div class="media-exhibit-frame">
     <div class="exhibit-toolbar">
       <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>
@@ -37,7 +41,7 @@ Infrastructure pull request interactions became one-click and typo-free while pr
 
 Here it is in action:
 
-<figure class="media-exhibit" data-exhibit>
+<figure class="media-exhibit wide" data-exhibit>
   <div class="media-exhibit-frame">
     <div class="exhibit-toolbar">
       <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>

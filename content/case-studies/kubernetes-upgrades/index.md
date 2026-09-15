@@ -3,6 +3,9 @@ title: Kubernetes upgrades became a checklist
 summary: Deprecated-API signals and a staged four-cluster sequence made upgrade risk visible before production.
 topics:
   - reliability
+order: 9
+aliases:
+  - 09-kubernetes-upgrades
 featured: false
 spotlight: false
 ---

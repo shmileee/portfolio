@@ -4,6 +4,10 @@ summary: The old formatting hook took about seven seconds; the rewritten one run
 topics:
   - developer experience
   - delivery
+order: 4
+aliases:
+  - 04-a-feedback-loop-measured-in-milliseconds
+  - fast-feedback
 featured: false
 spotlight: false
 ---

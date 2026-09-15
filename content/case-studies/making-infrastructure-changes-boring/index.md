@@ -5,6 +5,10 @@ topics:
   - delivery
   - developer experience
   - reliability
+order: 1
+aliases:
+  - 01-making-infrastructure-changes-boring
+  - infrastructure-changes
 featured: false
 spotlight: false
 ---

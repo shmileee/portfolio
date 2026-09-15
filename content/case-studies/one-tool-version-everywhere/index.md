@@ -4,6 +4,10 @@ summary: Version drift — between two laptops, or between a laptop and CI — s
 topics:
   - developer experience
   - delivery
+order: 5
+aliases:
+  - 05-one-tool-version-everywhere
+  - tool-versions
 featured: false
 spotlight: false
 cardLabel: sequel

@@ -14,13 +14,23 @@ One folder per case study, matched as `**/index.md`: `content/case-studies/<slug
 
 Frontmatter fields:
 
-| Field       | Type            | Notes                                  |
-| ----------- | --------------- | -------------------------------------- |
-| `title`     | string          | Case study title                       |
-| `summary`   | string          | One-line summary shown in the index    |
-| `topics`    | list of strings | Topic tags (e.g. `reliability`)        |
-| `featured`  | boolean         | Featured placement on the landing page |
-| `spotlight` | boolean         | Spotlight placement                    |
+| Field            | Type            | Notes                                                                                                                                                                                       |
+| ---------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title`          | string          | Case study title                                                                                                                                                                            |
+| `summary`        | string          | One-line summary: the dek on the study page and the card copy in the index. Inline Markdown (backticks, `**strong**`) renders                                                              |
+| `topics`         | list of strings | Topic tags (e.g. `reliability`); the homepage filter row is the union of every study's topics                                                                                              |
+| `order`          | integer         | Position in the published order. The displayed case number is the position, so inserting a study renumbers the ones after it. Optional: an unnumbered study follows the numbered ones alphabetically |
+| `aliases`        | list of slugs   | Old URLs for this study (`12-the-fleet-that-patches-itself`) and old reader ids (`fleet-patching`). Each redirects to the folder and still opens the homepage reader. Optional              |
+| `role`           | string          | "My role" line in the proof list (cards, spotlight, study header). Optional, shown with `evidence`                                                                                         |
+| `evidence`       | string          | "Evidence" line in the proof list. Optional, shown with `role`                                                                                                                              |
+| `featured`       | boolean         | Featured placement on the landing page                                                                                                                                                      |
+| `spotlight`      | boolean         | Spotlight placement; the homepage spotlight section renders only when one study carries it                                                                                                  |
+| `spotlightProof` | string          | The spotlight's one-paragraph proof. Optional                                                                                                                                               |
+| `cardLabel`      | string          | Extra label after the card number (`sequel`). Optional                                                                                                                                      |
+
+The folder name is the study's identity: its URL slug, what `content/arc/`
+links to, and what the homepage reader opens. Renaming a folder is a move;
+add the old folder name to `aliases` so the old URL keeps working.
 
 ### `content/home/` — home collection
 
@@ -28,7 +38,7 @@ Flat `*.md` files, one per home-page block (`hero.md`, `arc.md`, `hiring.md`). E
 
 ### `content/arc/` — arc collection
 
-Flat, number-prefixed `*.md` files (`01-…` through `06-…`) forming the career-arc timeline. Frontmatter: `number` (integer, ordering) and `links` (list of `{study, label}` references into the case-studies collection).
+Flat, number-prefixed `*.md` files (`01-…` through `06-…`) forming the career-arc timeline. Frontmatter: `number` (integer, ordering) and `links` (list of `{study, label}`, where `study` is a case-study **folder name**; a link to a folder that does not exist fails the site build with the offending reference).
 
 ### `content/principles/` — principles collection
 

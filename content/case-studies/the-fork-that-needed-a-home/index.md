@@ -4,6 +4,10 @@ summary: A vendor’s bug stopped being our outage.
 topics:
   - reliability
   - delivery
+order: 18
+aliases:
+  - 18-the-fork-that-needed-a-home
+  - provider-fork
 featured: false
 spotlight: false
 ---

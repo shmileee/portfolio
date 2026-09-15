@@ -7,6 +7,10 @@ topics:
   - security
   - cost
   - delivery
+order: 19
+aliases:
+  - 19-turning-container-images-from-a-liability-into-a-supply-chain
+  - container-supply-chain
 featured: true
 spotlight: false
 ---

@@ -4,6 +4,10 @@ summary: Topic changes became pull requests with named owners, review, and histo
 topics:
   - reliability
   - delivery
+order: 11
+aliases:
+  - 11-kafka-topics-as-code
+  - kafka-topics
 featured: false
 spotlight: false
 ---

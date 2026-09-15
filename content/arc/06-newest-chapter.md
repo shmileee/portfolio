@@ -1,13 +1,13 @@
 ---
 number: 6
 links:
-  - study: container-supply-chain
+  - study: turning-container-images-from-a-liability-into-a-supply-chain
     label: container images
-  - study: cloud-functions
+  - study: customer-code-running-safely-self-service-cloud-functions
     label: cloud functions
-  - study: ai-tooling
+  - study: safe-ai-tooling-for-every-developer
     label: ai tooling
-  - study: agent-ready-codebase
+  - study: a-codebase-whose-newest-users-are-ai-agents
     label: ai agents
 ---
 

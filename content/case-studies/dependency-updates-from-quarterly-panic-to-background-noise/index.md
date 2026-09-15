@@ -5,6 +5,10 @@ topics:
   - security
   - reliability
   - ai
+order: 8
+aliases:
+  - 08-dependency-updates-from-quarterly-panic-to-background-noise
+  - dependency-updates
 featured: false
 spotlight: false
 ---

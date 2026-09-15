@@ -7,6 +7,10 @@ topics:
   - ai
   - developer experience
   - security
+order: 22
+aliases:
+  - 23-a-codebase-whose-newest-users-are-ai-agents
+  - agent-ready-codebase
 featured: true
 spotlight: false
 ---

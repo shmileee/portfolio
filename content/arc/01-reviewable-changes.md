@@ -1,11 +1,11 @@
 ---
 number: 1
 links:
-  - study: infrastructure-changes
+  - study: making-infrastructure-changes-boring
     label: infrastructure changes
-  - study: audited-approve
+  - study: approve-the-audited-escape-hatch
     label: /approve
-  - study: self-service-buttons
+  - study: buttons-instead-of-incantations
     label: buttons
 ---
 

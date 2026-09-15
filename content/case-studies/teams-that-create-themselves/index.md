@@ -4,6 +4,10 @@ summary: One self-service pull request provisions the team, communication, on-ca
 topics:
   - developer experience
   - delivery
+order: 6
+aliases:
+  - 06-teams-that-create-themselves
+  - self-service-teams
 featured: false
 spotlight: false
 ---

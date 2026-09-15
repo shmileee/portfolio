@@ -4,6 +4,10 @@ summary: The per-gigabyte NAT tax is gone from the default path.
 topics:
   - cost
   - networking
+order: 15
+aliases:
+  - 15-the-nat-bill-and-the-open-source-fix-i-helped-ship
+  - nat-cost
 featured: false
 spotlight: false
 ---

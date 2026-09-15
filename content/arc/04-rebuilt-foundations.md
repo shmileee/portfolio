@@ -1,9 +1,9 @@
 ---
 number: 4
 links:
-  - study: network-rebuild
+  - study: the-network-nobody-dared-touch
     label: the network
-  - study: ephemeral-environments
+  - study: environments-you-can-create-and-destroy-with-one-command
     label: environments
 ---
 

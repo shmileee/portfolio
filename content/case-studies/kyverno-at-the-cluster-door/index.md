@@ -4,6 +4,10 @@ summary: "The clusters now say \"no\" politely, consistently, and in version con
 topics:
   - security
   - reliability
+order: 10
+aliases:
+  - 10-kyverno-at-the-cluster-door
+  - policy-engine
 featured: false
 spotlight: false
 ---

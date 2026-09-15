@@ -1,9 +1,9 @@
 ---
 number: 5
 links:
-  - study: acquisition-migration
+  - study: absorbing-an-acquisition-one-engineer-one-summer-an-entire-product-moved
     label: acquisition
-  - study: registry-migration
+  - study: leaving-docker-hub-without-anyone-noticing
     label: docker hub
 ---
 

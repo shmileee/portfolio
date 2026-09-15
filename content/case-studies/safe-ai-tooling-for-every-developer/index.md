@@ -5,6 +5,10 @@ topics:
   - ai
   - security
   - developer experience
+order: 21
+aliases:
+  - 22-safe-ai-tooling-for-every-developer
+  - ai-tooling
 featured: true
 spotlight: false
 ---

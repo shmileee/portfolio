@@ -1,9 +1,9 @@
 ---
 number: 2
 links:
-  - study: fast-feedback
+  - study: a-feedback-loop-measured-in-milliseconds
     label: feedback loop
-  - study: tool-versions
+  - study: one-tool-version-everywhere
     label: tool versions
 ---
 

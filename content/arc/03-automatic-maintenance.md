@@ -1,13 +1,13 @@
 ---
 number: 3
 links:
-  - study: terraform-product
+  - study: turning-a-terraform-repository-into-a-product
     label: terraform repository
-  - study: dependency-updates
+  - study: dependency-updates-from-quarterly-panic-to-background-noise
     label: dependency updates
   - study: kubernetes-upgrades
     label: kubernetes upgrades
-  - study: fleet-patching
+  - study: the-fleet-that-patches-itself
     label: fleet patching
 ---
 

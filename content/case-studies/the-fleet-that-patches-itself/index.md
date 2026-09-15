@@ -6,6 +6,10 @@ evidence: "07:00–20:00 weekday coverage, an 18:00 rotation cutoff, and pool-sp
 topics:
   - security
   - reliability
+order: 12
+aliases:
+  - 12-the-fleet-that-patches-itself
+  - fleet-patching
 featured: true
 spotlight: false
 ---
