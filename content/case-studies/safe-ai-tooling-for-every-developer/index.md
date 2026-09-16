@@ -19,7 +19,7 @@ AI coding assistants became genuinely useful for operations work — if they cou
 
 ## What I did
 
-I built the company's MCP gateway (MCP is the open protocol AI assistants use to call external tools): one stable, secure address per environment through which any assistant can reach our deployment system, dashboards, and metrics. Developers authenticate with the AWS identity they already have — no new tokens exist at all.
+I built the company’s MCP gateway (MCP is the open protocol AI assistants use to call external tools): one stable, secure address per environment through which any assistant can reach our deployment system, dashboards, and metrics. Developers authenticate with the AWS identity they already have — no new tokens exist at all.
 
 Behind the gateway, every backend is deliberately blunted: the deployment tool is read-only in production, the dashboard tool has writing disabled and only a safe subset of its capabilities exposed. Access for every developer is granted through our normal identity platform, in code.
 
@@ -51,11 +51,11 @@ Same pattern for staging, operations, and production — only the URL and profil
 
 > The gnarliest bug was cryptographic: requests are signed by the client for the public address, but the AWS service behind it requires a different signature — so the front door strips and re-signs every request in flight.
 >
-> And when an upstream tool suddenly rejected all proxied traffic (a new security feature couldn't know our gateway hostname was legitimate), the fix required understanding exactly which protection layer was redundant behind our signing — and disabling only that one.
+> And when an upstream tool suddenly rejected all proxied traffic (a new security feature couldn’t know our gateway hostname was legitimate), the fix required understanding exactly which protection layer was redundant behind our signing — and disabling only that one.
 
 ## The interesting part
 
-The whole design is one stable door, many safe backends. The hard part wasn't just making the proxy work; it was making the security model obvious enough that the repository itself can tell developers how to use it.
+The whole design is one stable door, many safe backends. The hard part wasn’t just making the proxy work; it was making the security model obvious enough that the repository itself can tell developers how to use it.
 
 ## What it changed
 

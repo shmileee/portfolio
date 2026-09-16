@@ -18,7 +18,7 @@ Setting up a new engineering team was a pile of tickets: a GitHub team here, a S
 
 ## What I did
 
-I made "team" a piece of infrastructure. A developer creates one folder with one small JSON file describing their team; automation generates everything else: the GitHub team (synced to our identity provider), the Slack channels, the on-call schedule, the service-catalog entry — and, crucially, the team's alert channels, with the alerting system already invited. Monitoring alerts for a team's services land in that team's channel from day one, with no platform-team involvement.
+I made “team” a piece of infrastructure. A developer creates one folder with one small JSON file describing their team; automation generates everything else: the GitHub team (synced to our identity provider), the Slack channels, the on-call schedule, the service-catalog entry — and, crucially, the team’s alert channels, with the alerting system already invited. Monitoring alerts for a team’s services land in that team’s channel from day one, with no platform-team involvement.
 
 ```json title="team.json"
 {

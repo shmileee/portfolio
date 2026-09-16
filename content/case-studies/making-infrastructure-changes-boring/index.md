@@ -15,7 +15,7 @@ spotlight: false
 
 ## The situation
 
-When I joined, infrastructure changes were largely hand-applied by engineers with privileged access. Change history was incomplete, and reviewers couldn't see what a change would actually do to production.
+When I joined, infrastructure changes were largely hand-applied by engineers with privileged access. Change history was incomplete, and reviewers couldn’t see what a change would actually do to production.
 
 ## What I did, in three moves
 

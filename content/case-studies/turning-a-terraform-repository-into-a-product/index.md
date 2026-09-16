@@ -14,14 +14,14 @@ spotlight: false
 
 ## The situation
 
-The central Terraform repository was where all cloud infrastructure lived — and it showed its age. Shared modules were "versioned" with hand-made git tags in no consistent format: random suffixes, a mix of underscores and hyphens, no changelogs. The Terraform state itself was committed into the git repository. There was no release process, no consistent style, and no place to learn how to do things right.
+The central Terraform repository was where all cloud infrastructure lived — and it showed its age. Shared modules were “versioned” with hand-made git tags in no consistent format: random suffixes, a mix of underscores and hyphens, no changelogs. The Terraform state itself was committed into the git repository. There was no release process, no consistent style, and no place to learn how to do things right.
 
 ## What I did
 
 I treated the repository as a product with users. I moved the state out of git and into S3 backends — every stack, in one focused campaign.
 I replaced hand-made tags with a real release pipeline: structured commit messages produce versioned, changelogged module releases automatically. I standardized the code itself — formatters and linters enforced automatically, guidelines and best practices written down, documentation curated and rewritten (including recorded terminal walkthroughs, so people could watch the workflow, not just read about it).
 I introduced Terramate to manage the growing estate of stacks, designed the repository layout and the reusable imports, then migrated every legacy stack onto it. I stood up an internal Terraform registry to host our own providers ([the fork that needed a home](/case-studies/the-fork-that-needed-a-home/)).
-And when navigation itself became the problem — hundreds of stacks across many accounts and regions — I built a terminal tool that answers "where is X deployed, and in which account?" in seconds:
+And when navigation itself became the problem — hundreds of stacks across many accounts and regions — I built a terminal tool that answers “where is X deployed, and in which account?” in seconds:
 
 <figure class="media-exhibit wide" data-exhibit>
   <div class="media-exhibit-frame">
@@ -35,7 +35,7 @@ And when navigation itself became the problem — hundreds of stacks across many
   <figcaption class="exhibit-caption"><span>EXHIBIT 01</span> — Where is X deployed, and in which account? Answered in seconds</figcaption>
 </figure>
 
-Alongside the tooling I started the company's Terraform community channel, answered beginner questions, and taught people their first steps.
+Alongside the tooling I started the company’s Terraform community channel, answered beginner questions, and taught people their first steps.
 
 ## The interesting part
 

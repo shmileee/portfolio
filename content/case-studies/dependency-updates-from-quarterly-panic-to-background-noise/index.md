@@ -1,6 +1,7 @@
 ---
 title: "Dependency updates: from quarterly panic to background noise"
 summary: Staying current became the default state.
+description: A self-hosted Renovate instance, automated releases and a supervised AI review skill turned third-party updates from a quarterly scramble into a continuous stream of small, audited merges.
 topics:
   - security
   - reliability
@@ -24,7 +25,7 @@ Three layers, built over three years. First, the *plumbing*: I deployed a self-h
 ## The interesting part
 
 In the final year I encoded that judgment into a reusable LLM skill — a written playbook an AI agent executes under supervision. It classifies each update pull request by *proven* safety, not by trusting version labels: it reads the rendered deployment diff or the actual Terraform plan, merges only what is demonstrably a no-op or a verified-safe bump, mechanically repairs simple failures, and holds everything else for a human.
-The prerequisite was unglamorous: resurrecting a dozen long-broken infrastructure stacks that couldn't even produce a clean plan. A backlog that had accumulated for months cleared in weeks — at roughly twenty times the usual pace, with an audit trail for every merge.
+The prerequisite was unglamorous: resurrecting a dozen long-broken infrastructure stacks that couldn’t even produce a clean plan. A backlog that had accumulated for months cleared in weeks — at roughly twenty times the usual pace, with an audit trail for every merge.
 
 ## What it changed
 

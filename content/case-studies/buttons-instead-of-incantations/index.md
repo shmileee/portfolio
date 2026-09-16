@@ -37,7 +37,7 @@ The extension only activates on the right repositories, checks team membership b
 
 ## What it changed
 
-Infrastructure pull request interactions became one-click and typo-free while preserving the logged-in user's existing permissions and audit trail.
+Infrastructure pull request interactions became one-click and typo-free while preserving the logged-in user’s existing permissions and audit trail.
 
 Here it is in action:
 

@@ -17,7 +17,7 @@ spotlight: false
 ## The situation
 All our AWS networks were interconnected through a transit-gateway setup built from about fifteen copies of a community module. Routes were tracked by position in a list, so adding one network range made the plan propose destroying and recreating production routes. The resulting blast radius kept the stack effectively frozen for years.
 
-And the fear was structural, not personal: with a transit gateway, all the wiring is yours — a route table per attachment, hand-managed propagation, and no concept of "environment" beyond the discipline of whoever edits the routes.
+And the fear was structural, not personal: with a transit gateway, all the wiring is yours — a route table per attachment, hand-managed propagation, and no concept of “environment” beyond the discipline of whoever edits the routes.
 
 ## What I did
 Two moves — first make it safe, then make it better.
@@ -30,11 +30,11 @@ Make it better: I designed and drove our move to AWS Cloud WAN — effectively t
 
 - The network is one reviewable document. Segments — production, non-production, shared, and a quarantine for anything unrecognized — and the rules for joining them live in a single policy definition, in git, instead of being implied by dozens of route tables.
 
-- Joining is by policy, not by hand. An attachment is admitted to a segment only if it carries the right tag and comes from the right account; anything unknown lands in quarantine with no connectivity to lose sleep over. Nobody edits another account's route tables anymore.
+- Joining is by policy, not by hand. An attachment is admitted to a segment only if it carries the right tag and comes from the right account; anything unknown lands in quarantine with no connectivity to lose sleep over. Nobody edits another account’s route tables anymore.
 
 - Real separation. Production and non-production traffic simply cannot mix unless the policy says so — a property our transit-gateway mesh never had.
 
-- It's managed and multi-region. AWS runs the core network with edges in each region we need; expanding the network to a new region is a policy change, not a peering project. (We also evaluated AWS's transit-gateway orchestration solution and rejected it — too many moving parts to own.)
+- It’s managed and multi-region. AWS runs the core network with edges in each region we need; expanding the network to a new region is a policy change, not a peering project. (We also evaluated AWS’s transit-gateway orchestration solution and rejected it — too many moving parts to own.)
 
 ## The interesting part
 After the refactor, dependency updates and colleague-authored network changes could use the same plan-and-review path as the rest of the infrastructure estate.

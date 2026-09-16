@@ -19,13 +19,13 @@ spotlight: false
 
 We ran on dozens of internally-maintained container images — patched third-party tools, custom bases, CI runners. Each built its own way.
 
-I'd seen this exact problem at every scale of company: internal images accumulate, and they end up managed either by a docker bake file or a pile of bash scripts. It never holds. Either every change rebuilds everything in sequence, or the scripts grow so entangled that adding one image means understanding all of them.
+I’d seen this exact problem at every scale of company: internal images accumulate, and they end up managed either by a docker bake file or a pile of bash scripts. It never holds. Either every change rebuilds everything in sequence, or the scripts grow so entangled that adding one image means understanding all of them.
 
 Meanwhile, when a vulnerability landed, patching meant hunting through repositories by hand; nobody could say with confidence where a given image came from; and the cheaper ARM-based cloud servers were off-limits because almost nothing was built for them.
 
 ## What I did
 
-I built an internal "image factory": every image is described by one small config file, and the factory does the rest — builds it for both processor architectures, tests it, publishes it, and then independently checks that what landed in the registry is exactly what was built. The whole contract fits on one screen:
+I built an internal “image factory”: every image is described by one small config file, and the factory does the rest — builds it for both processor architectures, tests it, publishes it, and then independently checks that what landed in the registry is exactly what was built. The whole contract fits on one screen:
 
 ```yaml title="images/cloudwatch-exporter/image.yaml"
 apiVersion: images.example.io/v1alpha1
@@ -117,7 +117,7 @@ Because each image is a self-contained folder with a manifest, the factory disco
 <figcaption class="exhibit-caption"><span>EXHIBIT</span> — The release is accepted only when the registry digest matches the artifact that passed both architecture builds and their tests.</figcaption>
 </figure>
 
-> The scariest failure in image publishing isn't a build that breaks — it's a wrong image quietly landing under a trusted name.
+> The scariest failure in image publishing isn’t a build that breaks — it’s a wrong image quietly landing under a trusted name.
 
 So the publisher is deliberately paranoid: published versions can never be overwritten, and every upload is read back and compared against what was actually built. A transient failure during publishing can restart from the planned state and reuse existing digest artifacts without rebuilding; a failed platform build requires a new workflow run. The principle: a missing image is an inconvenience; a wrong image is a disaster — every design choice guards against the disaster.
 
@@ -127,4 +127,4 @@ The factory got boring in the best way: images became data, not scripts; ARM bec
 
 ## What it changed
 
-Security patching became a routine automated flow. "Where did this image come from?" stopped being a research project. ARM support by default opened the door to meaningfully cheaper compute. Built from zero to production in under a month — possible only because pull request automation, releases, runners, and hooks already existed.
+Security patching became a routine automated flow. “Where did this image come from?” stopped being a research project. ARM support by default opened the door to meaningfully cheaper compute. Built from zero to production in under a month — possible only because pull request automation, releases, runners, and hooks already existed.

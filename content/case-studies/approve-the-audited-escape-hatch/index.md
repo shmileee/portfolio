@@ -14,12 +14,12 @@ spotlight: false
 
 ## The situation
 
-Our own safety rules created a new problem. Our Atlantis workflow blocks `terraform apply` until a pull request is approved — correct ninety-nine percent of the time. But at 3 a.m., the on-call engineer fixing production may have no reviewer awake. And a developer iterating alone in a development stack shouldn't need to interrupt a colleague for every experiment. The wrong fixes were obvious: hand out admin rights, or weaken branch protection for everyone, forever.
+Our own safety rules created a new problem. Our Atlantis workflow blocks `terraform apply` until a pull request is approved — correct ninety-nine percent of the time. But at 3 a.m., the on-call engineer fixing production may have no reviewer awake. And a developer iterating alone in a development stack shouldn’t need to interrupt a colleague for every experiment. The wrong fixes were obvious: hand out admin rights, or weaken branch protection for everyone, forever.
 
 ## What I did
 
 I built a small escape hatch with a complete audit trail. Commenting `/approve reason="emergency: prod fix"` on a pull request triggers a workflow that checks whether the commenter — deliberately not the author — belongs to an explicitly authorized team. If yes, the CI bot posts the approving review and Atlantis can run `terraform apply`; if not, the commenter gets a polite explanation and nothing happens.
-Every use is announced in a Slack audit channel: who approved, which pull request, on whose team's authority, and the stated reason — which is also recorded permanently in the review itself.
+Every use is announced in a Slack audit channel: who approved, which pull request, on whose team’s authority, and the stated reason — which is also recorded permanently in the review itself.
 
 ## What it changed
 
