@@ -2,7 +2,7 @@
 title: Turning a Terraform repository into a product
 summary: Release automation, reusable stacks, documentation, and teaching made the central Terraform repository usable across teams.
 topics:
-  - developer experience
+  - devex
   - delivery
 order: 7
 aliases:

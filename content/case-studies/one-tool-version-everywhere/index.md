@@ -2,7 +2,7 @@
 title: "One tool version, everywhere: from decision record to a centrally cached CI"
 summary: Version drift — between two laptops, or between a laptop and CI — stopped being a category of bug.
 topics:
-  - developer experience
+  - devex
   - delivery
 order: 5
 aliases:

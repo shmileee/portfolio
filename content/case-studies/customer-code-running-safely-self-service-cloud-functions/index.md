@@ -35,7 +35,8 @@ spec:
   timeout: 20
   compositionSelector:
     matchLabels:
-      type: container        # or "zip" — two compositions, selected by label
+      # or "zip" — two compositions, selected by label
+      type: container
 ```
 
 Crossplane turns that object into the real thing: an isolated Lambda function, its own IAM role capped by a permissions boundary the platform patches in (customers get creative freedom inside a box they cannot climb out of), a URL requiring signed requests, streaming-response support (the functions live outside any VPC, per AWS guidance for low-latency streaming), and a per-function log group so app developers can see their own logs.

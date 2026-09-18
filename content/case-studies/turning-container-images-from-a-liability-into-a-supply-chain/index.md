@@ -33,7 +33,8 @@ kind: Image
 metadata:
   name: cloudwatch-exporter
   owners: [team-sre]
-  category: patched            # a patched third-party image (vs. fully internal)
+  # a patched third-party image (vs. fully internal)
+  category: patched
 spec:
   repository: maintained/cloudwatch-exporter
   defaults:
@@ -49,8 +50,10 @@ spec:
         primary: "2.0.0"
         aliases: [latest]
       tests:
-        buildTargets: [test]   # test stage must pass before publish
-  upstream:                    # what the update bot watches for new versions
+        # test stage must pass before publish
+        buildTargets: [test]
+  # what the update bot watches for new versions
+  upstream:
     datasource: docker
     image: docker.io/prom/cloudwatch-exporter
     version: "v0.18.0"

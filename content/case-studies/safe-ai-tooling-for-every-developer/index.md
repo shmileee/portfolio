@@ -4,7 +4,7 @@ summary: Existing AWS identity and restricted backends provide one governed path
 topics:
   - ai
   - security
-  - developer experience
+  - devex
 order: 21
 aliases:
   - 22-safe-ai-tooling-for-every-developer

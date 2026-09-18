@@ -3,7 +3,7 @@ title: Making infrastructure changes boring
 summary: Pull-request plans and Kubernetes diffs made infrastructure changes visible before automated deployment.
 topics:
   - delivery
-  - developer experience
+  - devex
   - reliability
 order: 1
 aliases:

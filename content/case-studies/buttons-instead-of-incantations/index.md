@@ -2,7 +2,7 @@
 title: Buttons instead of incantations
 summary: Pull-request commands became one-click actions without adding tokens, a server, or a new identity.
 topics:
-  - developer experience
+  - devex
 order: 3
 aliases:
   - 03-buttons-instead-of-incantations

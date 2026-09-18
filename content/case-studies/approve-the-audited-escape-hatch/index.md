@@ -3,7 +3,7 @@ title: "/approve: the audited escape hatch"
 summary: An authorized reviewer can unblock an urgent `terraform apply` in Atlantis without weakening branch protection or losing the audit trail.
 topics:
   - security
-  - developer experience
+  - devex
 order: 2
 aliases:
   - 02-approve-the-audited-escape-hatch

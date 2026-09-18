@@ -2,7 +2,7 @@
 title: Teams that create themselves
 summary: One self-service pull request provisions the team, communication, on-call, catalog, and alerting resources together.
 topics:
-  - developer experience
+  - devex
   - delivery
 order: 6
 aliases:

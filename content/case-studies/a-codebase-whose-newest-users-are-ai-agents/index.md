@@ -5,7 +5,7 @@ role: Defined repository guidance, safe-tool defaults, supervised skills, and me
 evidence: Repository-local maps and playbooks route every change through the same plans, diffs, CI, and human merge gate.
 topics:
   - ai
-  - developer experience
+  - devex
   - security
 order: 22
 aliases:

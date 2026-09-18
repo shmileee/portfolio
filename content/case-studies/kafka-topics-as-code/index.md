@@ -26,7 +26,8 @@ kind: KafkaTopic
 metadata:
   name: orders-events
   labels:
-    owner: team-orders         # ownership resolved from our service catalog
+    # ownership resolved from our service catalog
+    owner: team-orders
 spec:
   topicName: orders.events
   partitions: 12

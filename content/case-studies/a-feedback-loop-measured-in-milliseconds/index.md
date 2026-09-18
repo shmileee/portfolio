@@ -2,7 +2,7 @@
 title: A feedback loop measured in milliseconds
 summary: The old formatting hook took about seven seconds; the rewritten one runs a fifty-file commit in 59 milliseconds.
 topics:
-  - developer experience
+  - devex
   - delivery
 order: 4
 aliases:
