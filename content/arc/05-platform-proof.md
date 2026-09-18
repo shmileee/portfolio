@@ -1,7 +1,7 @@
 ---
 number: 5
 links:
-  - study: absorbing-an-acquisition-one-engineer-one-summer-an-entire-product-moved
+  - study: absorbing-an-acquisition
     label: acquisition
   - study: leaving-docker-hub-without-anyone-noticing
     label: docker hub
