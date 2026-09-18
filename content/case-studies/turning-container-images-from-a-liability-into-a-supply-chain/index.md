@@ -126,4 +126,4 @@ The scariest failure in image publishing is not a build that breaks. It is a wro
 
 ## What it changed
 
-Security patching became a routine automated flow. "Where did this image come from?" stopped being a research project. ARM support by default opened the door to meaningfully cheaper compute. The factory went from zero to production in under a month, which was possible only because pull-request automation, releases, runners and hooks already existed.
+Security patching became a routine automated flow. "Where did this image come from?" stopped being a research project. ARM support by default opened the door to meaningfully cheaper compute. The factory went from zero to production in under a month, which was possible only because pull request automation, releases, runners and hooks already existed.

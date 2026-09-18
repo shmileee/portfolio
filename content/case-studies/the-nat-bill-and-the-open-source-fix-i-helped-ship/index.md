@@ -26,7 +26,7 @@ I ran it first in our main VPCs, then designed it into the [cell architecture](/
 
 ## The interesting part
 
-I did not only consume the project; I contributed the deployment model we needed. Early alterNAT required building and hosting a container image for its failover function, and in shared automation, CI and pull-request-driven Terraform, that is a build dependency nobody wants.
+I did not only consume the project; I contributed the deployment model we needed. Early alterNAT required building and hosting a container image for its failover function, and in shared automation, CI and Terraform run from pull requests, that is a build dependency nobody wants.
 
 My merged upstream pull requests added the native Zip deployment path ([#44](https://github.com/chime/terraform-aws-alternat/pull/44)), which packages the function for the standard runtime with no image registry involved, and then removed the last third-party dependency from the function so it runs on the standard library alone ([#52](https://github.com/chime/terraform-aws-alternat/pull/52)). Production at our company runs on exactly the code path I upstreamed.
 

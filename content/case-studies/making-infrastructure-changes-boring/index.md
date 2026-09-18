@@ -27,7 +27,7 @@ Three moves, in an order that mattered.
 
 I migrated all Kubernetes infrastructure into Argo CD, which keeps a cluster in sync with what a git repository declares, component by component until Argo CD managed even itself. Then I deleted the hundreds of thousands of lines of legacy configuration the old world had left behind.
 
-For cloud infrastructure I introduced Atlantis, which runs Terraform from pull-request comments. Since then Terraform has run in exactly one place, on pull requests, never on laptops. Over the years I customised it: authentication through a GitHub App, applies blocked until approval, plan locking, a cost estimate commented on every pull request, and performance tuning as the repository grew.
+For cloud infrastructure I introduced Atlantis, which runs Terraform from pull request comments. Since then Terraform has run in exactly one place, on pull requests, never on laptops. Over the years I customised it: authentication through a GitHub App, applies blocked until approval, plan locking, a cost estimate commented on every pull request, and performance tuning as the repository grew.
 
 ### Kubernetes got what Atlantis gave Terraform
 
