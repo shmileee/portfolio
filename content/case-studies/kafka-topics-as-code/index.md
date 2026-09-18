@@ -21,7 +21,6 @@ The runbook could not establish what existed, who owned each topic, or where doc
 I moved every topic into git as a Kubernetes resource (Strimzi’s KafkaTopic), managed by the same GitOps pipeline as everything else. Each topic is now one small reviewable file:
 
 ```yaml title="topics/orders-events.yaml"
-# topics/orders-events.yaml
 apiVersion: kafka.strimzi.io/v1
 kind: KafkaTopic
 metadata:
