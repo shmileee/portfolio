@@ -24,7 +24,7 @@ I introduced Kyverno, the policy engine that enforces rules at that door, with t
 
 Protecting data infrastructure. After [every Kafka topic became a git-managed resource](/case-studies/kafka-topics-as-code/), policies made destructive edits impossible: replica settings are rejected, partition counts may only grow, and nobody, however senior, can shell into a broker pod. The review comment "are you sure?" became a hard no from the cluster itself.
 
-The invisible registry switch. During [the Docker Hub exit](/case-studies/leaving-docker-hub-without-anyone-noticing/), mutation policies rewrote every image reference in flight to our own mirror, which is what let the whole organisation move registries without coordinating a single team.
+The invisible registry switch. During [the Docker Hub exit](/case-studies/leaving-docker-hub-without-anyone-noticing/), mutation policies rewrote every image reference in flight to our own mirror, which is what let the whole organisation move registries without coordinating a single team. Both halves are written up on the blog: [the mutating policy itself](/blog/posts/rewriting-docker-image-registries-with-kyverno/), rolled out one namespace at a time, and [the pull-through cache repositories](/blog/posts/setting-up-pull-through-cache-repositories-in-aws-ecr/) it points every pod at.
 
 Deletion safety. A policy preserves cloud resources when a GitOps application is deleted, so removing an application definition cannot cascade into deleting what it managed.
 
