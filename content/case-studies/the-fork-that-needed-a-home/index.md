@@ -1,7 +1,7 @@
 ---
 title: The fork that needed a home
-summary: A broken Terraform provider was forked and fixed in four days, and the internal registry built to serve it became the company's one governed distribution point for every provider.
-role: Forked and fixed the provider, filed every fix upstream, and stood up the internal Terraform registry that serves it.
+summary: The FireHydrant Terraform provider was forked and fixed in four days, and the internal registry built to serve it became the company's one governed distribution point for every provider.
+role: Forked and fixed the FireHydrant provider, filed every fix upstream, and stood up the internal Terraform registry that serves it.
 evidence: About 30 team stacks plan against the fork; the registry now also serves our own providers and mirrors the public registry for everything else.
 topics:
   - reliability
@@ -16,7 +16,7 @@ spotlight: false
 
 ## The situation
 
-Our incident-management provider's Terraform plugin broke at our scale. With about 30 team stacks planning against one account, the upstream provider, which had removed its request throttling, died with rate-limit errors on parallel runs; two resources re-planned phantom changes on every single run; a data source crashed on duplicate records. The [team automation](/case-studies/teams-that-create-themselves/) depended on all of it.
+FireHydrant's Terraform provider broke at our scale. With about 30 team stacks planning against one account, the upstream provider, which had removed its request throttling, died with rate-limit errors on parallel runs; two resources re-planned phantom changes on every single run; a data source crashed on duplicate records. The [team automation](/case-studies/teams-that-create-themselves/) depended on all of it.
 
 ## What I did
 
@@ -27,8 +27,8 @@ A patched provider is useless until Terraform can download it, and that is why t
 ```hcl title="versions.tf"
 terraform {
   required_providers {
-    incident = {
-      source  = "registry.example.com/platform/incident"
+    firehydrant = {
+      source  = "registry.example.com/platform/firehydrant"
       version = "0.15.2-platform.5"
     }
   }

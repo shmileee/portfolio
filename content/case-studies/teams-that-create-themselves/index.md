@@ -40,7 +40,7 @@ I made "team" a piece of infrastructure. A developer creates one folder with one
     "create_am_config": true,
     "create_slack_channels": true
   },
-  "oncall": {
+  "firehydrant": {
     "team_oncall_enabled": true,
     "schedules": [
       {
@@ -60,7 +60,7 @@ I made "team" a piece of infrastructure. A developer creates one folder with one
 
 The `alerts` block is the part that used to need a platform engineer: `create_am_config` generates the Alertmanager routing for the team's services, and `create_slack_channels` creates the channels those alerts go to. The two schedules are one on-call rotation covering both offices.
 
-The generator itself is described in [a note on the blog](/blog/posts/generating-terraform-for-teams-from-one-json-file/). The provider behind the on-call schedules broke at this scale, which is [its own story](/case-studies/the-fork-that-needed-a-home/).
+The generator itself is described in [a note on the blog](/blog/posts/generating-terraform-for-teams-from-one-json-file/). The `firehydrant` block drives the on-call schedules through FireHydrant's Terraform provider, which broke at this scale and became [its own story](/case-studies/the-fork-that-needed-a-home/).
 
 ## The interesting part
 
