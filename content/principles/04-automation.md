@@ -1,5 +1,5 @@
 ---
-number: 5
+number: 4
 title: Automation over heroics.
 ---
 

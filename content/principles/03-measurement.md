@@ -1,5 +1,5 @@
 ---
-number: 4
+number: 3
 title: Measure, don't assert.
 ---
 
