@@ -7,7 +7,7 @@ topics:
   - cost
   - reliability
   - security
-order: 17
+order: 13
 aliases:
   - 17-leaving-docker-hub-without-anyone-noticing
   - registry-migration
@@ -23,9 +23,9 @@ Docker Hub announced price changes. We had years of accumulated dependence on it
 
 I proposed the move, wrote the plan, a project timeline whose final line was "cancel the Docker Hub subscription", and implemented it end to end.
 
-First the infrastructure: [pull-through mirror repositories](/blog/posts/setting-up-pull-through-cache-repositories-in-aws-ecr/) in our own AWS registry that transparently cache Docker Hub and, soon after, several other public registries. Credentials are handled centrally, cleanup rules keep the caches from growing forever, and read access is granted organisation-wide.
+First the infrastructure: [pull-through mirror repositories](/blog/posts/setting-up-pull-through-cache-repositories-in-aws-ecr/) in our own AWS registry that transparently cache Docker Hub and, soon after, several other public registries. Credentials are handled centrally, cleanup rules keep the caches from growing forever, and read access is granted organization-wide.
 
-Then the bridge that removed the flag day: the Kyverno admission-time mutation policies from [Kyverno at the cluster door](/case-studies/kyverno-at-the-cluster-door/) rewrite image references in flight, so a workload asking for a Docker Hub image receives the mirrored copy. Image pulls moved to our own registry while teams continued shipping; within weeks the mirror was serving hundreds of images. The policy itself is [written up on the blog](/blog/posts/rewriting-docker-image-registries-with-kyverno/).
+Then the bridge that removed the flag day. Kyverno, the policy engine that validates and mutates objects at the Kubernetes admission layer, rewrites image references in flight, so a workload asking for a Docker Hub image receives the mirrored copy instead. The policies went out one namespace at a time. Image pulls moved to our own registry while teams kept shipping, and within weeks the mirror was serving hundreds of images. The policy itself is [written up on the blog](/blog/posts/rewriting-docker-image-registries-with-kyverno/).
 
 <div class="diagram-exhibit" data-exhibit>
   <div class="diagram-exhibit-label">EXHIBIT — THE INVISIBLE REGISTRY SWITCH</div>
@@ -34,9 +34,9 @@ Then the bridge that removed the flag day: the Kyverno admission-time mutation p
 
 Then I migrated the manifests themselves in a focused sweep, and left the rewrite policy running as a safety net for stragglers.
 
-## The interesting part
+## Retiring the bridge
 
-A migration is finished when nothing depends on the bridge any more. A year and a half after the sweep I deleted the migration rationale from the policy document, the project's quiet way of saying "done"; the rewrite rule stays, because a manifest that names Docker Hub tomorrow should still get the mirror.
+A year and a half after the sweep nothing depended on the bridge any more, and I deleted the migration rationale from the policy document. The rewrite rule itself stays: a manifest that names Docker Hub tomorrow still gets the mirror.
 
 ## What it changed
 

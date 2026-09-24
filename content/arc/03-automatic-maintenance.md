@@ -5,8 +5,6 @@ links:
     label: terraform repository
   - study: dependency-updates-from-quarterly-panic-to-background-noise
     label: dependency updates
-  - study: kubernetes-upgrades
-    label: kubernetes upgrades
   - study: the-fleet-that-patches-itself
     label: fleet patching
 ---
