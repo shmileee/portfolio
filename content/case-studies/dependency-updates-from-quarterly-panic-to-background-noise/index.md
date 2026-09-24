@@ -7,7 +7,7 @@ topics:
   - security
   - reliability
   - ai
-order: 8
+order: 6
 aliases:
   - 08-dependency-updates-from-quarterly-panic-to-background-noise
   - dependency-updates
@@ -29,7 +29,7 @@ Second, the precondition. Across the repositories our team maintained, I mandate
 
 Third, the judgment. For years I was the human gate reviewing that stream into production infrastructure.
 
-## The interesting part
+## Encoding the review as a skill
 
 In the final year I encoded that judgment into a reusable skill: a written playbook an AI agent executes under supervision, one of the [agent playbooks](/case-studies/a-codebase-whose-newest-users-are-ai-agents/) the repositories now carry. It classifies each update pull request by proven safety, not by trusting version labels. It reads the rendered deployment diff or the actual Terraform plan, merges only what is demonstrably a no-op or a verified-safe bump, mechanically repairs simple failures, and holds everything else for a human.
 

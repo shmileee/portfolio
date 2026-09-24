@@ -7,7 +7,7 @@ period: 2022–2024
 topics:
   - devex
   - delivery
-order: 5
+order: 3
 aliases:
   - 05-one-tool-version-everywhere
   - tool-versions
@@ -18,7 +18,7 @@ cardLabel: sequel
 
 ## The situation
 
-"Works on my machine" almost always means "different tool versions". Two engineers run the same Terraform command and get different results; a pipeline breaks because CI has a newer formatter than the laptop that wrote the code. In 2022 I standardised the company on a version manager, asdf, through one of our first architecture decision records: every repository declares its tool versions and the manager installs them.
+"Works on my machine" almost always means "different tool versions". Two engineers run the same Terraform command and get different results; a pipeline breaks because CI has a newer formatter than the laptop that wrote the code. In 2022 I standardized the company on a version manager, asdf, through one of our first architecture decision records: every repository declares its tool versions and the manager installs them.
 
 It solved the consistency problem. Over two years the cracks showed: every command ran through a shim, a small stand-in binary that adds a layer of redirection, which made everything slightly slow, and plugin management was a chore nobody loved.
 
@@ -47,9 +47,9 @@ TF_CLI_CONFIG_FILE = "{{config_root}}/.terraformrc"
 
 A new contributor's setup is one command, `mise install`. The file pins exact versions, and the comments say why each tool is there, so the configuration is its own onboarding document. Which tools deserve a pin at all is [a note of its own](/blog/posts/mise-faster-smarter-tool-versioning/).
 
-The same file drives CI. I rebuilt our centralised pre-commit workflow, one reusable GitHub Actions workflow that every repository calls instead of maintaining its own, to run inside a maintained mise container image and install from the very same pins. Local and CI can no longer disagree, and a fix to the workflow lands in every repository at once.
+The same file drives CI. I rebuilt our centralized pre-commit workflow, one reusable GitHub Actions workflow that every repository calls instead of maintaining its own, to run inside a maintained mise container image and install from the very same pins. Local and CI can no longer disagree, and a fix to the workflow lands in every repository at once.
 
-## The interesting part
+## What the caching taught
 
 The caching. Fast CI dies on cache mistakes, and each one taught a lesson that is now written into the workflow itself.
 
@@ -60,4 +60,4 @@ The caching. Fast CI dies on cache mistakes, and each one taught a lesson that i
 
 ## What it changed
 
-Setup went from a wiki page to one command. Version drift, between two laptops or between a laptop and CI, stopped being a category of bug. Because the workflow is centralised, the whole company's checks get faster every time one person improves one file. It also set a precedent: standards have lifecycles, and the person who introduces one should be willing to replace it, in writing, when something better exists.
+Setup went from a wiki page to one command. Version drift, between two laptops or between a laptop and CI, stopped being a category of bug. Because the workflow is centralized, the whole company's checks get faster every time one person improves one file, and the decision record that replaced asdf sits beside the one that introduced it.

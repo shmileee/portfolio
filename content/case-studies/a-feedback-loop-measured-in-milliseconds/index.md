@@ -6,7 +6,7 @@ evidence: About seven seconds per commit before; 59 milliseconds for a fifty-fil
 topics:
   - devex
   - delivery
-order: 4
+order: 2
 aliases:
   - 04-a-feedback-loop-measured-in-milliseconds
   - fast-feedback
@@ -23,13 +23,13 @@ Code review kept catching the same mechanical problems: formatting, stale docume
 
 I introduced pre-commit checks to the company and built our own hook library. The rule: fix what is fixable, and only complain about the rest ([the two kinds of hook](/blog/posts/save-yourself-from-formatting-hell/), in a note). Formatting, documentation generation and navigation files are repaired by the hooks themselves; in CI, a bot commits the fix to the pull request.
 
-Over three years I kept tightening the loop. I parallelised the slow hooks and added caching. I migrated the whole company to prek, a Rust reimplementation of pre-commit that reads the same configuration. And I rewrote the critical hooks in Go, with the hook manager compiling them from source, so nobody installs anything: no brew, no npm, no "works on my machine". A new laptop or a CI runner gets identical checks with zero setup.
+Over three years I kept tightening the loop. I parallelized the slow hooks and added caching. I migrated the whole company to prek, a Rust reimplementation of pre-commit that reads the same configuration. And I rewrote the critical hooks in Go, with the hook manager compiling them from source, so nobody installs anything: no brew, no npm, no "works on my machine". A new laptop or a CI runner gets identical checks with zero setup.
 
 To make CI as fast as the laptop, I set up the company's own GitHub Actions runners inside our clusters, built for these checks and for our container image builds, with node-local caching so a warm runner starts checking in seconds.
 
-## The interesting part
+## Measuring the hook
 
-I benchmarked instead of guessing. On our biggest repository the old formatting hook took about seven seconds per commit; the rewritten one runs a fifty-file commit there in 59 milliseconds.
+On our biggest repository the old formatting hook took about seven seconds per commit. The rewritten one runs a fifty-file commit there in 59 milliseconds, measured on the same repository.
 
 ## What it changed
 

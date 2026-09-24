@@ -6,7 +6,7 @@ evidence: Every stack moved to remote state in one campaign; the repository grew
 topics:
   - devex
   - delivery
-order: 7
+order: 5
 aliases:
   - 07-turning-a-terraform-repository-into-a-product
   - terraform-product
@@ -26,7 +26,7 @@ I moved the state out of git and into S3 backends, every stack, in one focused c
 
 I replaced hand-made tags with a release pipeline: structured commit messages produce versioned, changelogged module releases automatically.
 
-I standardised the code. Formatters and linters run automatically, guidelines and best practices are written down, and the documentation was curated and rewritten, including recorded terminal walkthroughs so people could watch the workflow rather than read about it.
+I standardized the code. Formatters and linters run automatically, guidelines and best practices are written down, and the documentation was curated and rewritten, including recorded terminal walkthroughs so people could watch the workflow rather than read about it.
 
 I introduced Terramate to manage the growing estate of stacks, designed the [repository layout](/blog/posts/structuring-a-terraform-monorepo-with-terramate/) and the reusable imports, and migrated every legacy stack onto it.
 
@@ -48,9 +48,9 @@ And when navigation itself became the problem, hundreds of stacks across many ac
 
 Alongside the tooling I started the company's Terraform community channel, answered beginner questions, and taught people their first steps.
 
-## The interesting part
+## Teaching alongside the tooling
 
-The teaching mattered as much as the tooling. Standards that arrive as documentation get ignored; standards that arrive with a helpful human, worked examples, and automation that fixes the formatting for you get adopted.
+Adoption tracked support rather than publication. The guidelines that landed were the ones with a community channel behind them, worked examples to copy, and automation that fixed the formatting instead of reporting it.
 
 ## What it changed
 

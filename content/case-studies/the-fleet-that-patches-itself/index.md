@@ -6,7 +6,7 @@ evidence: 07:00–20:00 weekday coverage, an 18:00 rotation cutoff, and pool-spe
 topics:
   - security
   - reliability
-order: 12
+order: 8
 aliases:
   - 12-the-fleet-that-patches-itself
   - fleet-patching
@@ -48,13 +48,13 @@ Development and staging track new images instantly through a name-pattern match,
 
 The core principle from the design document: drift is a controlled, planned operation triggered by a known image change, so it happens during coverage hours. Our two on-call regions cover 07:00–20:00 on weekdays, and rotation windows close at 18:00, two hours before coverage ends, so a bad image is caught on shift and never discovered by the night. Weekends are blocked; the design document puts it as "no one gets paged on weekends for node rotation". One deliberate inversion: the development Kafka brokers rotate on weekends, because a rebalance hurts developers more on a Tuesday than on a Saturday.
 
-Budgets control parallelism and pod-disruption rules protect individual services. A percentage cap decides how many nodes churn at once; per-service rules serialise replicas of the same service while different services drain in parallel. Special pools get special treatment: the metrics store rotates one node at a time, databases stagger per availability zone in pre-dawn slots, and one streaming workload blocks drift entirely, because its own operator migrates jobs on demand instead.
+Budgets control parallelism and pod-disruption rules protect individual services. A percentage cap decides how many nodes churn at once; per-service rules serialize replicas of the same service while different services drain in parallel. Special pools get special treatment: the metrics store rotates one node at a time, databases stagger per availability zone in pre-dawn slots, and one streaming workload blocks drift entirely, because its own operator migrates jobs on demand instead.
 
 A safety-net alert fires if any node's termination has been stuck for over 12 hours, with a runbook for the usual suspects: blocking disruption rules, crash-looping pods, stuck volumes.
 
-## The interesting part
+## The schedule arithmetic
 
-The schedule arithmetic is where the craft hides. The scheduler reads times in UTC with no daylight-saving handling, so the windows are set to the intersection of summer and winter coverage, safe in both. The whole policy is a handful of declarative budget blocks in the chart values, reviewed like any other code: the on-call calendar, encoded.
+The scheduler reads times in UTC with no daylight-saving handling, so the windows are set to the intersection of summer and winter coverage, safe in both. The whole policy is a handful of declarative budget blocks in the chart values, reviewed like any other code.
 
 ## What it changed
 

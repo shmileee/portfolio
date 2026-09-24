@@ -7,7 +7,7 @@ topics:
   - delivery
   - reliability
   - cost
-order: 16
+order: 12
 aliases:
   - 16-absorbing-an-acquisition-one-engineer-one-summer-an-entire-product-moved
   - absorbing-an-acquisition-one-engineer-one-summer-an-entire-product-moved
@@ -30,9 +30,9 @@ I replaced their deployment pipeline by putting CI runners inside our cluster, s
 
 We rehearsed the database export and import, deployed to staging, then production, and after a dry run cut over DNS in a scheduled maintenance window.
 
-## The interesting part
+## The cutover
 
-The switch itself was a one-line configuration change, built to be rolled back in seconds. The hard part was not the cutover; it was making the move boring enough that the acquired team could keep shipping the whole time, and arrive on the new platform with the same dashboards and their own alert channel on day one.
+The switch itself was a one-line configuration change, built to be rolled back in seconds. The work that made it safe happened earlier: the acquired team kept shipping through the whole migration, and arrived on the new platform with the same dashboards and their own alert channel on day one.
 
 ## What it changed
 

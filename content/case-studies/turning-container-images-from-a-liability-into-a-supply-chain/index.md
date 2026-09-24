@@ -7,7 +7,7 @@ topics:
   - security
   - cost
   - delivery
-order: 19
+order: 15
 aliases:
   - 19-turning-container-images-from-a-liability-into-a-supply-chain
   - container-supply-chain
@@ -17,7 +17,7 @@ spotlight: false
 
 ## The situation
 
-We ran on dozens of internally maintained container images: patched third-party tools, custom bases, CI runners. Each was built its own way, and I had seen where that ends at every size of company. Internal images accumulate and end up managed either by one bake file or by a pile of shell scripts; either every change rebuilds everything in sequence, or the scripts grow so entangled that adding one image means understanding all of them.
+We ran on dozens of internally maintained container images: patched third-party tools, custom bases, CI runners. Each was built its own way. Internal images accumulate and end up managed either by one bake file or by a pile of shell scripts; either every change rebuilds everything in sequence, or the scripts grow so entangled that adding one image means understanding all of them.
 
 When a vulnerability landed, patching meant hunting through repositories by hand. Nobody could say with confidence where a given image came from, and the cheaper ARM-based cloud servers were off limits because almost nothing was built for them.
 
@@ -120,9 +120,9 @@ I migrated the entire fleet of internal images onto the factory, 48 of them in f
 <figcaption class="exhibit-caption"><span>EXHIBIT 01</span> — The release is accepted only when the registry digest matches the artifact that passed both architecture builds and their tests.</figcaption>
 </figure>
 
-## The interesting part
+## Why the publisher is paranoid
 
-The scariest failure in image publishing is not a build that breaks. It is a wrong image landing under a trusted name. So the publisher is deliberately paranoid: published versions can never be overwritten, and every upload is read back and compared against what was actually built. A transient failure during publishing restarts from the planned state and reuses the existing digest artifacts without rebuilding; a failed platform build requires a new workflow run. The publishing contract is pinned down by 864 tests. The principle behind every one of those choices: a missing image is an inconvenience, a wrong image is a disaster.
+The failure mode that matters is not a build that breaks; it is a wrong image landing under a trusted name, because a missing image is an inconvenience and a wrong one is a disaster. So published versions can never be overwritten, and every upload is read back and compared against what was actually built. A transient failure during publishing restarts from the planned state and reuses the existing digest artifacts without rebuilding; a failed platform build requires a new workflow run. 864 tests pin down the publishing contract.
 
 ## What it changed
 

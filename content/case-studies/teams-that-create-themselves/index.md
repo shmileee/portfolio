@@ -6,7 +6,7 @@ evidence: About 30 team stacks are provisioned this way; a new team's alerts rea
 topics:
   - devex
   - delivery
-order: 6
+order: 4
 aliases:
   - 06-teams-that-create-themselves
   - self-service-teams
@@ -62,7 +62,7 @@ The `alerts` block is the part that used to need a platform engineer: `create_am
 
 The generator itself is described in [a note on the blog](/blog/posts/generating-terraform-for-teams-from-one-json-file/). The `firehydrant` block drives the on-call schedules through FireHydrant's Terraform provider, which broke at this scale and became [its own story](/case-studies/the-fork-that-needed-a-home/).
 
-## The interesting part
+## Alerts that route themselves on day one
 
 Monitoring alerts for a team's services land in that team's channel from the day the pull request merges. Nothing routes through a shared channel first, and nobody on the platform team touches an alerting configuration for a new team.
 

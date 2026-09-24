@@ -1,12 +1,12 @@
 ---
 title: Self-service cloud functions for customer code
 summary: Uploaded customer code becomes an isolated, observable Lambda function through a Step Functions build plane and a Crossplane provisioning plane, with no platform engineer in the loop per function.
-role: Took the chosen direction, introduced Crossplane to the organisation and built the automation around it, plus the Terraform, the build pipeline and the safety rules.
+role: Took the chosen direction, introduced Crossplane to the organization and built the automation around it, plus the Terraform, the build pipeline and the safety rules.
 evidence: One Kubernetes object per function is the whole provisioning API; only the SDK service may create one, and each function runs under a permissions boundary the platform patches in.
 topics:
   - security
   - delivery
-order: 20
+order: 16
 aliases:
   - 21-customer-code-running-safely-self-service-cloud-functions
   - cloud-functions
@@ -16,11 +16,11 @@ spotlight: false
 
 ## The situation
 
-The business came to our team with a concrete ask: the product's app platform needed to run customer-written server-side code, and they wanted an architecture and an implementation. An earlier evaluation had compared hosted runtimes, Deno Subhosting and Cloudflare Workers for Platforms, against building on AWS ourselves. Hosted lost on data residency and vendor lock-in; AWS Lambda won on isolation and maturity. I took the chosen direction and built it: I introduced Crossplane to the organisation and built the automation around it, plus the Terraform, the build pipeline and the safety rules.
+The business came to our team with a concrete ask: the product's app platform needed to run customer-written server-side code, and they wanted an architecture and an implementation. An earlier evaluation had compared hosted runtimes, Deno Subhosting and Cloudflare Workers for Platforms, against building on AWS ourselves. Hosted lost on data residency and vendor lock-in; AWS Lambda won on isolation and maturity. I took the chosen direction and built it: I introduced Crossplane to the organization and built the automation around it, plus the Terraform, the build pipeline and the safety rules.
 
 ## What I did
 
-The platform splits into two planes, and the split is the design.
+The platform splits into two planes: one turns uploaded code into an image, the other turns that image into a running function.
 
 ### The build plane
 
@@ -46,7 +46,7 @@ spec:
       type: container
 ```
 
-Crossplane turns that object into the real thing: an isolated Lambda function; its own IAM role, capped by a permissions boundary the platform patches in, so customers get creative freedom inside a box they cannot climb out of; a URL that requires signed requests; streaming-response support, with the functions living outside any VPC as AWS advises for low-latency streaming; and a per-function log group, so app developers can see their own logs.
+Crossplane turns that object into the real thing: an isolated Lambda function; its own IAM role, capped by a permissions boundary the platform patches in, so customer code cannot widen its own permissions; a URL that requires signed requests; streaming-response support, with the functions living outside any VPC as AWS advises for low-latency streaming; and a per-function log group, so app developers can see their own logs.
 
 <div class="diagram-exhibit" data-exhibit>
   <div class="diagram-exhibit-label">EXHIBIT — FROM UPLOAD TO RUNNING FUNCTION</div>
@@ -55,7 +55,7 @@ Crossplane turns that object into the real thing: an isolated Lambda function; i
 
 The self-service needed a fence: the only identity allowed to create function objects is the SDK service itself. The unglamorous correctness work mattered too: cleaning up cloud resources when a function object is deleted half-way, and making Crossplane's dynamically spawned machinery carry proper team-ownership labels so it shows up in our monitoring like everything else.
 
-## The interesting part
+## A build plane safe to re-run
 
 The build plane is safe to re-run. The per-version lock means concurrent builds of the same version cannot trample each other, stale locks expire and are reclaimed, and a version that already succeeded is simply skipped, so a retried or duplicated event is a no-op rather than a second image under the same name.
 

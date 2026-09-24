@@ -6,7 +6,7 @@ evidence: About 30 team stacks plan against the fork; the registry now also serv
 topics:
   - reliability
   - delivery
-order: 18
+order: 14
 aliases:
   - 18-the-fork-that-needed-a-home
   - provider-fork
@@ -37,10 +37,10 @@ terraform {
 
 The registry immediately outgrew its first tenant. It now hosts our own [environment-lifecycle provider](/case-studies/environments-you-can-create-and-destroy-with-one-command/) and mirrors the public registry for every provider we use: one governed, cached distribution point for all of Terraform.
 
-## The interesting part
+## Signing without a key in CI
 
-The signing. CI signs each release with a key it fetches at runtime, so no signing key lives in CI secrets, and the registry serves what that pipeline publishes. Together with the explicit version scheme, that is what made the fork the normal path instead of a special case: a team stack pins it like any other provider.
+CI signs each release with a key it fetches at runtime, so no signing key lives in CI secrets, and the registry serves what that pipeline publishes. With the explicit version scheme, a team stack pins the fork like any other provider rather than treating it as a special case.
 
 ## What it changed
 
-A vendor's bug stopped being our outage. The escape hatch, fork plus registry, became permanent infrastructure, and the whole organisation's provider supply chain got faster and more controlled as a side effect of fixing one broken plugin.
+A vendor's bug stopped being our outage. The escape hatch, fork plus registry, became permanent infrastructure, and the whole organization's provider supply chain got faster and more controlled as a side effect of fixing one broken plugin.
