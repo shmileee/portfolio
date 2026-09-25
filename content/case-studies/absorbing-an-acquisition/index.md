@@ -1,8 +1,8 @@
 ---
 title: Absorbing an acquisition
-summary: Six services moved from Heroku to AWS and onto the shared platform in about two months, with a DNS cutover built to roll back in seconds.
-role: Led and implemented the whole migration, from the deployment charts and managed services to the rehearsed database move and the cutover.
-evidence: About two months from start to cutover; the acquired team kept shipping through the shared pipeline from day one, and the old hosting account was closed.
+summary: "I migrated six services from Heroku to the shared AWS platform in about two months while the acquired team continued shipping, with a rehearsed database move and reversible DNS cutover."
+role: "Led and implemented the migration, including service deployment, supporting infrastructure, database rehearsals, and cutover."
+evidence: "Six services migrated in about two months; the old hosting account closed; the acquired team had shared monitoring and its own alert channel at handover."
 topics:
   - delivery
   - reliability
@@ -16,24 +16,36 @@ featured: false
 spotlight: false
 ---
 
-## The situation
+## Bring an acquired product onto the shared platform
 
-The company made an acquisition, and the acquired product ran on Heroku: a different cloud, a different deployment model, a different everything. Running two stacks in parallel means double the tooling, double the on-call knowledge, and an "integration" that exists on slides but not in production.
+The acquired product ran on Heroku, while our shared platform ran on AWS. Supporting both required separate deployment workflows, tooling, and operational knowledge.
 
-## What I did
+I led and implemented the migration of six services in about two months. The acquired team needed to keep shipping during the work and arrive on the new platform with an operational setup they could use immediately.
 
-I led and implemented the Heroku-to-AWS migration in about two months.
+## Recreate the service contract before changing traffic
 
-I wrote the deployment charts for their services, the backend API, background workers, the web frontend and a handful of supporting jobs, and wired them into our GitOps pipeline like any other internal application. I recreated everything the old hosting had been providing: the databases with the extensions their code depended on, a cache, object storage, certificates for their public domain, secrets management.
+I wrote deployment charts for the backend API, background workers, frontend, and supporting jobs, then connected them to the existing GitOps pipeline. I also provisioned the services the application had relied on in Heroku: databases with the required extensions, cache, object storage, certificates, and secrets management.
 
-I replaced their deployment pipeline by putting CI runners inside our cluster, so their existing repositories could deploy the new way without disruption.
+CI runners inside the cluster let the existing repositories deploy through the shared pipeline. That allowed the team to keep working in its repositories while I prepared the new hosting environment.
 
-We rehearsed the database export and import, deployed to staging, then production, and after a dry run cut over DNS in a scheduled maintenance window.
+The migration covered both runtime dependencies and the team's operating workflow:
 
-## The cutover
+**Application delivery.** Deployment charts and CI integration
 
-The switch itself was a one-line configuration change, built to be rolled back in seconds. The work that made it safe happened earlier: the acquired team kept shipping through the whole migration, and arrived on the new platform with the same dashboards and their own alert channel on day one.
+**Data and dependencies.** Databases, required extensions, cache, storage, and secrets
 
-## What it changed
+**Traffic.** Public-domain certificates and a reversible DNS change
 
-One less cloud, one less deployment model, one less set of tools to staff and secure. The old hosting account could be closed. Years later, when the product was eventually sunset, decommissioning it was ordinary infrastructure work instead of archaeology.
+**Operations.** Shared dashboards and a dedicated alert channel
+
+## Rehearse the data move, then cut over
+
+We rehearsed database export and import, deployed to staging and production, and performed a dry run before changing DNS in a scheduled maintenance window.
+
+The routing change itself was one configuration line, designed to be reversed in seconds. That made the DNS decision reversible; the database migration still required its own rehearsal and coordinated maintenance window.
+
+Preparing the deployment and monitoring workflows early meant the acquired team could continue shipping during the migration and use the shared operational tooling from the first day on the new platform.
+
+## What changed
+
+Six services moved onto the shared platform in about two months, and the old hosting account was closed. The organization had one fewer hosting environment and deployment workflow to maintain. When the product was later retired, its infrastructure could be decommissioned through the same processes as the rest of the platform.

@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 658" role="img" aria-labelledby="cell-lifecycle-title cell-lifecycle-desc">
+<title id="cell-lifecycle-title">Cell Lifecycle</title>
+<desc id="cell-lifecycle-desc">Terraform creates the cluster and bootstraps Flux, whose add-ons create cloud resources through controllers. During destruction the lifecycle provider runs preflight, freeze, evacuate, decommission, reconcile and verify before Terraform can destroy the cluster and its owned infrastructure. If the cluster API is unavailable, cleanup proceeds to AWS reconciliation. Incomplete cleanup stops destruction, reports survivors and can be retried from checkpointed phases.</desc>
+<defs>
+<marker id="cell-lifecycle-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 Z" fill="var(--color-accent, #72a8ff)"/></marker>
+<marker id="cell-lifecycle-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 Z" fill="var(--color-text-subtle, #b4bfce)"/></marker>
+</defs>
+<rect width="720" height="658" fill="#0b1220"/>
+<text x="20" y="20" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-accent, #72a8ff)">CREATE · DECLARED INFRASTRUCTURE</text>
+<rect x="20" y="38" width="212" height="88" rx="10" fill="var(--color-accent-surface, #192c48)" stroke="var(--color-accent, #72a8ff)" stroke-width="1.4"/>
+<text x="126.0" y="67" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-accent, #72a8ff)">Terraform</text>
+<text x="126.0" y="91" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">VPC + EKS + metadata</text>
+<text x="126.0" y="111" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Bootstrap Flux</text>
+<rect x="254" y="38" width="212" height="88" rx="10" fill="var(--color-accent-surface, #192c48)" stroke="var(--color-accent, #72a8ff)" stroke-width="1.4"/>
+<text x="360.0" y="67" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-accent, #72a8ff)">Flux</text>
+<text x="360.0" y="91" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Enabled platform</text>
+<text x="360.0" y="111" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">add-ons</text>
+<rect x="488" y="38" width="212" height="88" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="594.0" y="67" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">Controllers</text>
+<text x="594.0" y="91" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Cloud resources:</text>
+<text x="594.0" y="111" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">volumes, LBs, nodes</text>
+<path d="M232 82 H249" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#cell-lifecycle-accent)"/>
+<path d="M466 82 H483" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#cell-lifecycle-accent)"/>
+<path d="M20 151 H700" fill="none" stroke="var(--color-border, #455062)" stroke-width="1.8" stroke-linejoin="round"/>
+<text x="20" y="180" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-accent, #72a8ff)">DESTROY · LIFECYCLE PROVIDER RUNS FIRST</text>
+<rect x="20" y="206" width="212" height="98" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="126.0" y="235" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">01 · Preflight</text>
+<text x="126.0" y="259" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Is the cluster API</text>
+<text x="126.0" y="279" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">reachable?</text>
+<rect x="254" y="206" width="212" height="98" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="360.0" y="235" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">02 · Freeze</text>
+<text x="360.0" y="259" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Pause reconciliation</text>
+<text x="360.0" y="279" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Unblock deletion</text>
+<rect x="488" y="206" width="212" height="98" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="594.0" y="235" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">03 · Evacuate</text>
+<text x="594.0" y="259" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Remove workloads</text>
+<text x="594.0" y="279" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Controllers clean up</text>
+<rect x="488" y="390" width="212" height="98" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="594.0" y="419" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">04 · Decommission</text>
+<text x="594.0" y="443" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Remove autoscaled</text>
+<text x="594.0" y="463" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">capacity</text>
+<rect x="254" y="390" width="212" height="98" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="360.0" y="419" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">05 · Reconcile</text>
+<text x="360.0" y="443" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">AWS cleanup within</text>
+<text x="360.0" y="463" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">ownership scope</text>
+<rect x="20" y="390" width="212" height="98" rx="10" fill="var(--color-accent-surface, #192c48)" stroke="var(--color-accent, #72a8ff)" stroke-width="1.4"/>
+<text x="126.0" y="419" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-accent, #72a8ff)">06 · Verify</text>
+<text x="126.0" y="443" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Re-scan and wait</text>
+<text x="126.0" y="463" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Report survivors</text>
+<path d="M232 255 H249" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#cell-lifecycle-accent)"/>
+<path d="M466 255 H483" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#cell-lifecycle-accent)"/>
+<path d="M594 304 V385" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#cell-lifecycle-accent)"/>
+<path d="M488 439 H471" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#cell-lifecycle-accent)"/>
+<path d="M254 439 H237" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#cell-lifecycle-accent)"/>
+<path d="M126 304 V354 H360 V385" fill="none" stroke="var(--color-text-subtle, #b4bfce)" stroke-width="1.8" stroke-linejoin="round" stroke-dasharray="5 5" marker-end="url(#cell-lifecycle-muted)"/>
+<text x="245" y="342" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">API unavailable → AWS cleanup</text>
+<path d="M126 488 V518 H170 V548" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#cell-lifecycle-accent)"/>
+<text x="212" y="539" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="400" fill="var(--color-accent, #72a8ff)">clean</text>
+<path d="M126 518 H540 V548" fill="none" stroke="var(--color-text-subtle, #b4bfce)" stroke-width="1.8" stroke-linejoin="round" stroke-dasharray="5 5" marker-end="url(#cell-lifecycle-muted)"/>
+<text x="595" y="539" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">incomplete</text>
+<rect x="20" y="554" width="300" height="90" rx="10" fill="var(--color-accent-surface, #192c48)" stroke="var(--color-accent, #72a8ff)" stroke-width="1.4"/>
+<text x="170.0" y="583" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-accent, #72a8ff)">Continue destruction</text>
+<text x="170.0" y="607" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Terraform removes cluster</text>
+<text x="170.0" y="627" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">and owned infrastructure</text>
+<rect x="380" y="554" width="320" height="90" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4" stroke-dasharray="6 5"/>
+<text x="540.0" y="583" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">Stop + report survivors</text>
+<text x="540.0" y="607" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Retry resumes checkpointed</text>
+<text x="540.0" y="627" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">phases; cleanup stays visible</text>
+</svg>

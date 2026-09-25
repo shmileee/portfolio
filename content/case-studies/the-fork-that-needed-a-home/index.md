@@ -1,8 +1,8 @@
 ---
 title: The fork that needed a home
-summary: The FireHydrant Terraform provider was forked and fixed in four days, and the internal registry built to serve it became the company's one governed distribution point for every provider.
-role: Forked and fixed the FireHydrant provider, filed every fix upstream, and stood up the internal Terraform registry that serves it.
-evidence: About 30 team stacks plan against the fork; the registry now also serves our own providers and mirrors the public registry for everything else.
+summary: "I fixed a Terraform provider that was blocking team automation, then built a registry to distribute the fork through normal version pins and signed releases."
+role: "Forked and fixed the FireHydrant provider, reported the issues upstream, and established the internal registry and publishing workflow."
+evidence: "Provider fixes completed in four days, with the registry built in parallel in three; about 30 team stacks used the fork."
 topics:
   - reliability
   - delivery
@@ -14,17 +14,29 @@ featured: false
 spotlight: false
 ---
 
-## The situation
+## Restore reliable plans for team automation
 
-FireHydrant's Terraform provider broke at our scale. With about 30 team stacks planning against one account, the upstream provider, which had removed its request throttling, died with rate-limit errors on parallel runs; two resources re-planned phantom changes on every single run; a data source crashed on duplicate records. The [team automation](/case-studies/teams-that-create-themselves/) depended on all of it.
+The FireHydrant Terraform provider failed under our usage pattern. About 30 team stacks planned against one account. Parallel runs hit rate limits after upstream request throttling was removed. Two resources repeatedly reported changes that had already been applied, and a data source crashed when it encountered duplicate records.
 
-## What I did
+The [team provisioning workflow](/case-studies/teams-that-create-themselves/) depended on those resources. I forked the provider and completed the fixes in four days.
 
-Forked and fixed in four days: a rate-limited HTTP client with retries that back off and add jitter, so 30 stacks do not retry in lockstep; the phantom-diff suppressions; deterministic duplicate resolution. The fork is versioned as `0.15.2-platform.N`, the upstream base plus a visible patch train, and each fix was filed as an upstream issue with a written report, which keeps the fork rebaseable and the maintainers informed.
+## Address the distinct failure modes
 
-A patched provider is useless until Terraform can download it, and that is why the company got an internal Terraform registry. It came up in three days, in parallel with the fork: a tag push triggers CI, which signs the build and publishes it to the registry, which serves the standard provider protocol from object storage. The provider pin in every team stack tells the story in one line:
+**Rate limits during parallel plans.** A throttled HTTP client with backoff and jitter
 
-```hcl title="versions.tf"
+**Repeated changes with no intended configuration difference.** Suppression of the affected phantom diffs
+
+**Duplicate data-source records.** Deterministic duplicate handling
+
+I reported each issue upstream with a written explanation. The fork used an explicit version suffix so consumers could identify both the upstream base and our patch revision.
+
+Fixing the provider was only half the work. Terraform also needed a dependable way to download it.
+
+## Distribute the fork through Terraform's normal interface
+
+I built an internal registry in parallel, bringing it up in three days. A team stack could then pin the patched provider like any other dependency. The hostname, namespace, and suffix in this example are anonymized:
+
+```hcl title="team/terraform.tf"
 terraform {
   required_providers {
     firehydrant = {
@@ -35,12 +47,12 @@ terraform {
 }
 ```
 
-The registry immediately outgrew its first tenant. It now hosts our own [environment-lifecycle provider](/case-studies/environments-you-can-create-and-destroy-with-one-command/) and mirrors the public registry for every provider we use: one governed, cached distribution point for all of Terraform.
+Exact pins make the fork version explicit and avoid ambiguity around pre-release version constraints.
 
-## Signing without a key in CI
+Publishing starts with a version tag. CI assumes a scoped AWS role through GitHub OIDC, retrieves the GPG signing key from Secrets Manager, builds the provider binaries, and publishes them with signed checksums to object storage. The registry serves the provider protocol and download locations; the publishing workflow does not need to upload through the registry's HTTP service.
 
-CI signs each release with a key it fetches at runtime, so no signing key lives in CI secrets, and the registry serves what that pipeline publishes. With the explicit version scheme, a team stack pins the fork like any other provider rather than treating it as a special case.
+This keeps static AWS credentials and the stored signing key out of CI configuration. The signing key still exists and is retrieved for the release job.
 
-## What it changed
+## What changed
 
-A vendor's bug stopped being our outage. The escape hatch, fork plus registry, became permanent infrastructure, and the whole organization's provider supply chain got faster and more controlled as a side effect of fixing one broken plugin.
+About 30 team stacks could use the repaired provider through standard Terraform configuration. The registry then expanded to host our own [environment-lifecycle provider](/case-studies/environments-you-can-create-and-destroy-with-one-command/) and mirror public providers, giving the wider repository one distribution and caching layer.

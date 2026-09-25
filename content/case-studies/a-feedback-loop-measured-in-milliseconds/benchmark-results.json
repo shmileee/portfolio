@@ -1,0 +1,104 @@
+{
+  "date": "2026-09-25",
+  "machine": "Apple M5 Max",
+  "os": "27.0",
+  "logical_cpus": 18,
+  "terraform": "Terraform v1.15.8",
+  "bash": "GNU bash, version 3.2.57(1)-release (arm64-apple-darwin26)",
+  "old_version": "v1.108.0",
+  "old_revision": "05fd71a57a467ccf5598f7e836d3af4cf9225abb",
+  "new_version": "v2.1.1",
+  "warmups": 1,
+  "runs": 7,
+  "method": "Direct hook entry points, identical preformatted Terraform file inputs; excludes hook-manager startup, downloads and other hooks. Old hook uses default directory parallelism. Checkpoint lookup disabled for both. Alternating execution order.",
+  "workloads": [
+    {
+      "label": "50-file sample",
+      "files": 50,
+      "directories": 49,
+      "content_sha256": "1da81b99113a7ef34b71bdaeb485609ce341ee2edf64d04c20fa867bc35a2fab",
+      "unchanged_output": true,
+      "seconds": {
+        "old": [
+          0.3757150829999999,
+          0.355574375,
+          0.36348358400000014,
+          0.3562108749999999,
+          0.33825700000000003,
+          0.3375263340000001,
+          0.3260310409999998
+        ],
+        "new": [
+          0.07403758400000005,
+          0.07385575000000011,
+          0.0741670000000001,
+          0.07379383399999995,
+          0.07507883300000007,
+          0.07402958300000018,
+          0.07493583300000006
+        ]
+      },
+      "median_seconds": {
+        "old": 0.355574375,
+        "new": 0.07403758400000005
+      },
+      "range_seconds": {
+        "old": [
+          0.3260310409999998,
+          0.3757150829999999
+        ],
+        "new": [
+          0.07379383399999995,
+          0.07507883300000007
+        ]
+      },
+      "speedup": 4.802619909909537
+    },
+    {
+      "label": "All matching handwritten Terraform files",
+      "files": 1793,
+      "directories": 372,
+      "content_sha256": "2c766f0ce936130d2ed15dc3627007e10f9392961bfcb8517da7cac48ee18670",
+      "unchanged_output": true,
+      "seconds": {
+        "old": [
+          13.524352291000003,
+          13.069768042,
+          13.220570625,
+          13.130552375,
+          13.298317749999995,
+          13.114164291000009,
+          13.402851292000008
+        ],
+        "new": [
+          0.7531655000000015,
+          0.7380861669999987,
+          0.7389569999999992,
+          0.7398472499999968,
+          0.7354132090000007,
+          0.7437917920000103,
+          0.7537619999999947
+        ]
+      },
+      "median_seconds": {
+        "old": 13.220570625,
+        "new": 0.7398472499999968
+      },
+      "range_seconds": {
+        "old": [
+          13.069768042,
+          13.524352291000003
+        ],
+        "new": [
+          0.7354132090000007,
+          0.7537619999999947
+        ]
+      },
+      "speedup": 17.869324546384483
+    }
+  ],
+  "new_script_sha256": "7808c5ab8b3ec3b2ebc25f9326dfa538d0acb04e777763179d7c41388abc618f",
+  "corpus": "Tracked .tf files matching the pre-migration hook filter; Terramate-generated files excluded. Copied from the repository snapshot immediately before the migration. Private source files are not distributed.",
+  "sample_selection": "Sort matching paths, then select floor(i * file_count / 50) for i=0..49. Copy only selected files into each workload directory.",
+  "preparation": "Preformat each isolated workload with the same Terraform executable before warming and timing both hooks. Verify its content hash is unchanged afterwards."
+}

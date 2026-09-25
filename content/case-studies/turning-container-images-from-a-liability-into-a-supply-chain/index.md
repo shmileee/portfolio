@@ -1,8 +1,8 @@
 ---
 title: Turning container images from a liability into a supply chain
-summary: One manifest per image; the factory builds both architectures, tests, publishes once and reads the registry back to prove it holds exactly what was built.
-role: Designed and built the image factory, then turned the migration into a playbook teammates could run.
-evidence: "48 images migrated in four days; 35 releases in 20 days; 864 tests protected the publishing contract."
+summary: "I built a shared image pipeline and led the migration of 48 images in four days. Releases build for x86 and ARM, run tests, and verify published artifacts against their digests."
+role: "Designed and built the image factory, established its publishing contract, and created the migration playbook used by teammates."
+evidence: "48 images migrated in four days; 35 releases in the first 20 days; version conflicts, architecture mismatches, and publishing retries covered by tests."
 topics:
   - security
   - cost
@@ -15,23 +15,25 @@ featured: true
 spotlight: false
 ---
 
-## The situation
+## Make each image an independently maintained component
 
-We ran on dozens of internally maintained container images: patched third-party tools, custom bases, CI runners. Each was built its own way. Internal images accumulate and end up managed either by one bake file or by a pile of shell scripts; either every change rebuilds everything in sequence, or the scripts grow so entangled that adding one image means understanding all of them.
+Our internal images included patched third-party tools, base images, and CI runners. Their build processes varied by repository. Patching required manual investigation, and most images had no ARM build, limiting where they could run.
 
-When a vulnerability landed, patching meant hunting through repositories by hand. Nobody could say with confidence where a given image came from, and the cheaper ARM-based cloud servers were off limits because almost nothing was built for them.
+I built a shared image factory and led the migration of all 48 internal images in four days. The design gave each image its own manifest, build context, ownership, upstream version, and tests.
 
-## What I did
+## Use a manifest as the build contract
 
-I built an internal image factory. Every image is described by one small configuration file, and the factory does the rest: builds it for both processor architectures, tests it, publishes it, and then independently checks that what landed in the registry is exactly what was built. The whole contract fits on one screen:
+Adding an image means adding a directory and a configuration file. The factory discovers the component, validates it, and plans the affected builds. Architectures build in parallel, and unrelated images do not need to rebuild for every change.
+
+This example packages a patched third-party tool. Internal identifiers are anonymized; the manifest retains ownership, architecture targets, upstream tracking, release tags, and test stages:
 
 ```yaml title="images/cloudwatch-exporter/image.yaml"
 apiVersion: images.example.io/v1alpha1
 kind: Image
 metadata:
   name: cloudwatch-exporter
-  owners: [team-sre]
-  # a patched third-party image, as opposed to a fully internal one
+  owners: [platform-team]
+  # A maintained patch of a third-party image.
   category: patched
 spec:
   repository: maintained/cloudwatch-exporter
@@ -43,23 +45,28 @@ spec:
         context: .
         dockerfile: Dockerfile
         args:
-          upstream_version: { from: spec.upstream.version }
+          upstream_version:
+            from: spec.upstream.version
       tags:
         primary: "2.0.0"
         aliases: [latest]
       tests:
-        # the test stage must pass before publishing
+        # The test stage must pass before publishing.
         buildTargets: [test]
-  # what the update bot watches for new versions
+  # Renovate watches this version for upstream releases.
   upstream:
     datasource: docker
     image: docker.io/prom/cloudwatch-exporter
     version: "v0.18.0"
 ```
 
-Because each image is a self-contained folder with a manifest, the factory discovers them independently: only changed images rebuild, builds run in parallel per architecture, and adding an image means adding a folder, not editing a script. The `upstream` block closes the security loop: the [dependency bot](/case-studies/dependency-updates-from-quarterly-panic-to-background-noise/) watches it and opens the version bump, and the factory rebuilds and republishes.
+The primary version identifies our image release, while `upstream.version` identifies the third-party version it packages. A change to our `Dockerfile` can require a new primary version even when the upstream version stays the same.
 
-I migrated the entire fleet of internal images onto the factory, 48 of them in four days, with a playbook repeatable enough that teammates ran migrations without me. The first 20 days saw 35 releases.
+Pull requests validate, build, and run the declared test stages without publishing. The release workflow publishes after merge. Renovate reads upstream versions from the manifest and proposes updates; publishing changed content also requires a new primary version.
+
+## Treat publishing as a separate correctness problem
+
+A successful build is insufficient evidence that a registry now contains the intended release. The publisher verifies each architecture's digest, assembles the multi-platform index, and checks that the published result matches the plan.
 
 <figure class="concept-diagram" data-concept-diagram>
 <div class="diagram-exhibit" data-exhibit>
@@ -120,10 +127,25 @@ I migrated the entire fleet of internal images onto the factory, 48 of them in f
 <figcaption class="exhibit-caption"><span>EXHIBIT 01</span> — The release is accepted only when the registry digest matches the artifact that passed both architecture builds and their tests.</figcaption>
 </figure>
 
-## Why the publisher is paranoid
+The failure policy distinguishes recoverable interruptions from conflicting content:
 
-The failure mode that matters is not a build that breaks; it is a wrong image landing under a trusted name, because a missing image is an inconvenience and a wrong one is a disaster. So published versions can never be overwritten, and every upload is read back and compared against what was actually built. A transient failure during publishing restarts from the planned state and reuses the existing digest artifacts without rebuilding; a failed platform build requires a new workflow run. 864 tests pin down the publishing contract.
+| Condition | Publisher behavior |
+| --- | --- |
+| Version already points to the same digest | Continue without replacing it |
+| Version exists with a different digest | Stop; never overwrite the release |
+| Index assembly fails transiently | Retry publication using existing verified artifacts |
+| An alias update fails | Retry the alias step; retain the verified version |
+| An architecture build fails | Require a new build run before release |
 
-## What it changed
 
-Security patching became a routine automated flow. "Where did this image come from?" stopped being a research project. ARM support by default opened the door to meaningfully cheaper compute. The factory went from zero to production in under a month, which was possible only because pull request automation, releases, runners and hooks already existed.
+Version tags are immutable. Convenience aliases such as `latest` can move, but only to the verified release. Digest artifacts also carry plan and run identity, allowing the publisher to reject artifacts that belong to a different build plan.
+
+## Make migration repeatable for other engineers
+
+I documented the conversion from the old builds into a playbook. Teammates could migrate components independently, which made the four-day rollout possible. The factory entered production in under a month and produced 35 releases in its first 20 days.
+
+The implementation built on existing runners, dependency updates, review checks, and release automation. That foundation let this project concentrate on the image contract and publishing behavior.
+
+## What changed
+
+Images gained consistent ownership, versioning, tests, and a traceable release path. Upstream patching could flow through automated pull requests, and ARM builds made those images usable on ARM compute. The migration also removed the need to understand a shared build script before adding or maintaining one image.

@@ -1,9 +1,9 @@
 ---
 title: Safe AI tooling for every developer
-summary: An MCP gateway per environment gives every AI assistant one governed path to deployments, dashboards and metrics, authenticated with the AWS identity developers already have and backed by deliberately blunted tools.
-role: Designed and built the gateway, its signing front door and the restricted backends; wrote the repository guidance and the supervised skills that keep agent work inside the existing gates.
-evidence: Rolled out to four environments with no new credentials anywhere; the deployment tool is read-only in production, and agent campaigns land as pull requests behind the existing merge gate.
-period: "2025"
+summary: "AI assistants gained a shared route to operational tools using developers’ existing AWS identities. Backend restrictions and repository playbooks keep access and infrastructure changes within defined controls."
+role: "Built the MCP gateway and signing proxy, configured restricted backends, and wrote repository guidance and supervised automation playbooks."
+evidence: "Gateway deployed across four environments; no additional per-tool credentials for developers; production deployment access is read-only and infrastructure changes use existing review gates."
+period: 2025–2026
 topics:
   - ai
   - security
@@ -19,28 +19,15 @@ featured: true
 spotlight: false
 ---
 
-## The situation
+## Make operational access consistent across AI clients
 
-AI coding assistants became useful for operations work once they could see our systems: deployments, dashboards, metrics. The naive path was every developer wiring assistants to internal tools with hand-made tokens, a problem that multiplies with every tool and every laptop.
+AI assistants became more useful for operations when they could inspect deployments, dashboards, and metrics. Connecting each developer's assistant directly to every service would have scattered credentials and access configuration across laptops.
 
-By 2025 the same assistants were doing real work inside the platform repositories. Left unmanaged, that ends with an agent running `terraform apply` from a laptop, or renaming a contract that consumers depend on silently.
+I built an MCP gateway with one endpoint per environment. MCP is the protocol assistants use to discover and call tools. Developers authenticate with their existing AWS identities, while the gateway handles the separate authentication needed to reach backend services.
 
-## What I did
+The deployment covers four environments. Developers do not manage additional per-tool credentials; backend service credentials still exist and are managed centrally.
 
-### One door, many safe backends
-
-I built the company's MCP gateway. MCP is the open protocol AI assistants use to call external tools; the gateway is one stable, secure address per environment through which any assistant can reach our deployment system, dashboards and metrics. Developers authenticate with the AWS identity they already have, so no new tokens exist at all.
-
-Behind the gateway, every backend is deliberately blunted: the deployment tool is read-only in production, and the dashboard tool has writing disabled and only a safe subset of its capabilities exposed. Access for every developer is granted through our normal identity platform, in code.
-
-The request path: the client signs each request for the public API Gateway with the developer's AWS identity; a front-door function re-signs it for the AgentCore gateway behind it, Amazon's managed MCP gateway service; that gateway holds one JWT-protected target per tool and reaches each backend through a proxy function inside the VPC, with a machine-to-machine OAuth token per target.
-
-<div class="diagram-exhibit" data-exhibit>
-  <div class="diagram-exhibit-label">EXHIBIT — MCP GATEWAY · REQUEST PATH</div>
-  <svg aria-label="An MCP client in OpenCode or Cursor signs requests through a local AWS signing bridge to an IAM-authorized API Gateway; a front-door function re-signs them for the AgentCore gateway, which holds a JWT-protected target per tool and reaches the Argo CD, Grafana and Prometheus MCP services through a proxy function inside the VPC with a machine-to-machine OAuth token per target" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 628" role="img"><defs><marker id="arrGW" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--color-text-muted)"></path></marker></defs><rect x="140" y="10" width="320" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="33" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">OpenCode or Cursor</text><text x="300" y="51" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">MCP client</text><path d="M300,68 L300,92" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="94" width="320" height="40" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="119" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">local AWS signing bridge</text><path d="M300,134 L300,158" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="160" width="320" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="183" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">API Gateway</text><text x="300" y="201" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">IAM-authorized</text><path d="M300,218 L300,242" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="244" width="320" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="267" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">Frontdoor Lambda</text><text x="300" y="285" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">re-signs for the gateway service</text><path d="M300,302 L300,326" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="328" width="320" height="40" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="353" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">AgentCore gateway</text><path d="M300,368 L300,392" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="394" width="320" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="417" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">Per-target API</text><text x="300" y="435" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">JWT protected</text><path d="M300,452 L300,476" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="478" width="320" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="501" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">Proxy Lambda</text><text x="300" y="519" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">in VPC</text><path d="M300,536 L300,560" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="562" width="320" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="585" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">ArgoCD · Grafana · Prometheus</text><text x="300" y="603" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">MCP services</text><rect x="500" y="319" width="210" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1" stroke-dasharray="4 4"></rect><text x="605" y="342" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text-body)">OAuth</text><text x="605" y="360" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">machine-to-machine</text><path d="M460,348 L498,348" stroke="var(--color-border)" stroke-width="1.2" fill="none" stroke-dasharray="3 4" marker-end="url(#arrGW)"></path><text x="605" y="393" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="0.06em" fill="var(--color-text-muted)">per-target token</text></svg>
-</div>
-
-Connecting a client is a few lines, the committed example our developers copy. This is the OpenCode form; Cursor uses the same command in its own configuration:
+The committed client configuration makes that access practical. This OpenCode example uses an anonymized gateway hostname and AWS profile:
 
 ```jsonc title="opencode.jsonc"
 {
@@ -59,26 +46,55 @@ Connecting a client is a few lines, the committed example our developers copy. T
 }
 ```
 
-The same pattern serves staging, operations and production; only the URL and the profile change. It is rolled out to all four environments, and our repositories now instruct AI agents to prefer the gateway over raw command-line access.
+OpenCode launches the local proxy, which signs requests using the developer's existing AWS profile. The same command works in Cursor's MCP configuration. Connecting another environment changes the endpoint and profile; backend credentials remain managed by the gateway.
 
-### The repositories that agents read
+## Enforce access in the gateway and backends
 
-A gateway is only a door, so the repositories had to point at it. I wrote the `AGENTS.md` files for the core platform repositories, with the scope stated in the file itself: "this file only flags things that aren't obvious from any single doc". No duplicated documentation that rots, just the traps: which contracts break consumers silently, where local access comes from, what a repository must never contain. The convention is hierarchical, so a nested file deeper in the tree overrides the top-level one and the guidance sits next to what it guards.
+The client signs its request for API Gateway using AWS SigV4. A front-door Lambda removes the incoming signing headers and signs a new request for AgentCore. AgentCore then routes tool calls through OAuth-protected target APIs and VPC proxy functions to the internal services.
 
-The same repositories ship committed client configurations pointing at the gateway, and the map says it outright: "prioritize using these MCP servers instead of relying on raw CLI commands." Only the development environment is enabled by default; production access is a deliberate opt-in. An agent cloning the repository is configured for the governed path before it does anything at all.
+<div class="diagram-exhibit" data-exhibit>
+  <div class="diagram-exhibit-label">EXHIBIT — MCP GATEWAY · REQUEST PATH</div>
+  <svg aria-label="An MCP client in OpenCode or Cursor signs requests through a local AWS signing bridge to an IAM-authorized API Gateway; a front-door function re-signs them for the AgentCore gateway, which holds a JWT-protected target per tool and reaches the Argo CD, Grafana and Prometheus MCP services through a proxy function inside the VPC with a machine-to-machine OAuth token per target" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 628" role="img"><defs><marker id="arrGW" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--color-text-muted)"></path></marker></defs><rect x="140" y="10" width="320" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="33" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">OpenCode or Cursor</text><text x="300" y="51" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">MCP client</text><path d="M300,68 L300,92" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="94" width="320" height="40" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="119" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">local AWS signing bridge</text><path d="M300,134 L300,158" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="160" width="320" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="183" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">API Gateway</text><text x="300" y="201" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">IAM-authorized</text><path d="M300,218 L300,242" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="244" width="320" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="267" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">Frontdoor Lambda</text><text x="300" y="285" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">re-signs for the gateway service</text><path d="M300,302 L300,326" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="328" width="320" height="40" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="353" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">AgentCore gateway</text><path d="M300,368 L300,392" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="394" width="320" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="417" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">Per-target API</text><text x="300" y="435" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">JWT protected</text><path d="M300,452 L300,476" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="478" width="320" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="501" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">Proxy Lambda</text><text x="300" y="519" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">in VPC</text><path d="M300,536 L300,560" stroke="var(--color-border)" stroke-width="1.2" fill="none" marker-end="url(#arrGW)"></path><rect x="140" y="562" width="320" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1"></rect><text x="300" y="585" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text)">ArgoCD · Grafana · Prometheus</text><text x="300" y="603" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">MCP services</text><rect x="500" y="319" width="210" height="58" rx="6" fill="var(--color-surface)" stroke="var(--color-accent)" stroke-width="1" stroke-dasharray="4 4"></rect><text x="605" y="342" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text-body)">OAuth</text><text x="605" y="360" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="var(--color-text-subtle)">machine-to-machine</text><path d="M460,348 L498,348" stroke="var(--color-border)" stroke-width="1.2" fill="none" stroke-dasharray="3 4" marker-end="url(#arrGW)"></path><text x="605" y="393" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="0.06em" fill="var(--color-text-muted)">per-target token</text></svg>
+</div>
 
-### Judgment, encoded as skills
+Re-signing is necessary because the client signature is bound to the public host and service. Passing it unchanged to AgentCore would fail authentication.
 
-For recurring campaign work I wrote reusable playbooks an agent executes under supervision, each carrying hard limits as imperatives. The [dependency-update skill](/case-studies/dependency-updates-from-quarterly-panic-to-background-noise/) touches only bot-authored pull requests, caps its fix attempts at two cycles, and "never runs unattended". The stack-migration skill is hold-by-default: "copy state, never move", so the old state stays byte for byte as the rollback, and anything but a tags-only plan diff stops the run. The image-maintenance skill enforces that published versions can never change. One of them was hardened mid-campaign as failures taught lessons, then retired with the pipeline it served.
+The backend configuration limits what a successfully authenticated caller can do:
 
-Campaign work runs as one unit per pull request and is judged by [the gates that were already there](/case-studies/making-infrastructure-changes-boring/): the Terraform plan or the rendered diff decides, not the agent's confidence. Auto-fix commits are tagged so CI does not re-trigger itself in a loop, and campaign runbooks are committed documents rather than chat history.
+**Production deployment backend.** Read-only tool access
 
-## Two bugs at the front door
+**Dashboard backend.** Selected tool groups exposed; writes disabled
 
-The hardest bug was cryptographic. Requests are signed by the client for the public address, but the AWS service behind it requires a different signature, so the front door strips and re-signs every request in flight.
+**Developer access.** Granted through the existing identity platform
 
-Then an upstream tool suddenly rejected all proxied traffic: a new security feature could not know that our gateway hostname was legitimate. The fix required understanding exactly which protection layer was redundant behind our own signing, and disabling only that one.
+**Committed client configuration.** Development enabled by default; production requires explicit opt-in
 
-## What it changed
+One upstream upgrade exposed a useful integration edge: the dashboard MCP server rejected requests carrying the gateway hostname. I adjusted its host check for the internal proxy path while retaining origin validation and gateway authentication. The distinction between these checks mattered more than simply making the error disappear.
 
-Developers have one governed path from AI assistants to operational tooling, using the identity and backend restrictions that already existed instead of per-tool credentials on each laptop. Agent-assisted work became a supervised platform capability: campaign changes cross the same plans, rendered diffs, CI checks and human merge gates as any other work, and the guidance and limits are versioned beside the code they govern.
+## Give agents the repository context they need
+
+I wrote `AGENTS.md` guidance for the core platform repositories, focusing on information an agent could not infer from a single file: contracts consumed by other repositories, generated paths, access conventions, and changes that require coordination.
+
+For example, a Vault role declared in the Terraform repository is consumed by external-secret resources in the Kubernetes repository. Renaming it can break a consumer without changing that consumer’s files. The guidance names that contract and points to both sides, so an agent can identify the coordination required before editing.
+
+Nested guidance keeps component-specific rules close to the code. Committed client configurations point assistants at the gateway, making the configured tool path available when work starts.
+
+These instructions guide agent behavior. The backend permissions and deployment controls enforce the access boundaries.
+
+## Encode recurring work in supervised playbooks
+
+I also wrote playbooks for dependency updates, stack migrations, and image maintenance. Their limits follow the failure modes of each task:
+
+**Dependency update.** Inspect the actual plan or rendered diff; stop after limited repair attempts
+
+**Stack migration.** Copy state to the new backend; retain the old object; accept only the expected tag changes
+
+**Image maintenance.** Publish changed content under a new immutable version
+
+The stack-migration runbook makes the stopping condition concrete. Copy the state before opening the pull request, because Atlantis plans automatically and an empty destination would appear to need every resource created. Preserve module and provider versions during the move. The acceptance check permits only the expected `tags` and `tags_all` changes: zero creates, replacements, destroys, or other attribute changes. An unexpected diff starts an investigation into provider drift, aliases, module paths, or backend selection.
+
+Campaigns run as reviewable pull requests through the [existing infrastructure workflow](/case-studies/making-infrastructure-changes-boring/). Plans, diffs, and CI results provide the evidence. Runbooks live beside the code, and autofix commits carry a marker to prevent the checks from repeatedly triggering themselves.
+
+## What changed
+
+Developers gained a consistent way to connect assistants to operational data using identities they already had. Repeated engineering tasks gained versioned instructions and explicit stopping conditions, while production tool restrictions and the established review process continued to govern what could change.

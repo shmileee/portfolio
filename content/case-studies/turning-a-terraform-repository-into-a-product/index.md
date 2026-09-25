@@ -1,8 +1,8 @@
 ---
 title: Turning a Terraform repository into a product
-summary: State out of git, versioned module releases from structured commits, a Terramate layout for hundreds of stacks, an internal registry and a terminal explorer made the central Terraform repository usable across teams.
-role: Owned the repository as a product; designed the Terramate layout and the release pipeline, built the stacks explorer, and ran the Terraform community channel.
-evidence: Every stack moved to remote state in one campaign; the repository grew from dozens of stacks to hundreds with one release process and one navigation tool.
+summary: "The shared Terraform repository grew from dozens of stacks to hundreds with remote state, automated module releases, consistent structure, and an inventory engineers could navigate."
+role: "Led the repository improvements, designed the Terramate layout and release workflow, built the stack explorer, and supported adoption through a Terraform community channel."
+evidence: "Migrated every stack to remote state; introduced versioned module releases and a terminal inventory spanning accounts, regions, and environments."
 topics:
   - devex
   - delivery
@@ -14,25 +14,38 @@ featured: false
 spotlight: false
 ---
 
-## The situation
+## Make a shared repository usable across teams
 
-The central Terraform repository was where all cloud infrastructure lived, and it showed its age. Shared modules were "versioned" with hand-made git tags in no consistent format: random suffixes, a mix of underscores and hyphens, no changelogs. The Terraform state itself was committed into the repository. There was no release process, no consistent style, and no place to learn how to do things right.
+The central Terraform repository held the company's cloud infrastructure, but lacked the conventions needed to support a growing group of contributors. State files were committed to Git. Module tags used inconsistent names and had no changelogs. Finding the right stack or learning the release process depended on asking someone who already knew the repository.
 
-## What I did
+I approached the work as a series of improvements to a shared product: state management first, then releases, structure, navigation, and support for the people using it.
 
-I treated the repository as a product with users, one change at a time.
+## Establish a predictable state and release model
 
-I moved the state out of git and into S3 backends, every stack, in one focused campaign.
+I moved every stack's state into S3 backends in one migration campaign. That separated Terraform's resource state from the source code engineers reviewed.
 
-I replaced hand-made tags with a release pipeline: structured commit messages produce versioned, changelogged module releases automatically.
+Next I replaced manual module tags with automated releases. Structured commit messages determine the version change and produce a changelog. Each releasable component runs in an isolated release job, avoiding interference between releases in the monorepo. The resulting tags also gave [dependency automation](/case-studies/dependency-updates-from-quarterly-panic-to-background-noise/) stable versions to track.
 
-I standardized the code. Formatters and linters run automatically, guidelines and best practices are written down, and the documentation was curated and rewritten, including recorded terminal walkthroughs so people could watch the workflow rather than read about it.
+Formatting, linting, and documentation generation became automated checks. I rewrote the contributor documentation and recorded terminal walkthroughs so engineers could see the workflow being used.
 
-I introduced Terramate to manage the growing estate of stacks, designed the [repository layout](/blog/posts/structuring-a-terraform-monorepo-with-terramate/) and the reusable imports, and migrated every legacy stack onto it.
+## Separate a stack's identity from its deployments
 
-I stood up an internal Terraform registry to host our own providers, which began with [the fork that needed a home](/case-studies/the-fork-that-needed-a-home/).
+I introduced Terramate, designed the shared imports and [repository layout](/blog/posts/structuring-a-terraform-monorepo-with-terramate/), and migrated legacy stacks into it. A simplified path illustrates the structure:
 
-And when navigation itself became the problem, hundreds of stacks across many accounts and regions, I built [a terminal tool](/blog/posts/building-an-interactive-tui-for-terramate-stacks/) that answers "where is X deployed, and in which account?" in seconds:
+```text title="stacks/"
+stacks/
+  aws/
+    development/
+      eu-west-1/
+        service-platform/
+    production/
+      eu-west-1/
+        service-platform/
+```
+
+Shared imports generate backend and provider configuration. The deployment directory carries the configuration that varies by account and region. The migration runbook preserves the old state object as a rollback reference and verifies the new configuration through Atlantis before applying it.
+
+As the inventory reached hundreds of stacks, directory conventions alone were insufficient. I built a terminal explorer that groups stacks by identity and shows where each is deployed, with evaluated account, region, and environment settings. It also exposes recent Git history and table, JSON, and CSV output for scripting. Browsing the inventory does not require cloud credentials or elevated access.
 
 <figure class="media-exhibit wide" data-exhibit>
   <div class="media-exhibit-frame">
@@ -46,12 +59,14 @@ And when navigation itself became the problem, hundreds of stacks across many ac
   <figcaption class="exhibit-caption"><span>EXHIBIT 01</span> — Twelve stacks, 22 deployments: browse, filter to one environment, search, then act on the selection</figcaption>
 </figure>
 
-Alongside the tooling I started the company's Terraform community channel, answered beginner questions, and taught people their first steps.
+The recording uses a demonstration inventory. The [implementation notes](/blog/posts/building-an-interactive-tui-for-terramate-stacks/) explain how the explorer resolves stack metadata.
 
-## Teaching alongside the tooling
+## Support adoption alongside the tooling
 
-Adoption tracked support rather than publication. The guidelines that landed were the ones with a community channel behind them, worked examples to copy, and automation that fixed the formatting instead of reporting it.
+I started a Terraform community channel, answered beginner questions, and provided worked examples. That support made the conventions easier to adopt and gave me feedback about where the workflow remained confusing.
 
-## What it changed
+The [internal provider registry](/case-studies/the-fork-that-needed-a-home/) later added a common distribution point for custom and mirrored providers.
 
-Engineers across teams propose infrastructure changes through the shared workflow, modules are versioned and reusable, and the repository scaled from dozens of stacks to hundreds with consistent navigation and release controls.
+## What changed
+
+The repository grew from dozens of stacks to hundreds while retaining one release process and a consistent way to discover deployments. Engineers across teams could propose infrastructure changes through the shared workflow, with reusable modules, documented conventions, and support available when the automation was not enough.

@@ -1,8 +1,8 @@
 ---
 title: "Dependency updates: from quarterly panic to background noise"
-summary: A self-hosted Renovate, automated module releases and a supervised AI review skill turned third-party updates into a continuous stream of small, audited merges.
-role: Deployed and wired the update bot, mandated the release automation it depends on, reviewed the stream for years and then encoded that judgment as a supervised skill.
-evidence: A months-old backlog cleared in weeks, with a plan or rendered diff and an audit trail behind every merge.
+summary: "Dependency updates became a continuous flow of small pull requests, supported by automated releases, deployment previews, and a supervised review playbook."
+role: "Deployed Renovate, established the module release automation, reviewed infrastructure updates, and encoded recurring review decisions in a supervised agent skill."
+evidence: "Restored clean planning for about a dozen infrastructure stacks; cleared a months-old update backlog in weeks with recorded evidence for each merge."
 topics:
   - security
   - reliability
@@ -15,26 +15,36 @@ featured: false
 spotlight: false
 ---
 
-## The situation
+## Make updates small enough to review continuously
 
-Third-party updates, modules, charts, base images, providers, were handled reactively. They piled up until something forced a scramble, and a scramble is how vulnerable versions end up running in production for months.
+Infrastructure dependencies were updated reactively. Terraform modules, providers, Helm charts, and base images accumulated changes until a security issue or compatibility problem forced a larger upgrade.
 
-## What I did
+I built a continuous update workflow over three years. It needed reliable version discovery, reviewable changes, and enough working validation to decide which updates could be applied safely.
 
-Three layers, built over three years.
+## Build the prerequisites for automation
 
-First, the plumbing. I deployed a self-hosted instance of Renovate, the dependency-update bot, wired into our private registries, so update proposals arrive continuously as small pull requests.
+I deployed a self-hosted Renovate instance with access to our private registries. It opened small pull requests as new versions became available.
 
-Second, the precondition. Across the repositories our team maintained, I mandated structured commit messages and automated releases. Without version tags on our own modules, the bot would have had nothing to track.
+For our own modules, I established structured commits and automated releases across the repositories our team maintained. Without consistent version tags, the bot could not discover or propose those updates.
 
-Third, the judgment. For years I was the human gate reviewing that stream into production infrastructure.
+I then reviewed the stream of infrastructure changes for several years. The useful evidence was the effect of an update: a Terraform plan, rendered Kubernetes diff, or relevant build and test results. A patch-version label by itself was insufficient.
 
-## Encoding the review as a skill
+## Encode the repeatable review decisions
 
-In the final year I encoded that judgment into a reusable skill: a written playbook an AI agent executes under supervision, one of the [agent playbooks](/case-studies/a-codebase-whose-newest-users-are-ai-agents/) the repositories now carry. It classifies each update pull request by proven safety, not by trusting version labels. It reads the rendered deployment diff or the actual Terraform plan, merges only what is demonstrably a no-op or a verified-safe bump, mechanically repairs simple failures, and holds everything else for a human.
+I turned that review process into a supervised agent skill. It gathers deployment evidence for the exact commit under review, checks the update's operational effect, and proposes a concrete action for each pull request. I confirm that plan before the agent can repair, approve, or squash-merge anything. If the pull request changes, the old assessment no longer authorizes the action.
 
-The prerequisite was unglamorous: resurrecting a dozen long-broken infrastructure stacks that could not produce a clean plan. Once they could, a backlog that had accumulated for months cleared in weeks, with an audit trail for every merge.
+**Ready to merge.** Current checks pass, the deployment effect is understood, and no coordinated migration is needed. Propose approval and squash-merge for my confirmation.
 
-## What it changed
+**Repair first.** The dependency is otherwise safe, but its updated formatter causes a mechanical check failure. Propose the bounded repair, then validate it before approval and merge.
 
-Staying current became the default state. Security fixes ride an existing conveyor belt instead of triggering fire drills, and the belt now largely runs itself.
+**Hold.** Plans fail, a prerequisite migration is needed, or evidence remains ambiguous. Investigate or ask for human review.
+
+A patch label or green CI alone cannot authorize a merge. For example, an unchanged Terraform plan still needs a compatibility check against the provider update; a plan containing an unexplained resource replacement stays on hold. The skill rechecks the commit, checks, and merge gates immediately before each authorized action. It never runs an infrastructure apply.
+
+The skill can repair straightforward mechanical failures within a limited number of attempts. It does not treat a successful repair as proof that the underlying dependency update is safe. The [agent tooling case study](/case-studies/safe-ai-tooling-for-every-developer/) covers the surrounding guidance and access controls.
+
+Before the workflow could clear the backlog, about a dozen long-broken infrastructure stacks needed to produce clean plans again. Repairing that validation path was essential: an update cannot be judged from a plan that never completes.
+
+## What changed
+
+A backlog that had accumulated for months cleared in weeks. Updates had a repeatable route from proposal to review, with evidence and an audit trail behind each merge. Security fixes could use that existing process, while uncertain changes remained visible for a human to assess.

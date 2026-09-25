@@ -1,8 +1,8 @@
 ---
 title: Making infrastructure changes boring
-summary: Every Kubernetes and Terraform change became a pull request that shows its diff or plan before review and applies itself after the merge.
-role: Introduced Atlantis and Argo CD, built the Kubernetes diff bot, and sequenced the move to auto-deployment.
-evidence: Argo CD manages every cluster component, itself included; the diff bot has commented on every Kubernetes pull request for three and a half years.
+summary: "Infrastructure changes gained a shared review process: Terraform plans and Kubernetes previews in pull requests, approved applies through Atlantis, and Kubernetes deployment on merge."
+role: "Introduced Atlantis and Argo CD, built the Kubernetes diff bot, approval workflow, and Atlantis browser controls, and led the staged rollout of automatic deployment."
+evidence: "Four Kubernetes upgrades in the first six weeks; a diff bot used for three and a half years; infrastructure changes reviewed and applied through shared tooling."
 topics:
   - delivery
   - devex
@@ -24,42 +24,106 @@ featured: false
 spotlight: false
 ---
 
-## The situation
+## Make changes visible before automating them
 
-When I joined, infrastructure changes were applied by hand, by engineers with privileged access. The change history was incomplete, and a reviewer could not see what a change would do to production before it happened.
+When I joined, engineers applied infrastructure changes manually with privileged access. Reviewers could read the configuration, but had no reliable preview of its effect on a running environment. The change history was incomplete.
 
-The clusters were years behind supported versions, and I ran four consecutive Kubernetes upgrades in my first six weeks to reach supported ground. Every one of them was a manual operation with no preview of what it would break.
+The clusters were also years behind supported Kubernetes versions. I ran four consecutive upgrades in my first six weeks. That work made the immediate need clear: infrastructure changes needed a repeatable review and deployment process.
 
-## What I did
+I introduced that process in stages. First I moved infrastructure into shared tooling, then added previews, and only then enabled automatic Kubernetes deployment.
 
-Three moves, in an order that mattered.
+## One review process, two execution paths
 
-### Every change became a pull request that deploys itself
+I migrated Kubernetes infrastructure into Argo CD component by component, until it managed its own configuration too. For Terraform, I introduced Atlantis so plans and applies ran from pull requests in a controlled environment.
 
-I migrated all Kubernetes infrastructure into Argo CD, which keeps a cluster in sync with what a git repository declares, component by component until Argo CD managed even itself. Then I deleted the hundreds of thousands of lines of legacy configuration the old world had left behind.
+**Terraform.** Reviewers see a plan, locking, and a cost estimate. Approved changes are applied through Atlantis.
 
-For cloud infrastructure I introduced Atlantis, which runs Terraform from pull request comments. Since then Terraform has run in exactly one place, on pull requests, never on laptops. Over the years I customized it: authentication through a GitHub App, applies blocked until approval, plan locking, a cost estimate commented on every pull request, and performance tuning as the repository grew.
+**Kubernetes.** Reviewers see a rendered diff for affected applications in development. After merge, Argo CD reconciles the configuration.
 
-### Kubernetes got what Atlantis gave Terraform
+Atlantis provided Terraform's preview. Kubernetes needed an equivalent, so I built a bot that renders affected applications through Argo CD and posts their differences on the pull request. Rendering errors fail the check before merge.
 
-Atlantis set the standard: every Terraform pull request shows the exact plan of what will change. Kubernetes reviews had nothing comparable; the reviewer read YAML and imagined the consequences. So I built a bot that comments on every Kubernetes pull request with the exact diff the cluster will see when Argo CD applies it. It has outlived four generations of the infrastructure around it and is still commenting today, three and a half years later.
+<figure class="media-exhibit wide" data-exhibit>
+  <div class="media-exhibit-frame">
+    <div class="exhibit-toolbar">
+      <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="exhibit-filename">argocd-diff-commenter</span>
+      <span class="exhibit-badge">PR PREVIEW</span>
+    </div>
+    <div class="media-exhibit-stage"><img src="/case-studies/making-infrastructure-changes-boring/argocd-diff-commenter.png" width="1560" height="1008" loading="lazy" decoding="async" alt="The Argo CD diff bot posts a pull-request comment showing an AWS Load Balancer Controller chart update from 3.4.3 to 3.5.0, rendered against development Argo CD." /></div>
+  </div>
+  <figcaption class="exhibit-caption"><span>EXHIBIT 01</span> — A dependency update arrives with a rendered diff in the pull request. This excerpt shows version-label changes on a <code>Secret</code> and a <code>Service</code>. The bot identity is anonymized.</figcaption>
+</figure>
 
-### Only then, auto-deployment
+The preview has a defined scope: selected platform directories and the development Argo CD instance. It helps reviewers catch manifest and dependency changes early; production-specific differences still need review during promotion.
 
-One month after the migration, once reviewers could inspect diffs and the pipeline had operating history, merged changes began applying themselves.
+A month after the migration, once reviewers had those previews and the pipeline had operating history, I enabled Kubernetes deployment on merge. Over time I added GitHub App authentication, approval checks, and performance improvements to Atlantis, and removed the obsolete configuration left by the migration.
 
-## What the path carries
+## Make routine Atlantis commands discoverable
 
-Four things ride it that would otherwise have needed tooling of their own.
+Atlantis is driven by pull request comments. Engineers repeatedly typed the same commands, looked up options, and corrected mistakes before the actual infrastructure work could begin. During migrations, that friction repeated across many pull requests.
 
-Upgrades. Kubernetes versions now move in a fixed order across four clusters, operations first, then development, staging and production, with control plane, nodes and core components each a separate reviewed pull request. A per-cluster dashboard of deprecated-API usage names the workloads the next version breaks, so they are fixed before the upgrade starts. It began as an exporter wrapped around kube-no-trouble and was later rebased onto the metric the API server grew for the same purpose.
+I built a browser extension that puts the common commands above GitHub's comment box. It fills and submits the existing composer as the logged-in user. It needs no additional GitHub token, backend service, or bot identity; Atlantis receives the same attributed comment the engineer could have typed.
 
-The exception. Blocking `terraform apply` until a pull request is approved is right almost every time, and wrong at 3 a.m. when the on-call engineer has no reviewer awake. Handing out admin rights or weakening branch protection would have made a permanent hole for an occasional problem. Instead, commenting `/approve reason="emergency: prod fix"` triggers a workflow that checks the commenter against an explicitly authorized team, and the commenter can never be the author. Every use is announced in a Slack audit channel with the approver, the pull request, the team whose authority was used and the stated reason, which the review itself records permanently. Membership of that team is the whole trust boundary.
+<figure class="media-exhibit wide" data-exhibit>
+  <div class="media-exhibit-frame">
+    <div class="exhibit-toolbar">
+      <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="exhibit-filename">atlantis-pr-buttons.png</span>
+      <span class="exhibit-badge">COMMANDS</span>
+    </div>
+    <div class="media-exhibit-stage"><img src="/case-studies/making-infrastructure-changes-boring/atlantis-pr-buttons.png" width="1654" height="676" loading="lazy" decoding="async" alt="Atlantis Plan, Approve, and Apply controls directly above GitHub's pull request comment box." /></div>
+  </div>
+  <figcaption class="exhibit-caption"><span>EXHIBIT 02</span> — Common commands beside the composer they use. Each action posts as the logged-in engineer.</figcaption>
+</figure>
 
-The typing. Atlantis is driven by typed comments whose project flags have to be exactly right, so a browser extension adds the common commands as buttons on the pull request page. It submits the comment as the logged-in user, through the box they would have typed into: no tokens, no server and no new identity to secure. The `apply` button has to be armed before it fires.
+- **Plan:** `atlantis plan` — one click.
+- **Approve:** `/approve` — one click; the workflow checks authorization.
+- **Apply:** `atlantis apply` — arm, then confirm.
+- **Apply without auto-merge:** `atlantis apply --auto-merge-disabled` — select the option, then confirm.
+- **Unlock:** `atlantis unlock` — select, then confirm.
 
-Deletion safety. An admission policy preserves cloud resources when a GitOps application is deleted, so removing an application definition cannot cascade into deleting what it managed.
 
-## What it changed
+Apply returns to its unarmed state after three seconds, and a short cooldown prevents double-posting. The extension limits itself to configured repositories and can check team membership before showing the controls. That browser-side check controls visibility; Atlantis and the approval workflow enforce authorization on the server.
 
-Infrastructure changes have one reviewable path: a visible plan or diff, a recorded approval, and a reversible history. Urgent work uses an attributed, announced override rather than a standing policy exception. Migrate first, prove visibility second, automate third, each step building the trust the next one needed, and that foundation carried the platform work that followed.
+<details>
+<summary>Watch the command and confirmation flow</summary>
+
+<figure class="media-exhibit wide" data-exhibit>
+  <div class="media-exhibit-frame">
+    <div class="exhibit-toolbar">
+      <span class="exhibit-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="exhibit-filename">atlantis-pr-buttons-demo.mp4</span>
+      <span class="exhibit-badge">DEMO</span>
+    </div>
+    <div class="media-exhibit-stage"><video src="/case-studies/making-infrastructure-changes-boring/atlantis-pr-buttons-demo.mp4" poster="/case-studies/making-infrastructure-changes-boring/atlantis-pr-buttons-demo-poster.png" width="880" height="588" controls playsinline preload="none" aria-label="Demonstration on a fictional pull request: Plan, Approve, two-stage Apply, Apply without auto-merge, and Unlock."></video></div>
+  </div>
+  <figcaption class="exhibit-caption"><span>EXHIBIT 03</span> — The interaction demonstrated on a mock pull request with fictional data. Apply and Unlock require confirmation.</figcaption>
+</figure>
+
+</details>
+
+## Make emergency approval explicit
+
+Requiring approval before `atlantis apply` created a practical question: how should an authorized on-call engineer proceed when an urgent fix cannot wait for normal peer review? I built a separate, auditable approval path:
+
+```text title="Pull request comment"
+/approve reason="emergency: restore service"
+```
+
+The workflow takes the commenter and pull request number from the dispatch event, so named command arguments cannot substitute another identity or target. It checks active membership in the configured authorized teams. An unauthorized request receives an explanation and no approval. An authorized request causes the CI bot to submit an approving review marked **Break-glass approval**.
+
+The review records the requester, the team that authorized them, the bot that executed the approval, and the reason when supplied. A Slack audit notification links to the pull request, diff, and original command. The review explicitly says that standard peer review was bypassed and calls for retrospective review under the break-glass policy.
+
+This is a delegated approval, not a second engineer's review. The current workflow permits an authorized PR author to invoke it, and the reason is optional in code. Team membership is the authorization boundary; the recorded identity and retrospective-review policy make its use accountable. The command grants an approval—it does not run `atlantis apply` itself.
+
+## Carry upgrades and deletion checks through the same process
+
+Kubernetes upgrades now follow a fixed order: operations, development, staging, then production. Control-plane, node, and component changes are separate pull requests, so a problem can be investigated before it reaches the next environment.
+
+I initially wrapped `kube-no-trouble` in an exporter to surface deprecated APIs on dashboards. The dashboard later moved to the API server's native `apiserver_requested_deprecated_apis` metric. Its table names the API group, version, resource, and removal release observed during the selected time window. It shows requests that actually occurred; repository scanning is still needed to find dormant manifests that nobody requested during that window.
+
+I also added a Kyverno policy checking resource-preservation settings on Argo CD `Application` and `ApplicationSet` resources. The checked-in policy runs in audit mode: it reports missing settings for follow-up rather than blocking deletion. Whether a deletion cascades still depends on the application's actual configuration.
+
+## What changed
+
+Engineers gained a consistent place to propose, inspect, approve, and execute infrastructure changes. The Kubernetes diff bot remained in use for three and a half years as the surrounding platform evolved. That review process became the foundation for later migrations, dependency updates, and supervised agent work.

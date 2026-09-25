@@ -1,9 +1,9 @@
 ---
 title: One tool version everywhere
-summary: One `mise.toml` per repository pins every tool for laptops and CI alike; a shared workflow installs from the same pins, so version drift stopped being a category of bug.
-role: Wrote the decision records that introduced asdf and later replaced it with mise, and rebuilt the shared pre-commit workflow around the pins.
-evidence: Setup is one command, `mise install`; the shared workflow runs from the same file, and fork pull requests can never write the cache.
-period: 2022–2024
+summary: "Repository tool definitions became the shared input for laptop setup and CI. One install command replaced manual setup, with cache isolation between repositories."
+role: "Introduced `asdf`, later evaluated and adopted `mise`, and rebuilt the shared pre-commit workflow around repository tool definitions."
+evidence: "Local setup and CI both use `mise.toml`; node-local caches are separated by repository, and fork pull requests skip that shared cache path."
+period: 2022–2026
 topics:
   - devex
   - delivery
@@ -16,15 +16,17 @@ spotlight: false
 cardLabel: sequel
 ---
 
-## The situation
+## Give local development and CI the same inputs
 
-"Works on my machine" almost always means "different tool versions". Two engineers run the same Terraform command and get different results; a pipeline breaks because CI has a newer formatter than the laptop that wrote the code. In 2022 I standardized the company on a version manager, asdf, through one of our first architecture decision records: every repository declares its tool versions and the manager installs them.
+Engineers sometimes ran the same command with different tool versions. A formatter could pass locally and fail in CI, or a Terraform command could behave differently on two laptops.
 
-It solved the consistency problem. Over two years the cracks showed: every command ran through a shim, a small stand-in binary that adds a layer of redirection, which made everything slightly slow, and plugin management was a chore nobody loved.
+In 2022 I introduced `asdf` through an architecture decision record: repositories would declare their tool versions, and the version manager would install them. In 2024 I evaluated `mise` as its replacement, documenting the migration and trade-offs. It supported the existing version files, which reduced the work required to move repositories over.
 
-## What I did
+The important change was a shared source of configuration. The repository's tool file now drives both onboarding and CI.
 
-In 2024 I wrote the superseding decision record, evaluated against the incumbent with the trade-offs in writing, negatives included, and moved the company to mise, a Rust reimplementation that reads the same version files, so the migration cost was near zero. Then I made the tool file the backbone of both onboarding and CI:
+## Keep setup with the code
+
+This example includes the infrastructure tools, hook manager, and runtimes used by repository checks. The comments explain why the less obvious dependencies belong in the shared setup:
 
 ```toml title="mise.toml"
 [tools]
@@ -32,32 +34,36 @@ prek           = "0.4.13"
 terraform      = "1.15.8"
 terramate      = "0.17.2"
 terraform-docs = "0.24.0"
-# runs the JS tests of one subsystem; stdlib test runner only
+# Runs a subsystem's JavaScript tests with the standard test runner.
 node           = "24"
-# runs a local pre-commit hook script; stdlib only
+# Runs a repository-local pre-commit hook.
 python         = "3.14.7"
-# the hook manager builds our Go hooks in an isolated toolchain
+# The hook manager builds our Go hooks in an isolated toolchain.
 go             = "1.26"
 
 [env]
-# repository-specific environment travels with the repository:
-# provider downloads go through the internal registry mirror
+# Route provider downloads through the internal registry mirror.
 TF_CLI_CONFIG_FILE = "{{config_root}}/.terraformrc"
 ```
 
-A new contributor's setup is one command, `mise install`. The file pins exact versions, and the comments say why each tool is there, so the configuration is its own onboarding document. Which tools deserve a pin at all is [a note of its own](/blog/posts/mise-faster-smarter-tool-versioning/).
+After installing `mise` and configuring repository access, a contributor runs `mise install`. The same file can carry repository-specific environment settings, such as the path to Terraform's registry configuration. Comments explain why less obvious tools are needed; [the selection criteria](/blog/posts/mise-faster-smarter-tool-versioning/) are documented separately.
 
-The same file drives CI. I rebuilt our centralized pre-commit workflow, one reusable GitHub Actions workflow that every repository calls instead of maintaining its own, to run inside a maintained mise container image and install from the very same pins. Local and CI can no longer disagree, and a fix to the workflow lands in every repository at once.
+In 2026, I rebuilt the reusable pre-commit workflow to install from these definitions inside a maintained `mise` image. Repositories call the shared workflow instead of maintaining their own setup scripts. Improvements reach callers through their workflow reference.
 
-## What the caching taught
+## Make caching an explicit choice
 
-The caching. Fast CI dies on cache mistakes, and each one taught a lesson that is now written into the workflow itself.
+Installing consistent versions solved one problem. Caching them introduced another: time spent moving caches, and the risk of tools leaking between repositories on shared runners.
 
-- Restoring the big tool archive can cost more than a fresh install, so tool caching is a per-repository toggle with that exact warning in its description.
-- Cache uploads were dominating pull request runs, so pull requests only restore the cache and only the main branch saves it.
-- On our in-cluster runners the cache moved to the node's local disk. The tool manager keeps one global directory, and a shared one leaks tools between repositories, so each repository gets its own isolated subdirectory.
-- Pull requests from forks are excluded from writing entirely: untrusted code must never poison a shared cache.
+**Cache only what helps.** Restoring a large tool archive can take longer than installing. Tool caching can be disabled independently of hook caching.
 
-## What it changed
+**Keep uploads off PRs.** Cache uploads extended pull request runs. Only the default branch saves the GitHub Actions caches.
 
-Setup went from a wiki page to one command. Version drift, between two laptops or between a laptop and CI, stopped being a category of bug. Because the workflow is centralized, the whole company's checks get faster every time one person improves one file, and the decision record that replaced asdf sits beside the one that introduced it.
+**Separate repositories.** `mise`'s shared data directory includes tools and shims. Node-local data is separated into a directory per repository.
+
+**Exclude fork PRs.** Fork pull requests run untrusted code, so they skip the shared node-local cache setup.
+
+The isolation matters as much as the cache hit rate. A repository should not pass a check because a previous job happened to install a tool it never declared.
+
+## What changed
+
+Tool setup became a command backed by versioned configuration. Local checks and CI consume the same declarations, making version mismatches easier to prevent and diagnose. The architecture record that replaced `asdf` remains alongside the original decision, preserving why the standard changed.

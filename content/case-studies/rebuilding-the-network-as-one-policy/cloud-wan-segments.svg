@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 670" role="img" aria-labelledby="cloud-wan-segments-title cloud-wan-segments-desc">
+<title id="cloud-wan-segments-title">Cloud Wan Segments</title>
+<desc id="cloud-wan-segments-desc">One AWS Cloud WAN policy defines four segments. Production and non-production each exchange routes with shared services, with no direct route sharing between production and non-production. Attachment membership checks both account and requested segment tag. Unmatched attachments enter quarantine, which shares no routes with other segments and isolates its attachments from each other. This diagram shows the policy relationships, not a live attachment inventory.</desc>
+<defs>
+<marker id="cloud-wan-segments-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 Z" fill="var(--color-accent, #72a8ff)"/></marker>
+<marker id="cloud-wan-segments-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 Z" fill="var(--color-text-subtle, #b4bfce)"/></marker>
+</defs>
+<rect width="720" height="670" fill="#0b1220"/>
+<rect x="24" y="16" width="672" height="82" rx="10" fill="var(--color-accent-surface, #192c48)" stroke="var(--color-accent, #72a8ff)" stroke-width="1.4"/>
+<text x="360.0" y="45" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-accent, #72a8ff)">One core network policy</text>
+<text x="360.0" y="69" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Membership checks account + requested segment tag</text>
+<rect x="24" y="126" width="672" height="336" rx="10" fill="none" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="44" y="153" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-accent, #72a8ff)">EXPLICIT ROUTE SHARING</text>
+<rect x="248" y="178" width="224" height="82" rx="10" fill="var(--color-accent-surface, #192c48)" stroke="var(--color-accent, #72a8ff)" stroke-width="1.4"/>
+<text x="360.0" y="207" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-accent, #72a8ff)">Shared services</text>
+<text x="360.0" y="231" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Common platform services</text>
+<rect x="44" y="338" width="254" height="96" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="171.0" y="367" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">Production</text>
+<text x="171.0" y="391" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Production workloads</text>
+<rect x="422" y="338" width="254" height="96" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="549.0" y="367" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">Non-production</text>
+<text x="549.0" y="391" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Development + staging</text>
+<path d="M174 332 L300 266" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#cloud-wan-segments-accent)" marker-start="url(#cloud-wan-segments-accent)"/>
+<path d="M546 332 L420 266" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#cloud-wan-segments-accent)" marker-start="url(#cloud-wan-segments-accent)"/>
+<text x="182" y="287" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">shared routes</text>
+<text x="538" y="287" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">shared routes</text>
+<path d="M310 381 H340" fill="none" stroke="var(--color-text-subtle, #b4bfce)" stroke-width="1.8" stroke-linejoin="round" stroke-dasharray="5 5"/>
+<path d="M380 381 H410" fill="none" stroke="var(--color-text-subtle, #b4bfce)" stroke-width="1.8" stroke-linejoin="round" stroke-dasharray="5 5"/>
+<path d="M354 372 L366 384 M366 372 L354 384" fill="none" stroke="var(--color-text-subtle, #b4bfce)" stroke-width="1.8" stroke-linejoin="round"/>
+<text x="360" y="408" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">NO DIRECT</text>
+<text x="360" y="423" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">SHARING</text>
+<rect x="24" y="498" width="672" height="154" rx="10" fill="none" stroke="var(--color-text-subtle, #b4bfce)" stroke-width="1.4" stroke-dasharray="6 5"/>
+<text x="44" y="526" text-anchor="start" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="var(--color-text-subtle, #b4bfce)">QUARANTINE · UNMATCHED ATTACHMENTS</text>
+<rect x="44" y="544" width="254" height="64" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4" stroke-dasharray="6 5"/>
+<text x="171.0" y="573" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">Attachment A</text>
+<text x="171.0" y="597" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Isolated</text>
+<rect x="422" y="544" width="254" height="64" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4" stroke-dasharray="6 5"/>
+<text x="549.0" y="573" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">Attachment B</text>
+<text x="549.0" y="597" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Isolated</text>
+<path d="M354 572 L366 584 M366 572 L354 584" fill="none" stroke="var(--color-text-subtle, #b4bfce)" stroke-width="1.8" stroke-linejoin="round"/>
+<text x="360" y="636" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">No segment sharing · attachments isolated from each other</text>
+</svg>

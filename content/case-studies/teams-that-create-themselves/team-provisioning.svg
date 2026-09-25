@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 720" role="img" aria-labelledby="team-provisioning-title team-provisioning-desc">
+<title id="team-provisioning-title">Team Provisioning</title>
+<desc id="team-provisioning-desc">One Payments engineering team defines team.json. Terramate generates Terraform, which is planned and applied after approval. The definition provisions three GitHub teams: default, frontend and backend. It also provisions a Slack channel, a service-catalog entry, two on-call schedules in London and New York, and alert destinations selected by owner, environment and urgency.</desc>
+<defs>
+<marker id="team-provisioning-accent" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 Z" fill="var(--color-accent, #72a8ff)"/></marker>
+<marker id="team-provisioning-muted" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 Z" fill="var(--color-text-subtle, #b4bfce)"/></marker>
+</defs>
+<rect width="720" height="720" fill="#0b1220"/>
+<rect x="170" y="18" width="380" height="84" rx="10" fill="var(--color-accent-surface, #192c48)" stroke="var(--color-accent, #72a8ff)" stroke-width="1.4"/>
+<text x="360.0" y="47" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-accent, #72a8ff)">Payments</text>
+<text x="360.0" y="71" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">One engineering team · team.json</text>
+<path d="M360 102 V131" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#team-provisioning-accent)"/>
+<rect x="170" y="138" width="380" height="84" rx="10" fill="var(--color-accent-surface, #192c48)" stroke="var(--color-accent, #72a8ff)" stroke-width="1.4"/>
+<text x="360.0" y="167" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-accent, #72a8ff)">Terramate → Terraform</text>
+<text x="360.0" y="191" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Generate → plan → approved apply</text>
+<path d="M360 222 V258 H138 V288" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#team-provisioning-accent)"/>
+<path d="M360 258 H294 V654" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round"/>
+<path d="M294 330 H319" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#team-provisioning-accent)"/>
+<path d="M294 438 H319" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#team-provisioning-accent)"/>
+<path d="M294 546 H319" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#team-provisioning-accent)"/>
+<path d="M294 654 H319" fill="none" stroke="var(--color-accent, #72a8ff)" stroke-width="1.8" stroke-linejoin="round" marker-end="url(#team-provisioning-accent)"/>
+<rect x="20" y="294" width="236" height="390" rx="10" fill="var(--color-accent-surface, #192c48)" stroke="var(--color-accent, #72a8ff)" stroke-width="1.4"/>
+<text x="138" y="325" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="17" font-weight="500" fill="var(--color-accent, #72a8ff)">GitHub teams</text>
+<text x="138" y="348" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Three groups, one owner</text>
+<rect x="42" y="372" width="192" height="80" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="138.0" y="401" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">default</text>
+<text x="138.0" y="425" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">All engineers</text>
+<rect x="42" y="472" width="192" height="80" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="138.0" y="501" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">frontend</text>
+<text x="138.0" y="525" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Web client</text>
+<rect x="42" y="572" width="192" height="80" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="138.0" y="601" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">backend</text>
+<text x="138.0" y="625" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">APIs and workers</text>
+<rect x="326" y="294" width="374" height="78" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="513.0" y="323" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">Slack</text>
+<text x="513.0" y="347" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">#team-payments</text>
+<rect x="326" y="402" width="374" height="78" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="513.0" y="431" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">Service catalog</text>
+<text x="513.0" y="455" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Payments ownership entry</text>
+<rect x="326" y="510" width="374" height="90" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="513.0" y="539" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">On-call schedules</text>
+<text x="513.0" y="563" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">London · 09:00–17:00</text>
+<text x="513.0" y="583" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">New York · 09:00–17:00</text>
+<rect x="326" y="618" width="374" height="78" rx="10" fill="var(--color-surface, #111a28)" stroke="var(--color-border, #455062)" stroke-width="1.4"/>
+<text x="513.0" y="647" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="16" font-weight="500" fill="var(--color-text, #f3f6fb)">Alert destinations</text>
+<text x="513.0" y="671" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="400" fill="var(--color-text-subtle, #b4bfce)">Owner + environment + urgency</text>
+</svg>
