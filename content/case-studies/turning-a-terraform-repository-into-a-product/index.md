@@ -56,7 +56,7 @@ As the inventory reached hundreds of stacks, directory conventions alone were in
     </div>
     <div class="media-exhibit-stage"><video src="/case-studies/turning-a-terraform-repository-into-a-product/terramate-stacks-explorer.mp4" poster="/case-studies/turning-a-terraform-repository-into-a-product/terramate-stacks-explorer-poster.webp" width="1400" height="800" controls playsinline preload="metadata" aria-label="Terminal recording: the stacks explorer lists twelve stacks; selecting one shows its four deployments grouped by environment, then the inventory is filtered to production and fuzzy-searched for eks"></video></div>
   </div>
-  <figcaption class="exhibit-caption"><span>EXHIBIT 01</span> — Twelve stacks, 22 deployments: browse, filter to one environment, search, then act on the selection</figcaption>
+  <figcaption class="exhibit-caption"><span>EXHIBIT 01</span> — 12 stacks, 22 deployments: browse, filter to one environment, search, then act on the selection.</figcaption>
 </figure>
 
 The recording uses a demonstration inventory. The [implementation notes](/blog/posts/building-an-interactive-tui-for-terramate-stacks/) explain how the explorer resolves stack metadata.

@@ -2,7 +2,7 @@
 title: Leaving Docker Hub without a flag day
 summary: "Registry mirrors and admission-time image rewrites let Kubernetes workloads move to our own registry before teams changed their manifests. The Docker Hub subscription was then retired."
 role: "Proposed and implemented the migration, including pull-through caches, staged rewrite policies, manifest updates, and subscription retirement."
-evidence: "The mirror served hundreds of images within weeks; the subscription was cancelled, and the rewrite rule remained as a fallback for old references."
+evidence: "The mirror served hundreds of images within weeks; the subscription was canceled, and the rewrite rule remained as a fallback for old references."
 topics:
   - cost
   - reliability
@@ -44,4 +44,4 @@ A year and a half later, the migration no longer needed its original explanatory
 
 ## What changed
 
-The Docker Hub subscription was cancelled. Image distribution gained centralized credentials and cache lifecycle rules, while Kubernetes workloads moved without a coordinated deployment freeze. The mirror layer also provided a distribution foundation for the [internal image factory](/case-studies/turning-container-images-from-a-liability-into-a-supply-chain/).
+The Docker Hub subscription was canceled. Image distribution gained centralized credentials and cache lifecycle rules, while Kubernetes workloads moved without a coordinated deployment freeze. The mirror layer also provided a distribution foundation for the [internal image factory](/case-studies/turning-container-images-from-a-liability-into-a-supply-chain/).

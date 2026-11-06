@@ -96,7 +96,7 @@ The cell configuration uses that deployment path:
 # Selected inputs from the alterNAT module invocation.
 architecture        = "arm64"
 lambda_package_type = "Zip"
-create_nat_gateways  = true
+create_nat_gateways = true
 ```
 
 ## What changed

@@ -46,7 +46,7 @@ go             = "1.26"
 TF_CLI_CONFIG_FILE = "{{config_root}}/.terraformrc"
 ```
 
-After installing `mise` and configuring repository access, a contributor runs `mise install`. The same file can carry repository-specific environment settings, such as the path to Terraform's registry configuration. Comments explain why less obvious tools are needed; [the selection criteria](/blog/posts/mise-faster-smarter-tool-versioning/) are documented separately.
+After installing `mise` and configuring repository access, a contributor runs `mise install`. The same file can carry repository-specific environment settings, such as the path to Terraform's registry configuration. [The selection criteria](/blog/posts/mise-faster-smarter-tool-versioning/) are documented separately.
 
 In 2026, I rebuilt the reusable pre-commit workflow to install from these definitions inside a maintained `mise` image. Repositories call the shared workflow instead of maintaining their own setup scripts. Improvements reach callers through their workflow reference.
 

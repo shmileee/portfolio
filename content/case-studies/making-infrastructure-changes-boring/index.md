@@ -114,7 +114,7 @@ The workflow takes the commenter and pull request number from the dispatch event
 
 The review records the requester, the team that authorized them, the bot that executed the approval, and the reason when supplied. A Slack audit notification links to the pull request, diff, and original command. The review explicitly says that standard peer review was bypassed and calls for retrospective review under the break-glass policy.
 
-This is a delegated approval, not a second engineer's review. The current workflow permits an authorized PR author to invoke it, and the reason is optional in code. Team membership is the authorization boundary; the recorded identity and retrospective-review policy make its use accountable. The command grants an approval—it does not run `atlantis apply` itself.
+This is a delegated approval, not a second engineer's review. The current workflow permits an authorized PR author to invoke it, and the reason is optional in code. Team membership is the authorization boundary; the recorded identity and retrospective-review policy make its use accountable. The command grants an approval — it does not run `atlantis apply` itself.
 
 ## Carry upgrades and deletion checks through the same process
 

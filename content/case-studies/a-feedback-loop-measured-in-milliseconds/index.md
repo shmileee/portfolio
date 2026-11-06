@@ -41,7 +41,7 @@ Locally, `prek` supplies matching staged files; CI uses `--all-files` to check a
 
 ## Measure the local check separately from CI
 
-I compared the old and replacement hooks on identical files from the pre-migration repository. The follow-up benchmark, run on 25 September 2026, measured the cost of formatting the same work:
+I compared the old and replacement hooks on identical files from the pre-migration repository. The follow-up benchmark, run on 25 September 2026, measured the cost of formatting the same work.
 
 The batched hook was **4.8× faster** for fifty files and **17.9× faster** for the full workload.
 
