@@ -9,4 +9,4 @@ links:
     label: ai tooling
 ---
 
-And because all of that existed, the newest chapter — **AI tooling for every developer, customer code running as self-service functions, and building new platforms in weeks instead of quarters** — was possible at all. The container supply chain below went from nothing to production in under a month, precisely because the pull request automation, releases, runners and hooks it depended on were already there.
+And because all of that existed, the newest chapter was possible at all: **AI tooling for every developer, customer code running as self-service functions, and new platforms built in weeks instead of quarters**. The container supply chain below went from nothing to production in under a month, because the pull request automation, releases, runners and hooks it depended on were already there.

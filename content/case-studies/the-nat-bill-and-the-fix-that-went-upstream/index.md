@@ -1,5 +1,5 @@
 ---
-title: The NAT bill and the fix that went upstream
+title: Cutting the NAT bill with NAT instances
 summary: "NAT instances became the default egress path with managed-gateway fallback. I contributed the deployment changes needed to run the failover function without a container build."
 role: "Adopted alterNAT, integrated it into the cell platform, and contributed Zip packaging and dependency removal upstream."
 evidence: "Two merged upstream pull requests; the production configuration uses the Zip deployment path and checks connectivity every minute."
@@ -23,7 +23,7 @@ This removes the managed gateway's per-gigabyte processing charge from traffic t
 
 ## Make the failure path part of the design
 
-alterNAT checks connectivity every minute. Failed checks or an instance termination trigger a route change to the managed gateway. A replacement instance restores the instance route during startup. Upstream also supports health-based restoration of a recovered instance through a separate opt-in setting.
+alterNAT checks connectivity every minute. Failed checks or an instance termination trigger a route change to the managed gateway. A replacement instance restores the instance route during startup. Upstream can also restore a recovered instance based on its health, through a separate opt-in setting.
 
 <figure class="concept-diagram" data-concept-diagram>
 <div class="diagram-exhibit" data-exhibit>
@@ -79,7 +79,7 @@ alterNAT checks connectivity every minute. Failed checks or an instance terminat
 
 The check interval is a detection cadence, not a guarantee of recovery within one minute.
 
-I introduced the system in the main VPCs, then made it an option in the [cell platform](/case-studies/environments-you-can-create-and-destroy-with-one-command/). The configuration uses ARM instances. It also allocates separate Elastic IPs for the instance and fallback gateway, allowing both egress addresses to be known and allowlisted ahead of a switch.
+I introduced the system in the main VPCs, then made it an option in the [cell platform](/case-studies/environments-you-can-create-and-destroy-with-one-command/). The configuration uses ARM instances. It also allocates separate Elastic IPs for the instance and fallback gateway, so both egress addresses are known and can be allowlisted ahead of a switch.
 
 ## Remove an unnecessary deployment dependency
 

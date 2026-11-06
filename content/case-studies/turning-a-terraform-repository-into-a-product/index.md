@@ -45,7 +45,7 @@ stacks/
 
 Shared imports generate backend and provider configuration. The deployment directory carries the configuration that varies by account and region. The migration runbook preserves the old state object as a rollback reference and verifies the new configuration through Atlantis before applying it.
 
-As the inventory reached hundreds of stacks, directory conventions alone were insufficient. I built a terminal explorer that groups stacks by identity and shows where each is deployed, with evaluated account, region, and environment settings. It also exposes recent Git history and table, JSON, and CSV output for scripting. Browsing the inventory does not require cloud credentials or elevated access.
+As the inventory reached hundreds of stacks, directory conventions alone were not enough. I built a terminal explorer that groups stacks by identity and shows where each is deployed, with evaluated account, region, and environment settings. It also exposes recent Git history and table, JSON, and CSV output for scripting. Browsing the inventory does not require cloud credentials or elevated access.
 
 <figure class="media-exhibit wide" data-exhibit>
   <div class="media-exhibit-frame">

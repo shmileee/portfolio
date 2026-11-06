@@ -120,7 +120,7 @@ This is a delegated approval, not a second engineer's review. The current workfl
 
 Kubernetes upgrades now follow a fixed order: operations, development, staging, then production. Control-plane, node, and component changes are separate pull requests, so a problem can be investigated before it reaches the next environment.
 
-I initially wrapped `kube-no-trouble` in an exporter to surface deprecated APIs on dashboards. The dashboard later moved to the API server's native `apiserver_requested_deprecated_apis` metric. Its table names the API group, version, resource, and removal release observed during the selected time window. It shows requests that actually occurred; repository scanning is still needed to find dormant manifests that nobody requested during that window.
+I initially wrapped `kube-no-trouble` in an exporter to surface deprecated APIs on dashboards. The dashboard later moved to the API server's native `apiserver_requested_deprecated_apis` metric. Its table names the API group, version, resource, and removal release observed during the selected time window. It shows requests that actually occurred. Repository scanning is still needed to find dormant manifests that nobody requested during that window.
 
 I also added a Kyverno policy checking resource-preservation settings on Argo CD `Application` and `ApplicationSet` resources. The checked-in policy runs in audit mode: it reports missing settings for follow-up rather than blocking deletion. Whether a deletion cascades still depends on the application's actual configuration.
 

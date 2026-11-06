@@ -63,7 +63,7 @@ spec:
     segment.bytes: 1000000000
 ```
 
-Keeping `metadata.name` separate from `spec.topicName` preserves Kafka names that contain characters Kubernetes object names cannot use. The `config` block carries workload-specific retention, compaction, and segment settings alongside partitions and replicas, making those decisions visible in the same review.
+Keeping `metadata.name` separate from `spec.topicName` preserves Kafka names that contain characters Kubernetes object names cannot use. The `config` block carries retention, compaction, and segment settings next to partitions and replicas, so those decisions are visible in the same review.
 
 ## Control both adoption and later changes
 
@@ -75,4 +75,4 @@ Production topic resources are synchronized into the service catalog, connecting
 
 ## What changed
 
-About 550 topics came under management without recreation. Topic changes became pull requests with owners, review, and history. The generated definitions replaced the runbook as the inventory, and the admission policies helped keep subsequent changes inside that workflow.
+About 550 topics came under management without recreation. Topic changes became pull requests with owners, review, and history. The generated definitions replaced the runbook as the inventory, and the admission policies helped keep later changes inside that workflow.

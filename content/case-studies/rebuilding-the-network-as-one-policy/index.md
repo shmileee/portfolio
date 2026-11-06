@@ -34,7 +34,7 @@ The migration needed evidence before it touched the state. I mapped every old re
 
 </div>
 
-The no-op proof applied to this representation change. The subsequent Cloud WAN redesign was a separate architectural change.
+The no-op proof applied to this representation change. The later Cloud WAN redesign was a separate architectural change.
 
 ## Express connectivity as policy
 
@@ -42,7 +42,7 @@ I proposed AWS Cloud WAN, and the team adopted the design. We also evaluated a t
 
 The Cloud WAN policy defines production, non-production, shared services, and quarantine. Production and non-production each exchange routes with shared services; quarantine shares no routes and isolates its attachments from one another.
 
-Production and non-production are not directly shared with each other. Attachment rules check both the owning account and the requested segment tag; unmatched combinations fall through to quarantine. A tag alone is insufficient to grant connectivity.
+Production and non-production are not directly shared with each other. Attachment rules check both the owning account and the requested segment tag; unmatched combinations fall through to quarantine. A tag alone is not enough to grant connectivity.
 
 <figure class="concept-diagram" data-concept-diagram>
 <div class="diagram-exhibit" data-exhibit>

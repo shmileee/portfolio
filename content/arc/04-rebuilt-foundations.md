@@ -7,4 +7,4 @@ links:
     label: environments
 ---
 
-On that foundation we could rebuild the hard things: the **network**, from about 15 module copies into segments defined in one policy, and then **entire environments** that can be created and destroyed with one command.
+On that foundation we could rebuild the hard things. First the **network**, from about 15 module copies into segments defined in one policy. Then **entire environments** that can be created and destroyed with one command.

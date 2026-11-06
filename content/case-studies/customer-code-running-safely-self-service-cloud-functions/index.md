@@ -62,7 +62,7 @@ The SDK service has a dedicated Kubernetes role for managing function claims. Cu
 
 ## Handle retries and lifecycle edges explicitly
 
-The build workflow checks for an active build or an existing successful version before starting work. It uses a version-scoped lock, handles lock contention, and includes recovery for expired locks. Successful versions have a separate artifact record, allowing repeated events to be recognized.
+The build workflow checks for an active build or an existing successful version before starting work. It uses a version-scoped lock, handles lock contention, and includes recovery for expired locks. Successful versions have a separate artifact record, so repeated events are recognized.
 
 Cleanup also needed attention when a function object was removed partway through provisioning. The composition declares deletion behavior for its managed resources, and the integration includes cleanup for stale composite objects.
 

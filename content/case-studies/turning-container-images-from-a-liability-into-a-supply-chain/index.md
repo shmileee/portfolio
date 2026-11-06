@@ -1,5 +1,5 @@
 ---
-title: Turning container images from a liability into a supply chain
+title: One build pipeline for every internal image
 summary: "I built a shared image pipeline and led the migration of 48 images in four days. Releases build for x86 and ARM, run tests, and verify published artifacts against their digests."
 role: "Designed and built the image factory, established its publishing contract, and created the migration playbook used by teammates."
 evidence: "48 images migrated in four days; 35 releases in the first 20 days; version conflicts, architecture mismatches, and publishing retries covered by tests."
@@ -62,11 +62,11 @@ spec:
 
 The primary version identifies our image release, while `upstream.version` identifies the third-party version it packages. A change to our `Dockerfile` can require a new primary version even when the upstream version stays the same.
 
-Pull requests validate, build, and run the declared test stages without publishing. The release workflow publishes after merge. Renovate reads upstream versions from the manifest and proposes updates; publishing changed content also requires a new primary version.
+Pull requests validate, build, and run the declared test stages without publishing. The release workflow publishes after merge. Renovate reads upstream versions from the manifest and proposes updates. Publishing changed content also requires a new primary version.
 
 ## Treat publishing as a separate correctness problem
 
-A successful build is insufficient evidence that a registry now contains the intended release. The publisher verifies each architecture's digest, assembles the multi-platform index, and checks that the published result matches the plan.
+A successful build is not enough evidence that a registry now contains the intended release. The publisher verifies each architecture's digest, assembles the multi-platform index, and checks that the published result matches the plan.
 
 <figure class="concept-diagram" data-concept-diagram>
 <div class="diagram-exhibit" data-exhibit>

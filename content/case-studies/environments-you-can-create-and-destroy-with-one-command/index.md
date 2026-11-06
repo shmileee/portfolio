@@ -147,7 +147,7 @@ resource "cellops_cell_runtime" "this" {
 
 If Kubernetes is unavailable, the provider continues to the AWS cleanup stages. Those final stages determine whether teardown can proceed. A resource still deleting is distinguished from one that is stuck; a failed verification stops destruction and lists the survivors.
 
-Progress is checkpointed in Terraform's private state. A retry can resume completed work, but each phase is also safe to re-enter if the checkpoint is unavailable. During normal refresh, the provider reports attached resources outside its tag-based discovery scope, exposing potential cleanup problems before a destroy is requested.
+Progress is checkpointed in Terraform's private state. A retry can resume completed work, but each phase is also safe to re-enter if the checkpoint is unavailable. During a normal refresh, the provider reports attached resources outside its tag-based discovery scope. That exposes possible cleanup problems before a destroy is requested.
 
 ## What changed
 

@@ -1,5 +1,5 @@
 ---
-title: The fleet that patches itself while engineers are watching
+title: Patching Kubernetes nodes on a schedule
 summary: "Security-image builds and scheduled node replacement became one workflow: automatic adoption in lower environments, with an explicit image-version review before production rollout."
 role: "Designed the image and rotation policy, coordinated its review, and co-built the event-driven image pipeline with two teammates."
 evidence: "Lower environments adopt new images within hours when rotation windows allow; production pins image IDs and promotes them through reviewed pull requests."

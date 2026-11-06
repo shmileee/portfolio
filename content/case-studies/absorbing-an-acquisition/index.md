@@ -42,9 +42,9 @@ The migration covered both runtime dependencies and the team's operating workflo
 
 We rehearsed database export and import, deployed to staging and production, and performed a dry run before changing DNS in a scheduled maintenance window.
 
-The routing change itself was one configuration line, designed to be reversed in seconds. That made the DNS decision reversible; the database migration still required its own rehearsal and coordinated maintenance window.
+The routing change itself was one configuration line, designed to be reversed in seconds. That made the DNS decision reversible. The database migration still needed its own rehearsal and maintenance window.
 
-Preparing the deployment and monitoring workflows early meant the acquired team could continue shipping during the migration and use the shared operational tooling from the first day on the new platform.
+Preparing the deployment and monitoring workflows early meant the acquired team could keep shipping during the migration. They could use the shared operational tooling from the first day on the new platform.
 
 ## What changed
 

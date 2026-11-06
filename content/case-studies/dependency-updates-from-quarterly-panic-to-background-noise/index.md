@@ -27,7 +27,7 @@ I deployed a self-hosted Renovate instance with access to our private registries
 
 For our own modules, I established structured commits and automated releases across the repositories our team maintained. Without consistent version tags, the bot could not discover or propose those updates.
 
-I reviewed the stream of infrastructure changes throughout that period. The useful evidence was the effect of an update: a Terraform plan, rendered Kubernetes diff, or relevant build and test results. A patch-version label by itself was insufficient.
+I reviewed the stream of infrastructure changes throughout that period. The useful evidence was the effect of an update: a Terraform plan, rendered Kubernetes diff, or relevant build and test results. A patch-version label by itself was not enough.
 
 ## Encode the repeatable review decisions
 

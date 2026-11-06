@@ -1,5 +1,5 @@
 ---
-title: Teams that create themselves
+title: Team setup as one pull request
 summary: "Engineering teams provision their collaboration tools, on-call schedules, and alert routing through a reviewed pull request backed by one team definition."
 role: "Designed the team definition and built the Terraform and Terramate automation across the connected services."
 evidence: "About 30 team stacks used the workflow; engineers outside the platform team could provision team resources and alert destinations themselves."
@@ -126,7 +126,7 @@ A schema documents the accepted attributes. The generated Terraform is separated
 
 Provisioning channels alone would still leave a manual handoff. I connected team setup to alert routing so alerts for the team's services reach its own destinations once the configuration is applied.
 
-The routing contract uses a team owner label together with environment and urgency. Shared routing rules consume those labels, while the team module creates the schedules, escalation policies, and channels they resolve to. That keeps new teams from requiring another bespoke set of routing rules.
+The routing contract uses a team owner label together with environment and urgency. Shared routing rules consume those labels, while the team module creates the schedules, escalation policies, and channels they resolve to. That means new teams do not need their own set of routing rules.
 
 The [generator walkthrough](/blog/posts/generating-terraform-for-teams-from-one-json-file/) covers the configuration flow. As adoption grew, the FireHydrant provider's rate limiting and state behavior became a separate reliability problem, addressed in [the provider fork](/case-studies/the-fork-that-needed-a-home/).
 

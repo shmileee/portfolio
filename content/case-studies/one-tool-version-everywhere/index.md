@@ -66,4 +66,4 @@ The isolation matters as much as the cache hit rate. A repository should not pas
 
 ## What changed
 
-Tool setup became a command backed by versioned configuration. Local checks and CI consume the same declarations, making version mismatches easier to prevent and diagnose. The architecture record that replaced `asdf` remains alongside the original decision, preserving why the standard changed.
+Tool setup became a command backed by versioned configuration. Local checks and CI consume the same declarations, making version mismatches easier to prevent and diagnose. The architecture record that replaced `asdf` sits next to the original decision, preserving why the standard changed.

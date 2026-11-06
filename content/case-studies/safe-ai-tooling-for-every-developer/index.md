@@ -73,7 +73,7 @@ One upstream upgrade exposed a useful integration edge: the dashboard MCP server
 
 ## Give agents the repository context they need
 
-I wrote `AGENTS.md` guidance for the core platform repositories, focusing on information an agent could not infer from a single file: contracts consumed by other repositories, generated paths, access conventions, and changes that require coordination.
+I wrote `AGENTS.md` guidance for the core platform repositories. It focuses on information an agent could not infer from a single file: contracts consumed by other repositories, generated paths, access conventions, and changes that need coordination.
 
 For example, a Vault role declared in the Terraform repository is consumed by external-secret resources in the Kubernetes repository. Renaming it can break a consumer without changing that consumer’s files. The guidance names that contract and points to both sides, so an agent can identify the coordination required before editing.
 

@@ -1,5 +1,5 @@
 ---
-title: Leaving Docker Hub without a flag day
+title: Leaving Docker Hub one namespace at a time
 summary: "Registry mirrors and admission-time image rewrites let Kubernetes workloads move to our own registry before teams changed their manifests. The Docker Hub subscription was then retired."
 role: "Proposed and implemented the migration, including pull-through caches, staged rewrite policies, manifest updates, and subscription retirement."
 evidence: "The mirror served hundreds of images within weeks; the subscription was canceled, and the rewrite rule remained as a fallback for old references."
@@ -34,7 +34,7 @@ Next I introduced Kyverno mutation policies that rewrite image references when K
 
 I rolled the policies out one namespace at a time. Teams continued deploying while image pulls moved through the mirror, which was serving hundreds of images within weeks. The [cache configuration](/blog/posts/setting-up-pull-through-cache-repositories-in-aws-ecr/) and [rewrite policy](/blog/posts/rewriting-docker-image-registries-with-kyverno/) are documented separately.
 
-The mirror serves cached content from our cloud account. Cache fills and refreshes still depend on the upstream registry, so this reduces direct dependency on Docker Hub during routine pulls without making upstream availability irrelevant.
+The mirror serves cached content from our cloud account. Cache fills and refreshes still depend on the upstream registry. So this reduces direct dependence on Docker Hub during routine pulls, but upstream availability still matters.
 
 ## Finish the source migration without removing compatibility
 

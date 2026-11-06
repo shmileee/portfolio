@@ -1,5 +1,5 @@
 ---
-title: The fork that needed a home
+title: Fixing and hosting a Terraform provider fork
 summary: "I fixed a Terraform provider that was blocking team automation, then built a registry to distribute the fork through normal version pins and signed releases."
 role: "Forked and fixed the FireHydrant provider, reported the issues upstream, and established the internal registry and publishing workflow."
 evidence: "Provider fixes completed in four days, with the registry built in parallel in three; about 30 team stacks used the fork."
@@ -49,7 +49,7 @@ terraform {
 
 Exact pins make the fork version explicit and avoid ambiguity around pre-release version constraints.
 
-Publishing starts with a version tag. CI assumes a scoped AWS role through GitHub OIDC, retrieves the GPG signing key from Secrets Manager, builds the provider binaries, and publishes them with signed checksums to object storage. The registry serves the provider protocol and download locations; the publishing workflow does not need to upload through the registry's HTTP service.
+Publishing starts with a version tag. CI assumes a scoped AWS role through GitHub OIDC, retrieves the GPG signing key from Secrets Manager, builds the provider binaries, and publishes them with signed checksums to object storage. The registry serves the provider protocol and download locations. The publishing workflow does not need to upload through the registry's HTTP service.
 
 This keeps static AWS credentials and the stored signing key out of CI configuration. The signing key still exists and is retrieved for the release job.
 
