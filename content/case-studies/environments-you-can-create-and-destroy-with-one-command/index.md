@@ -38,7 +38,7 @@ Terraform then installs the Flux operator and declares the Flux runtime. Flux re
 
 Cluster metadata crosses the Terraform-to-Flux boundary through a generated `ConfigMap`. Environment and region variations use reusable Kustomize components. Guardrails reject unresolved substitutions in generated paths, so missing metadata surfaces as a reconciliation failure.
 
-Network attachment and [NAT instances](/case-studies/the-nat-bill-and-the-fix-that-went-upstream/) are explicit options. The network attachment manager also maintains a registry consumed by network and secrets automation. Its key includes account, region, and cluster identity so equal names in different locations cannot overwrite one another.
+Network attachment and [NAT instances](/case-studies/cutting-the-nat-bill-with-nat-instances/) are explicit options. The network attachment manager also maintains a registry consumed by network and secrets automation. Its key includes account, region, and cluster identity so equal names in different locations cannot overwrite one another.
 
 ## Make teardown an enforced dependency
 

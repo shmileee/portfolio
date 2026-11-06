@@ -8,6 +8,7 @@ topics:
   - networking
 order: 11
 aliases:
+  - the-nat-bill-and-the-fix-that-went-upstream
   - the-nat-bill-and-the-open-source-fix-i-helped-ship
   - 15-the-nat-bill-and-the-open-source-fix-i-helped-ship
   - nat-cost

@@ -8,6 +8,7 @@ topics:
   - reliability
 order: 8
 aliases:
+  - the-fleet-that-patches-itself
   - 12-the-fleet-that-patches-itself
   - fleet-patching
 featured: true

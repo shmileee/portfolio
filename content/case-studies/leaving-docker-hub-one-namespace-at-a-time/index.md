@@ -9,6 +9,7 @@ topics:
   - security
 order: 13
 aliases:
+  - leaving-docker-hub-without-anyone-noticing
   - 17-leaving-docker-hub-without-anyone-noticing
   - registry-migration
 featured: false
@@ -44,4 +45,4 @@ A year and a half later, the migration no longer needed its original explanatory
 
 ## What changed
 
-The Docker Hub subscription was canceled. Image distribution gained centralized credentials and cache lifecycle rules, while Kubernetes workloads moved without a coordinated deployment freeze. The mirror layer also provided a distribution foundation for the [internal image build pipeline](/case-studies/turning-container-images-from-a-liability-into-a-supply-chain/).
+The Docker Hub subscription was canceled. Image distribution gained centralized credentials and cache lifecycle rules, while Kubernetes workloads moved without a coordinated deployment freeze. The mirror layer also provided a distribution foundation for the [internal image build pipeline](/case-studies/one-build-pipeline-for-every-internal-image/).

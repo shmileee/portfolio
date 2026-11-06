@@ -3,7 +3,7 @@ number: 5
 links:
   - study: absorbing-an-acquisition
     label: acquisition
-  - study: leaving-docker-hub-without-anyone-noticing
+  - study: leaving-docker-hub-one-namespace-at-a-time
     label: docker hub
 ---
 

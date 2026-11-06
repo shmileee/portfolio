@@ -1,7 +1,7 @@
 ---
 number: 6
 links:
-  - study: turning-container-images-from-a-liability-into-a-supply-chain
+  - study: one-build-pipeline-for-every-internal-image
     label: image pipeline
   - study: customer-code-running-safely-self-service-cloud-functions
     label: cloud functions

@@ -65,7 +65,7 @@ The recording uses a demonstration inventory. The [implementation notes](/blog/p
 
 I started a Terraform community channel, answered beginner questions, and provided worked examples. That support made the conventions easier to adopt and gave me feedback about where the workflow remained confusing.
 
-The provider registry from [Fixing and hosting a Terraform provider fork](/case-studies/the-fork-that-needed-a-home/) later added a common distribution point for custom and mirrored providers.
+The provider registry from [Fixing and hosting a Terraform provider fork](/case-studies/fixing-and-hosting-a-terraform-provider-fork/) later added a common distribution point for custom and mirrored providers.
 
 ## What changed
 

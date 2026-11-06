@@ -9,6 +9,7 @@ topics:
   - delivery
 order: 15
 aliases:
+  - turning-container-images-from-a-liability-into-a-supply-chain
   - 19-turning-container-images-from-a-liability-into-a-supply-chain
   - container-supply-chain
 featured: true
