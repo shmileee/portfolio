@@ -18,7 +18,7 @@ spotlight: false
 
 The FireHydrant Terraform provider failed under our usage pattern. About 30 team stacks planned against one account. Parallel runs hit rate limits after upstream request throttling was removed. Two resources repeatedly reported changes that had already been applied, and a data source crashed when it encountered duplicate records.
 
-The [team provisioning workflow](/case-studies/teams-that-create-themselves/) depended on those resources. I forked the provider and completed the fixes in four days.
+The workflow in [Team setup as one pull request](/case-studies/teams-that-create-themselves/) depended on those resources. I forked the provider and completed the fixes in four days.
 
 ## Address the distinct failure modes
 

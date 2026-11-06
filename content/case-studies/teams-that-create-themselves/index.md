@@ -128,7 +128,7 @@ Provisioning channels alone would still leave a manual handoff. I connected team
 
 The routing contract uses a team owner label together with environment and urgency. Shared routing rules consume those labels, while the team module creates the schedules, escalation policies, and channels they resolve to. That means new teams do not need their own set of routing rules.
 
-The [generator walkthrough](/blog/posts/generating-terraform-for-teams-from-one-json-file/) covers the configuration flow. As adoption grew, the FireHydrant provider's rate limiting and state behavior became a separate reliability problem, addressed in [the provider fork](/case-studies/the-fork-that-needed-a-home/).
+The [generator walkthrough](/blog/posts/generating-terraform-for-teams-from-one-json-file/) covers the configuration flow. As adoption grew, the FireHydrant provider's rate limiting and state behavior became a separate reliability problem, addressed in [Fixing and hosting a Terraform provider fork](/case-studies/the-fork-that-needed-a-home/).
 
 ## What changed
 
